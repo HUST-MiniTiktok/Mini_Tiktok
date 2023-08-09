@@ -1,4 +1,4 @@
-run_command: "go run main.go"
+run_command: go run main.go
 debug:
   support: true
   launch:
