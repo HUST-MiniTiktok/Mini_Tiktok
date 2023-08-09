@@ -1,3 +1,3 @@
 module github.com/HUST-MiniTiktok/mini_tiktok
 
-go 1.20
+go 1.17
