@@ -3,7 +3,7 @@
 package publishservice
 
 import (
-	publish "github.com/HUST-MiniTiktok/mini_tiktok/service/publish/kitex_gen/publish"
+	publish "github.com/HUST-MiniTiktok/mini_tiktok/biz/publish/kitex_gen/publish"
 	server "github.com/cloudwego/kitex/server"
 )
 

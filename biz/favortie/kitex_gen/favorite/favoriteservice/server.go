@@ -2,7 +2,7 @@
 package favoriteservice
 
 import (
-	favorite "github.com/HUST-MiniTiktok/mini_tiktok/service/favortie/kitex_gen/favorite"
+	favorite "github.com/HUST-MiniTiktok/mini_tiktok/biz/favortie/kitex_gen/favorite"
 	server "github.com/cloudwego/kitex/server"
 )
 

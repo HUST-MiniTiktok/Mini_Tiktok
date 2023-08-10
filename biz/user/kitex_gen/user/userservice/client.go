@@ -4,7 +4,7 @@ package userservice
 
 import (
 	"context"
-	user "github.com/HUST-MiniTiktok/mini_tiktok/service/user/kitex_gen/user"
+	user "github.com/HUST-MiniTiktok/mini_tiktok/biz/user/kitex_gen/user"
 	client "github.com/cloudwego/kitex/client"
 	callopt "github.com/cloudwego/kitex/client/callopt"
 )

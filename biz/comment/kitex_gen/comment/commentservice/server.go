@@ -2,7 +2,7 @@
 package commentservice
 
 import (
-	comment "github.com/HUST-MiniTiktok/mini_tiktok/service/comment/kitex_gen/comment"
+	comment "github.com/HUST-MiniTiktok/mini_tiktok/biz/comment/kitex_gen/comment"
 	server "github.com/cloudwego/kitex/server"
 )
 

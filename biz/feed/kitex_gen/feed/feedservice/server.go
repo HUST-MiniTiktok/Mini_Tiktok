@@ -2,7 +2,7 @@
 package feedservice
 
 import (
-	feed "github.com/HUST-MiniTiktok/mini_tiktok/service/feed/kitex_gen/feed"
+	feed "github.com/HUST-MiniTiktok/mini_tiktok/biz/feed/kitex_gen/feed"
 	server "github.com/cloudwego/kitex/server"
 )
 

@@ -4,7 +4,7 @@ package publishservice
 
 import (
 	"context"
-	publish "github.com/HUST-MiniTiktok/mini_tiktok/service/publish/kitex_gen/publish"
+	publish "github.com/HUST-MiniTiktok/mini_tiktok/biz/publish/kitex_gen/publish"
 	client "github.com/cloudwego/kitex/client"
 	kitex "github.com/cloudwego/kitex/pkg/serviceinfo"
 )

@@ -4,7 +4,7 @@ package commentservice
 
 import (
 	"context"
-	comment "github.com/HUST-MiniTiktok/mini_tiktok/service/comment/kitex_gen/comment"
+	comment "github.com/HUST-MiniTiktok/mini_tiktok/biz/comment/kitex_gen/comment"
 	client "github.com/cloudwego/kitex/client"
 	callopt "github.com/cloudwego/kitex/client/callopt"
 )
