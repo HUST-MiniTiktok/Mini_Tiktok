@@ -16,3 +16,5 @@ func GetVideoFeed(ctx context.Context, latest_time int64) ([]*model.Video, error
 	}
 	return result, nil
 }
+
+//TODO：其他的数据库操作，比如查询、更新等
