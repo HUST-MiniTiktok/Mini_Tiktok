@@ -2544,7 +2544,7 @@ func (p *FavoriteListResponse) Field3DeepEqual(src []*Video) bool {
 }
 
 type FavoriteService interface {
-	FavoriteAction(ctx context.Context, request *FavoriteListRequest) (r *FavoriteActionResponse, err error)
+	FavoriteAction(ctx context.Context, request *FavoriteActionRequest) (r *FavoriteActionResponse, err error)
 
 	FavoriteList(ctx context.Context, request *FavoriteListRequest) (r *FavoriteListResponse, err error)
 }
@@ -2575,7 +2575,7 @@ func (p *FavoriteServiceClient) Client_() thrift.TClient {
 	return p.c
 }
 
-func (p *FavoriteServiceClient) FavoriteAction(ctx context.Context, request *FavoriteListRequest) (r *FavoriteActionResponse, err error) {
+func (p *FavoriteServiceClient) FavoriteAction(ctx context.Context, request *FavoriteActionRequest) (r *FavoriteActionResponse, err error) {
 	var _args FavoriteServiceFavoriteActionArgs
 	_args.Request = request
 	var _result FavoriteServiceFavoriteActionResult
@@ -2733,7 +2733,7 @@ func (p *favoriteServiceProcessorFavoriteList) Process(ctx context.Context, seqI
 }
 
 type FavoriteServiceFavoriteActionArgs struct {
-	Request *FavoriteListRequest `thrift:"request,1" frugal:"1,default,FavoriteListRequest" json:"request"`
+	Request *FavoriteActionRequest `thrift:"request,1" frugal:"1,default,FavoriteActionRequest" json:"request"`
 }
 
 func NewFavoriteServiceFavoriteActionArgs() *FavoriteServiceFavoriteActionArgs {
@@ -2744,15 +2744,15 @@ func (p *FavoriteServiceFavoriteActionArgs) InitDefault() {
 	*p = FavoriteServiceFavoriteActionArgs{}
 }
 
-var FavoriteServiceFavoriteActionArgs_Request_DEFAULT *FavoriteListRequest
+var FavoriteServiceFavoriteActionArgs_Request_DEFAULT *FavoriteActionRequest
 
-func (p *FavoriteServiceFavoriteActionArgs) GetRequest() (v *FavoriteListRequest) {
+func (p *FavoriteServiceFavoriteActionArgs) GetRequest() (v *FavoriteActionRequest) {
 	if !p.IsSetRequest() {
 		return FavoriteServiceFavoriteActionArgs_Request_DEFAULT
 	}
 	return p.Request
 }
-func (p *FavoriteServiceFavoriteActionArgs) SetRequest(val *FavoriteListRequest) {
+func (p *FavoriteServiceFavoriteActionArgs) SetRequest(val *FavoriteActionRequest) {
 	p.Request = val
 }
 
@@ -2824,7 +2824,7 @@ ReadStructEndError:
 }
 
 func (p *FavoriteServiceFavoriteActionArgs) ReadField1(iprot thrift.TProtocol) error {
-	p.Request = NewFavoriteListRequest()
+	p.Request = NewFavoriteActionRequest()
 	if err := p.Request.Read(iprot); err != nil {
 		return err
 	}
@@ -2896,7 +2896,7 @@ func (p *FavoriteServiceFavoriteActionArgs) DeepEqual(ano *FavoriteServiceFavori
 	return true
 }
 
-func (p *FavoriteServiceFavoriteActionArgs) Field1DeepEqual(src *FavoriteListRequest) bool {
+func (p *FavoriteServiceFavoriteActionArgs) Field1DeepEqual(src *FavoriteActionRequest) bool {
 
 	if !p.Request.DeepEqual(src) {
 		return false

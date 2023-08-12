@@ -9,7 +9,7 @@ import (
 type FavoriteServiceImpl struct{}
 
 // FavoriteAction implements the FavoriteServiceImpl interface.
-func (s *FavoriteServiceImpl) FavoriteAction(ctx context.Context, request *favorite.FavoriteListRequest) (resp *favorite.FavoriteActionResponse, err error) {
+func (s *FavoriteServiceImpl) FavoriteAction(ctx context.Context, request *favorite.FavoriteActionRequest) (resp *favorite.FavoriteActionResponse, err error) {
 	// TODO: Your code here...
 	return
 }

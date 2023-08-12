@@ -13,7 +13,7 @@ func init() {
 	var err error
 	Conf, err = InitConfig()
 	if err != nil {
-		panic(err)
+		klog.Fatal(err)
 	}
 }
 

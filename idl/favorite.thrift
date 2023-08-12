@@ -49,7 +49,7 @@ struct FavoriteListResponse {
 
 service FavoriteService {
     // 赞操作
-    FavoriteActionResponse FavoriteAction (1: FavoriteListRequest request) (api.post = "/douyin/favorite/action/")
+    FavoriteActionResponse FavoriteAction (1: FavoriteActionRequest request) (api.post = "/douyin/favorite/action/")
     // 喜欢列表
     FavoriteListResponse FavoriteList (1: FavoriteListRequest request) (api.get = "/douyin/favorite/list/")
 }
