@@ -20,7 +20,7 @@ func PublishAction(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-
+	//TODO: 业务逻辑
 	resp := new(publish.PublishActionResponse)
 
 	c.JSON(consts.StatusOK, resp)
@@ -36,7 +36,7 @@ func PublishList(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-
+	//TODO: 业务逻辑
 	resp := new(publish.PublishListResponse)
 
 	c.JSON(consts.StatusOK, resp)

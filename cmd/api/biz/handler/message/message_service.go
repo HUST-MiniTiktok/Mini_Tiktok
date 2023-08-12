@@ -20,7 +20,7 @@ func MessageChat(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-
+	//TODO: 业务逻辑
 	resp := new(message.MessageChatResponse)
 
 	c.JSON(consts.StatusOK, resp)
@@ -36,7 +36,7 @@ func MessageAction(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-
+	//TODO: 业务逻辑
 	resp := new(message.MessageActionResponse)
 
 	c.JSON(consts.StatusOK, resp)

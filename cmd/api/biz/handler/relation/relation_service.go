@@ -20,7 +20,7 @@ func RelationAction(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-
+	//TODO: 业务逻辑
 	resp := new(relation.RelationActionResponse)
 
 	c.JSON(consts.StatusOK, resp)
@@ -36,7 +36,7 @@ func RelationFollowList(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-
+	//TODO: 业务逻辑
 	resp := new(relation.RelationFollowListResponse)
 
 	c.JSON(consts.StatusOK, resp)
@@ -52,7 +52,7 @@ func RelationFollowerList(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-
+	//TODO: 业务逻辑
 	resp := new(relation.RelationFollowerListResponse)
 
 	c.JSON(consts.StatusOK, resp)
@@ -68,7 +68,7 @@ func RelationFriendList(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-
+	//TODO: 业务逻辑
 	resp := new(relation.RelationFriendListResponse)
 
 	c.JSON(consts.StatusOK, resp)

@@ -20,7 +20,7 @@ func User(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-
+	//TODO: 业务逻辑
 	resp := new(user.UserResponse)
 
 	c.JSON(consts.StatusOK, resp)
@@ -36,7 +36,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-
+	//TODO: 业务逻辑
 	resp := new(user.UserRegisterResponse)
 
 	c.JSON(consts.StatusOK, resp)
@@ -52,7 +52,7 @@ func Login(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-
+	//TODO: 业务逻辑
 	resp := new(user.UserLoginResponse)
 
 	c.JSON(consts.StatusOK, resp)

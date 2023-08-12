@@ -20,7 +20,7 @@ func CommentAction(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-
+	//TODO: 业务逻辑
 	resp := new(comment.CommentActionResponse)
 
 	c.JSON(consts.StatusOK, resp)
@@ -36,7 +36,7 @@ func CommentList(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-
+	//TODO: 业务逻辑
 	resp := new(comment.CommentListResponse)
 
 	c.JSON(consts.StatusOK, resp)

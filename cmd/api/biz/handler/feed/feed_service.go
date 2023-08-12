@@ -20,7 +20,7 @@ func GetFeed(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-
+	//TODO: 业务逻辑
 	resp := new(feed.FeedResponse)
 
 	c.JSON(consts.StatusOK, resp)
