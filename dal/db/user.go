@@ -1,11 +1,26 @@
 package db
 
-import  (
+import (
 	"context"
-	model "github.com/HUST-MiniTiktok/mini_tiktok/dal/db/model"
+	"gorm.io/gorm"
 )
 
-func CreateUser(ctx context.Context, user *model.User) (id int64, err error) {
+const UserTableName = "user"
+
+type User struct {
+	gorm.Model
+	UserName        string `json:"username"`
+	Password        string `json:"password"`
+	Avatar          string `json:"avatar"`
+	BackgroundImage string `json:"background_image"`
+	Signature       string `json:"signature"`
+}
+
+func (User) TableName() string {
+	return UserTableName
+}
+
+func CreateUser(ctx context.Context, user *User) (id int64, err error) {
 	err = DB.WithContext(ctx).Create(user).Error
 	id = int64(user.ID)
 	return

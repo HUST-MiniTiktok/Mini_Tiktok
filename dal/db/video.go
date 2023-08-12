@@ -2,11 +2,27 @@ package db
 
 import (
 	"context"
-	model "github.com/HUST-MiniTiktok/mini_tiktok/dal/db/model"
+	"gorm.io/gorm"
+	"time"
 )
 
-func GetVideoFeed(ctx context.Context, latest_time int64) ([]*model.Video, error) {
-	result := make([]*model.Video, 0)
+const VideoTableName = "video"
+
+type Video struct {
+	gorm.Model
+	AuthorID    int64     `json:"authorID"`
+	PlayURL     string    `json:"playURL"`
+	CoverURL    string    `json:"coverURL"`
+	PublishTime time.Time `json:"publishTime"`
+	Title       string    `json:"title"`
+}
+
+func (Video) TableName() string {
+	return VideoTableName
+}
+
+func GetVideoFeed(ctx context.Context, latest_time int64) ([]*Video, error) {
+	result := make([]*Video, 0)
 	if err := DB.WithContext(ctx).
 		Where("created_at < ?", latest_time).
 		Order("created_at desc").
