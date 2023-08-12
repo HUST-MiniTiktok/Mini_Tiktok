@@ -48,6 +48,8 @@ struct PublishListResponse {
 }
 
 service PublishService {
-    PublishActionResponse PublishAction (1: PublishActionRequest request)
-    PublishListResponse PublishList (1: PublishListRequest request)
+    // 投稿接口
+    PublishActionResponse PublishAction (1: PublishActionRequest request) (api.post = "/douyin/publish/action/")
+    // 发布列表
+    PublishListResponse PublishList (1: PublishListRequest request) (api.get = "/douyin/publish/list/")
 }

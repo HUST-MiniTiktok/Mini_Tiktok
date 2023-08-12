@@ -50,7 +50,10 @@ struct UserResponse {
 }
 
 service UserService {
-    UserRegisterResponse Register(1: UserRegisterRequest request) // 用户注册
-    UserLoginResponse Login(1: UserLoginRequest request)          // 用户登录
-    UserResponse GetUserById(1: UserRequest request)              // 获取用户信息
+    // 用户信息
+    UserResponse User(1: UserRequest request) (api.get = "/douyin/user/")
+    // 用户注册
+    UserRegisterResponse Register(1: UserRegisterRequest request) (api.post = "/douyin/user/register/")
+    // 用户登录
+    UserLoginResponse Login(1: UserLoginRequest request) (api.post = "/douyin/user/login/")
 }

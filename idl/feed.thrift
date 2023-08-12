@@ -37,17 +37,7 @@ struct FeedResponse {
     4: optional i64 next_time                           // 本次返回的视频中，发布最早的时间，作为下次请求时的latest_time
 }
 
-struct GetVideoByIdRequest {
-    1: i64 id  // 视频唯一标识
-}
-
-struct GetVideoByIdResponse {
-    1: i32 status_code (go.tag="json:\"status_code\"")  // 状态码，0-成功，其他值-失败
-    2: optional string status_msg                       // 返回状态描述
-    3: Video video                                      // 视频信息
-}
-
 service FeedService {
-    FeedResponse GetFeed(1: FeedRequest request)
-    GetVideoByIdResponse GetVideoById(1: GetVideoByIdRequest request)
+    // 视频流接口
+    FeedResponse GetFeed(1: FeedRequest request) (api.get = "/douyin/feed/")
 }

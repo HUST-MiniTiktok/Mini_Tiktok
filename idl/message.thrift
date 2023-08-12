@@ -33,6 +33,8 @@ struct MessageActionResponse {
 }
 
 service MessageService {
-    MessageChatResponse MessageChat(MessageChatRequest request)
-    MessageActionResponse MessageAction(MessageActionRequest request)
+    // 聊天记录
+    MessageChatResponse MessageChat(MessageChatRequest request) (api.get = "/douyin/message/chat/")
+    // 发送消息
+    MessageActionResponse MessageAction(MessageActionRequest request) (api.post = "/douyin/message/action/")
 }

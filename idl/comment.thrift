@@ -47,6 +47,8 @@ struct CommentListResponse {
 }
 
 service CommentService {
-    CommentActionResponse CommentAction(1: CommentActionRequest request)
-    CommentListResponse CommentList(1: CommentListRequest request)
+    // 评论操作
+    CommentActionResponse CommentAction(1: CommentActionRequest request) (api.post = "/douyin/comment/action/")
+    // 评论列表
+    CommentListResponse CommentList(1: CommentListRequest request) (api.get = "/douyin/comment/list/")
 }
