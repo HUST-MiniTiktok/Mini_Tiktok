@@ -20,10 +20,12 @@ func init() {
 func InitConfig() (*viper.Viper, error) {
 	v := viper.New()
 	v.BindEnv("GO_ENV")
-	// 当环境变量GO_ENV未设置时，默认使用dev配置
 	if v.GetString("GO_ENV") == "prod" {
 		v.SetConfigName("prod")
+	} else if v.GetString("GO_ENV") == "test" {
+		v.SetConfigName("test")
 	} else {
+		// 当环境变量GO_ENV未设置时，默认使用dev配置
 		v.SetConfigName("dev")
 	}
 	v.SetConfigType("yaml")

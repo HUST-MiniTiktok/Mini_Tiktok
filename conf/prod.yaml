@@ -11,6 +11,7 @@ db:
     db: 0
     username: ""
     password: ""
+    auth: ""
 
 registry:
   address:
