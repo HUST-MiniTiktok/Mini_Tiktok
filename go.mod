@@ -56,7 +56,6 @@ require (
 	github.com/cloudwego/thriftgo v0.2.11 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/pprof v0.0.0-20220608213341-c488b8fa1db3 // indirect
-	github.com/hertz-contrib/registry/etcd v0.0.0-20230731080040-f474f58b3da2
 	github.com/jhump/protoreflect v1.8.2 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kitex-contrib/registry-etcd v0.1.0
