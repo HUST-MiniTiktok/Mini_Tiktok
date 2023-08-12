@@ -25,6 +25,11 @@ func (p *User) IsValid() error {
 	return nil
 }
 func (p *FriendUser) IsValid() error {
+	if p.User != nil {
+		if err := p.User.IsValid(); err != nil {
+			return fmt.Errorf("field User not valid, %w", err)
+		}
+	}
 	return nil
 }
 func (p *RelationActionRequest) IsValid() error {

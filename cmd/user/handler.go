@@ -8,6 +8,12 @@ import (
 // UserServiceImpl implements the last service interface defined in the IDL.
 type UserServiceImpl struct{}
 
+// User implements the UserServiceImpl interface.
+func (s *UserServiceImpl) User(ctx context.Context, request *user.UserRequest) (resp *user.UserResponse, err error) {
+	// TODO: Your code here...
+	return
+}
+
 // Register implements the UserServiceImpl interface.
 func (s *UserServiceImpl) Register(ctx context.Context, request *user.UserRegisterRequest) (resp *user.UserRegisterResponse, err error) {
 	// TODO: Your code here...
@@ -16,12 +22,6 @@ func (s *UserServiceImpl) Register(ctx context.Context, request *user.UserRegist
 
 // Login implements the UserServiceImpl interface.
 func (s *UserServiceImpl) Login(ctx context.Context, request *user.UserLoginRequest) (resp *user.UserLoginResponse, err error) {
-	// TODO: Your code here...
-	return
-}
-
-// GetUserById implements the UserServiceImpl interface.
-func (s *UserServiceImpl) GetUserById(ctx context.Context, request *user.UserRequest) (resp *user.UserResponse, err error) {
 	// TODO: Your code here...
 	return
 }

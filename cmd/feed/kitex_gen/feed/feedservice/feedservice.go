@@ -19,8 +19,7 @@ func NewServiceInfo() *kitex.ServiceInfo {
 	serviceName := "FeedService"
 	handlerType := (*feed.FeedService)(nil)
 	methods := map[string]kitex.MethodInfo{
-		"GetFeed":      kitex.NewMethodInfo(getFeedHandler, newFeedServiceGetFeedArgs, newFeedServiceGetFeedResult, false),
-		"GetVideoById": kitex.NewMethodInfo(getVideoByIdHandler, newFeedServiceGetVideoByIdArgs, newFeedServiceGetVideoByIdResult, false),
+		"GetFeed": kitex.NewMethodInfo(getFeedHandler, newFeedServiceGetFeedArgs, newFeedServiceGetFeedResult, false),
 	}
 	extra := map[string]interface{}{
 		"PackageName": "feed",
@@ -54,24 +53,6 @@ func newFeedServiceGetFeedResult() interface{} {
 	return feed.NewFeedServiceGetFeedResult()
 }
 
-func getVideoByIdHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
-	realArg := arg.(*feed.FeedServiceGetVideoByIdArgs)
-	realResult := result.(*feed.FeedServiceGetVideoByIdResult)
-	success, err := handler.(feed.FeedService).GetVideoById(ctx, realArg.Request)
-	if err != nil {
-		return err
-	}
-	realResult.Success = success
-	return nil
-}
-func newFeedServiceGetVideoByIdArgs() interface{} {
-	return feed.NewFeedServiceGetVideoByIdArgs()
-}
-
-func newFeedServiceGetVideoByIdResult() interface{} {
-	return feed.NewFeedServiceGetVideoByIdResult()
-}
-
 type kClient struct {
 	c client.Client
 }
@@ -87,16 +68,6 @@ func (p *kClient) GetFeed(ctx context.Context, request *feed.FeedRequest) (r *fe
 	_args.Request = request
 	var _result feed.FeedServiceGetFeedResult
 	if err = p.c.Call(ctx, "GetFeed", &_args, &_result); err != nil {
-		return
-	}
-	return _result.GetSuccess(), nil
-}
-
-func (p *kClient) GetVideoById(ctx context.Context, request *feed.GetVideoByIdRequest) (r *feed.GetVideoByIdResponse, err error) {
-	var _args feed.FeedServiceGetVideoByIdArgs
-	_args.Request = request
-	var _result feed.FeedServiceGetVideoByIdResult
-	if err = p.c.Call(ctx, "GetVideoById", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

@@ -13,9 +13,3 @@ func (s *FeedServiceImpl) GetFeed(ctx context.Context, request *feed.FeedRequest
 	// TODO: Your code here...
 	return
 }
-
-// GetVideoById implements the FeedServiceImpl interface.
-func (s *FeedServiceImpl) GetVideoById(ctx context.Context, request *feed.GetVideoByIdRequest) (resp *feed.GetVideoByIdResponse, err error) {
-	// TODO: Your code here...
-	return
-}

@@ -19,9 +19,9 @@ func NewServiceInfo() *kitex.ServiceInfo {
 	serviceName := "UserService"
 	handlerType := (*user.UserService)(nil)
 	methods := map[string]kitex.MethodInfo{
-		"Register":    kitex.NewMethodInfo(registerHandler, newUserServiceRegisterArgs, newUserServiceRegisterResult, false),
-		"Login":       kitex.NewMethodInfo(loginHandler, newUserServiceLoginArgs, newUserServiceLoginResult, false),
-		"GetUserById": kitex.NewMethodInfo(getUserByIdHandler, newUserServiceGetUserByIdArgs, newUserServiceGetUserByIdResult, false),
+		"User":     kitex.NewMethodInfo(userHandler, newUserServiceUserArgs, newUserServiceUserResult, false),
+		"Register": kitex.NewMethodInfo(registerHandler, newUserServiceRegisterArgs, newUserServiceRegisterResult, false),
+		"Login":    kitex.NewMethodInfo(loginHandler, newUserServiceLoginArgs, newUserServiceLoginResult, false),
 	}
 	extra := map[string]interface{}{
 		"PackageName": "user",
@@ -35,6 +35,24 @@ func NewServiceInfo() *kitex.ServiceInfo {
 		Extra:           extra,
 	}
 	return svcInfo
+}
+
+func userHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*user.UserServiceUserArgs)
+	realResult := result.(*user.UserServiceUserResult)
+	success, err := handler.(user.UserService).User(ctx, realArg.Request)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newUserServiceUserArgs() interface{} {
+	return user.NewUserServiceUserArgs()
+}
+
+func newUserServiceUserResult() interface{} {
+	return user.NewUserServiceUserResult()
 }
 
 func registerHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
@@ -73,24 +91,6 @@ func newUserServiceLoginResult() interface{} {
 	return user.NewUserServiceLoginResult()
 }
 
-func getUserByIdHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
-	realArg := arg.(*user.UserServiceGetUserByIdArgs)
-	realResult := result.(*user.UserServiceGetUserByIdResult)
-	success, err := handler.(user.UserService).GetUserById(ctx, realArg.Request)
-	if err != nil {
-		return err
-	}
-	realResult.Success = success
-	return nil
-}
-func newUserServiceGetUserByIdArgs() interface{} {
-	return user.NewUserServiceGetUserByIdArgs()
-}
-
-func newUserServiceGetUserByIdResult() interface{} {
-	return user.NewUserServiceGetUserByIdResult()
-}
-
 type kClient struct {
 	c client.Client
 }
@@ -99,6 +99,16 @@ func newServiceClient(c client.Client) *kClient {
 	return &kClient{
 		c: c,
 	}
+}
+
+func (p *kClient) User(ctx context.Context, request *user.UserRequest) (r *user.UserResponse, err error) {
+	var _args user.UserServiceUserArgs
+	_args.Request = request
+	var _result user.UserServiceUserResult
+	if err = p.c.Call(ctx, "User", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
 }
 
 func (p *kClient) Register(ctx context.Context, request *user.UserRegisterRequest) (r *user.UserRegisterResponse, err error) {
@@ -116,16 +126,6 @@ func (p *kClient) Login(ctx context.Context, request *user.UserLoginRequest) (r 
 	_args.Request = request
 	var _result user.UserServiceLoginResult
 	if err = p.c.Call(ctx, "Login", &_args, &_result); err != nil {
-		return
-	}
-	return _result.GetSuccess(), nil
-}
-
-func (p *kClient) GetUserById(ctx context.Context, request *user.UserRequest) (r *user.UserResponse, err error) {
-	var _args user.UserServiceGetUserByIdArgs
-	_args.Request = request
-	var _result user.UserServiceGetUserByIdResult
-	if err = p.c.Call(ctx, "GetUserById", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
