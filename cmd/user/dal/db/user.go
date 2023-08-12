@@ -1,4 +1,4 @@
-package mysql
+package db
 
 import (
 	"context"
@@ -26,4 +26,4 @@ func CreateUser(ctx context.Context, user *User) (id int64, err error) {
 	return
 }
 
-//TODO：其他的数据库操作，比如查询、更新等
+//TODO: 其他的数据库操作，比如查询、更新等

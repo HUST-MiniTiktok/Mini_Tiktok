@@ -1,4 +1,4 @@
-package mysql
+package db
 
 import (
 	"context"
@@ -33,4 +33,4 @@ func GetVideoFeed(ctx context.Context, latest_time int64) ([]*Video, error) {
 	return result, nil
 }
 
-//TODO：其他的数据库操作，比如查询、更新等
+//TODO: 其他的数据库操作，比如查询、更新等

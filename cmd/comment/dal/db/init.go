@@ -1,4 +1,4 @@
-package mysql
+package db
 
 import (
 	"gorm.io/gorm"
@@ -15,7 +15,7 @@ func Init() {
 	DB, err = gorm.Open(mysql.Open(conf.GetConf().GetString("db.mysql.dsn")),
 		&gorm.Config{
 			PrepareStmt:            true,
-		//	SkipDefaultTransaction: true,
+			SkipDefaultTransaction: true,
 		},
 	)
 	if err != nil {
