@@ -1,6 +1,6 @@
 
 #!/bin/bash
-RUN_NAME=
+RUN_NAME=hertz_service
 mkdir -p output/bin
 cp script/* output 2>/dev/null
 chmod +x output/bootstrap.sh

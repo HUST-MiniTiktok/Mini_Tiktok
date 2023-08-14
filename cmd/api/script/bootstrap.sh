@@ -1,6 +1,6 @@
 
 #!/bin/bash
 CURDIR=$(cd $(dirname $0); pwd)
-BinaryName=
+BinaryName=hertz_service
 echo "$CURDIR/bin/${BinaryName}"
 exec $CURDIR/bin/${BinaryName}

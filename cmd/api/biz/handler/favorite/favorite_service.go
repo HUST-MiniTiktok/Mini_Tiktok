@@ -5,7 +5,7 @@ package favorite
 import (
 	"context"
 
-	favorite "github.com/HUST-MiniTiktok/mini_tiktok/cmd/favorite/kitex_gen/favorite"
+	favorite "github.com/HUST-MiniTiktok/mini_tiktok/biz/model/favorite"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
@@ -14,13 +14,13 @@ import (
 // @router /douyin/favorite/action/ [POST]
 func FavoriteAction(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req favorite.FavoriteListRequest
+	var req favorite.FavoriteActionRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-	//TODO: 业务逻辑
+
 	resp := new(favorite.FavoriteActionResponse)
 
 	c.JSON(consts.StatusOK, resp)
@@ -36,7 +36,7 @@ func FavoriteList(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-	//TODO: 业务逻辑
+
 	resp := new(favorite.FavoriteListResponse)
 
 	c.JSON(consts.StatusOK, resp)

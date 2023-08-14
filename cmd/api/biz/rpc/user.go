@@ -19,18 +19,19 @@ var (
 func init() {
 	r, err := etcd.NewEtcdResolver(conf.GetConf().GetStringSlice("registry.address"))
 	if err != nil {
-		klog.Fatalf("new resolver failed: %v", err)
+		klog.Fatalf("new resolver failed: %v", err.Error())
 	}
 	userClient, err = userservice.NewClient("user", client.WithResolver(r))
 	if err != nil {
-		klog.Fatalf("new user client failed: %v", err)
+		klog.Fatalf("new user client failed: %v", err.Error())
 	}
 }
 
 func User(context context.Context, req *user.UserRequest) (resp *user.UserResponse, err error) {
+	klog.Warnf("user req: %v", req)
 	resp, err = userClient.User(context, req)
 	if err != nil {
-		klog.Errorf("user client failed: %v", err)
+		klog.Errorf("user client failed: %v", err.Error())
 		return nil, err
 	}
 	if resp.StatusCode != 0 {
@@ -40,10 +41,11 @@ func User(context context.Context, req *user.UserRequest) (resp *user.UserRespon
 	return resp, nil
 }
 
-func Login(context context.Context, req *user.UserLoginRequest) (resp *user.UserLoginResponse,err error) {
+func Login(context context.Context, req *user.UserLoginRequest) (resp *user.UserLoginResponse, err error) {
+	klog.Warnf("login req: %v", req)
 	resp, err = userClient.Login(context, req)
 	if err != nil {
-		klog.Errorf("user client failed: %v", err)
+		klog.Errorf("user client failed: %v", err.Error())
 		return nil, err
 	}
 	if resp.StatusCode != 0 {
@@ -53,10 +55,11 @@ func Login(context context.Context, req *user.UserLoginRequest) (resp *user.User
 	return resp, nil
 }
 
-func Register(context context.Context, req *user.UserRegisterRequest) (resp *user.UserRegisterResponse,err error) {
+func Register(context context.Context, req *user.UserRegisterRequest) (resp *user.UserRegisterResponse, err error) {
+	klog.Warnf("register req: %v", req)
 	resp, err = userClient.Register(context, req)
 	if err != nil {
-		klog.Errorf("user client failed: %v", err)
+		klog.Errorf("user client failed: %v", err.Error())
 		return nil, err
 	}
 	if resp.StatusCode != 0 {
@@ -65,4 +68,3 @@ func Register(context context.Context, req *user.UserRegisterRequest) (resp *use
 	}
 	return resp, nil
 }
-

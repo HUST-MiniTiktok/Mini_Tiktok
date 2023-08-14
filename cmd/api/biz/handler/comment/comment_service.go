@@ -5,7 +5,7 @@ package comment
 import (
 	"context"
 
-	comment "github.com/HUST-MiniTiktok/mini_tiktok/cmd/comment/kitex_gen/comment"
+	comment "github.com/HUST-MiniTiktok/mini_tiktok/biz/model/comment"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
@@ -20,7 +20,7 @@ func CommentAction(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-	//TODO: 业务逻辑
+
 	resp := new(comment.CommentActionResponse)
 
 	c.JSON(consts.StatusOK, resp)
@@ -36,7 +36,7 @@ func CommentList(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-	//TODO: 业务逻辑
+
 	resp := new(comment.CommentListResponse)
 
 	c.JSON(consts.StatusOK, resp)

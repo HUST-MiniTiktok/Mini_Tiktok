@@ -3,7 +3,7 @@
 package comment
 
 import (
-	comment "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/handler/comment"
+	comment "github.com/HUST-MiniTiktok/mini_tiktok/biz/handler/comment"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 

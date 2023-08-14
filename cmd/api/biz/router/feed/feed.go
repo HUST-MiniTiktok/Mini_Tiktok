@@ -3,7 +3,7 @@
 package feed
 
 import (
-	feed "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/handler/feed"
+	feed "github.com/HUST-MiniTiktok/mini_tiktok/biz/handler/feed"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 

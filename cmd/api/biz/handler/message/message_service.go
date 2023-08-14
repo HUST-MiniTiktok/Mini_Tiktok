@@ -5,7 +5,7 @@ package message
 import (
 	"context"
 
-	message "github.com/HUST-MiniTiktok/mini_tiktok/cmd/message/kitex_gen/message"
+	message "github.com/HUST-MiniTiktok/mini_tiktok/biz/model/message"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
@@ -20,7 +20,7 @@ func MessageChat(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-	//TODO: 业务逻辑
+
 	resp := new(message.MessageChatResponse)
 
 	c.JSON(consts.StatusOK, resp)
@@ -36,7 +36,7 @@ func MessageAction(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-	//TODO: 业务逻辑
+
 	resp := new(message.MessageActionResponse)
 
 	c.JSON(consts.StatusOK, resp)

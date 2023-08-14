@@ -5,8 +5,7 @@ package user
 import (
 	"context"
 
-	user "github.com/HUST-MiniTiktok/mini_tiktok/cmd/user/kitex_gen/user"
-	rpc "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/rpc"
+	user "github.com/HUST-MiniTiktok/mini_tiktok/biz/model/user"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
@@ -22,10 +21,7 @@ func User(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp, err := rpc.User(ctx, &req)
-	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error())
-	}
+	resp := new(user.UserResponse)
 
 	c.JSON(consts.StatusOK, resp)
 }
@@ -41,10 +37,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp, err := rpc.Register(ctx, &req)
-	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error())
-	}
+	resp := new(user.UserRegisterResponse)
 
 	c.JSON(consts.StatusOK, resp)
 }
@@ -59,11 +52,8 @@ func Login(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-	
-	resp, err := rpc.Login(ctx, &req)
-	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error())
-	}
+
+	resp := new(user.UserLoginResponse)
 
 	c.JSON(consts.StatusOK, resp)
 }

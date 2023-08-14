@@ -5,7 +5,7 @@ package feed
 import (
 	"context"
 
-	feed "github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/kitex_gen/feed"
+	feed "github.com/HUST-MiniTiktok/mini_tiktok/biz/model/feed"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
@@ -20,7 +20,7 @@ func GetFeed(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-	//TODO: 业务逻辑
+
 	resp := new(feed.FeedResponse)
 
 	c.JSON(consts.StatusOK, resp)

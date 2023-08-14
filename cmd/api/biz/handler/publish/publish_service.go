@@ -5,7 +5,7 @@ package publish
 import (
 	"context"
 
-	publish "github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/kitex_gen/publish"
+	publish "github.com/HUST-MiniTiktok/mini_tiktok/biz/model/publish"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
@@ -20,7 +20,7 @@ func PublishAction(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-	//TODO: 业务逻辑
+
 	resp := new(publish.PublishActionResponse)
 
 	c.JSON(consts.StatusOK, resp)
@@ -36,7 +36,7 @@ func PublishList(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-	//TODO: 业务逻辑
+
 	resp := new(publish.PublishListResponse)
 
 	c.JSON(consts.StatusOK, resp)
