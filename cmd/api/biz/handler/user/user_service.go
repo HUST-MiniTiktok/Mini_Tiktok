@@ -6,6 +6,7 @@ import (
 	"context"
 
 	user "github.com/HUST-MiniTiktok/mini_tiktok/cmd/user/kitex_gen/user"
+	rpc "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/rpc"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
@@ -20,8 +21,11 @@ func User(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-	//TODO: 业务逻辑
-	resp := new(user.UserResponse)
+
+	resp, err := rpc.User(ctx, &req)
+	if err != nil {
+		c.String(consts.StatusInternalServerError, err.Error())
+	}
 
 	c.JSON(consts.StatusOK, resp)
 }
@@ -36,8 +40,11 @@ func Register(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-	//TODO: 业务逻辑
-	resp := new(user.UserRegisterResponse)
+
+	resp, err := rpc.Register(ctx, &req)
+	if err != nil {
+		c.String(consts.StatusInternalServerError, err.Error())
+	}
 
 	c.JSON(consts.StatusOK, resp)
 }
@@ -52,8 +59,11 @@ func Login(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-	//TODO: 业务逻辑
-	resp := new(user.UserLoginResponse)
+	
+	resp, err := rpc.Login(ctx, &req)
+	if err != nil {
+		c.String(consts.StatusInternalServerError, err.Error())
+	}
 
 	c.JSON(consts.StatusOK, resp)
 }

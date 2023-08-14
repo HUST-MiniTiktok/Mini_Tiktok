@@ -51,6 +51,22 @@ services:
       - dev
       - release
 
+  etcd:
+    image: bitnami/etcd:latest
+    container_name: tiktok_etcd
+    ports:
+      - "12004:2379"
+    volumes:
+      - ./docker/etcd/data/:/bitnami/etcd/data
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+      - ALLOW_NONE_AUTHENTICATION=yes
+      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd-server:2379
+    profiles:
+      - dev
+      - release
+
   tiktok:
     image: tiktok:latest
     container_name: tiktok_main
