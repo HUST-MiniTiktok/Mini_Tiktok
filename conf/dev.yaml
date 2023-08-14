@@ -4,7 +4,7 @@ app:
   
 db:
   mysql:
-    dsn: "root:root@tcp(127.0.0.1:3306)/mini_tiktok?charset=utf8mb4&parseTime=True&loc=Local"
+    dsn: "mini_tiktok_user:mini_tiktok_pass@tcp(127.0.0.1:12000)/mini_tiktok?charset=utf8mb4&parseTime=True&loc=Local"
   redis:
     host: 127.0.0.1
     port: 6067

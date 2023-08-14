@@ -4,3 +4,4 @@
 .1024feature*
 .nfs*
 node_modules
+**/data/*

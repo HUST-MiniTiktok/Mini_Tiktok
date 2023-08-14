@@ -1,0 +1,64 @@
+version: '3'
+
+services:
+  mysql:
+    image: 'mysql:latest'
+    container_name: tiktok_mysql
+    volumes:
+      - ./docker/mysql/sql:/docker-entrypoint-initdb.d
+    ports:
+      - "12000:3306"
+    environment:
+      - MYSQL_DATABASE=mini_tiktok
+      - MYSQL_USER=mini_tiktok_user
+      - MYSQL_PASSWORD=mini_tiktok_pass
+      - MYSQL_RANDOM_ROOT_PASSWORD="yes"
+    restart: always
+    profiles:
+      - dev
+      - release
+
+  minio:
+    image: minio/minio
+    container_name: tiktok_minio
+    ports:
+      - "12001:9000"
+      - "12002:9001"
+    environment:
+      MINIO_ACCESS_KEY: mini_tiktok_user
+      MINIO_SECRET_KEY: mini_tiktok_pass
+    volumes:
+      - ./docker/minio/data/:/data
+      - ./docker/minio/config/:/root/.minio
+    command: server --console-address ':9001' /data
+    privileged: true
+    restart: always
+    profiles:
+      - dev
+      - release
+
+  redis:
+    image: redis:7
+    container_name: tiktok_redis
+    ports:
+      - "12003:6379"
+    volumes:
+      - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./docker/redis/data/:/data
+    command: redis-server /usr/local/etc/redis/redis.conf
+    restart: always
+    profiles:
+      - dev
+      - release
+
+  tiktok:
+    image: tiktok:latest
+    container_name: tiktok_main
+    depends_on:
+      - mysql
+      - redis
+      - minio
+    restart: always
+    network_mode: host
+    profiles:
+      - release

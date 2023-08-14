@@ -1,6 +1,9 @@
 package conf
 
 import (
+	"path"
+	"runtime"
+
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/spf13/viper"
 )
@@ -29,7 +32,9 @@ func InitConfig() (*viper.Viper, error) {
 		v.SetConfigName("dev")
 	}
 	v.SetConfigType("yaml")
-	v.AddConfigPath(".")
+	_, filename, _, _ := runtime.Caller(0)
+	root := path.Dir(path.Dir(filename))
+	v.AddConfigPath(root + "/conf")
 	if err := v.ReadInConfig(); err == nil {
 		klog.Info("Using config: ", v.ConfigFileUsed())
 	} else {
