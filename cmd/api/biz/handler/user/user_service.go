@@ -6,6 +6,9 @@ import (
 	"context"
 
 	user "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/user"
+	rpc "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/rpc"
+	kitex_user "github.com/HUST-MiniTiktok/mini_tiktok/cmd/user/kitex_gen/user"
+	_ "github.com/HUST-MiniTiktok/mini_tiktok/cmd/user/kitex_gen/user/userservice"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
@@ -21,8 +24,32 @@ func User(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(user.UserResponse)
+	kitex_resp, err := rpc.User(ctx, &kitex_user.UserRequest{
+		UserId: req.UserID,
+		Token:  req.Token,
+	})
 
+	if err != nil {
+		c.String(consts.StatusInternalServerError, err.Error())
+		return
+	}
+
+	resp := &user.UserResponse{
+		StatusCode: kitex_resp.StatusCode,
+		StatusMsg:  kitex_resp.StatusMsg,
+		User: &user.User{ID: kitex_resp.User.Id,
+			Name:            kitex_resp.User.Name,
+			FollowCount:     kitex_resp.User.FollowCount,
+			FollowerCount:   kitex_resp.User.FollowerCount,
+			IsFollow:        kitex_resp.User.IsFollow,
+			Avatar:          kitex_resp.User.Avatar,
+			BackgroundImage: kitex_resp.User.BackgroundImage,
+			Signature:       kitex_resp.User.Signature,
+			TotalFavorited:  kitex_resp.User.TotalFavorited,
+			WorkCount:       kitex_resp.User.WorkCount,
+			FavoriteCount:   kitex_resp.User.FavoriteCount,
+		},
+	}
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -37,7 +64,22 @@ func Register(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(user.UserRegisterResponse)
+	kitex_resp, err := rpc.Register(ctx, &kitex_user.UserRegisterRequest{
+		Username: req.Username,
+		Password: req.Password,
+	})
+
+	if err != nil {
+		c.String(consts.StatusInternalServerError, err.Error())
+		return
+	}
+
+	resp := &user.UserRegisterResponse{
+		StatusCode: kitex_resp.StatusCode,
+		StatusMsg:  kitex_resp.StatusMsg,
+		UserID:     kitex_resp.UserId,
+		Token:      kitex_resp.Token,
+	}
 
 	c.JSON(consts.StatusOK, resp)
 }
@@ -53,7 +95,22 @@ func Login(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(user.UserLoginResponse)
+	kitex_resp, err := rpc.Login(ctx, &kitex_user.UserLoginRequest{
+		Username: req.Username,
+		Password: req.Password,
+	})
+
+	if err != nil {
+		c.String(consts.StatusInternalServerError, err.Error())
+		return
+	}
+
+	resp := &user.UserLoginResponse{
+		StatusCode: kitex_resp.StatusCode,
+		StatusMsg:  kitex_resp.StatusMsg,
+		UserID:     kitex_resp.UserId,
+		Token:      kitex_resp.Token,
+	}
 
 	c.JSON(consts.StatusOK, resp)
 }

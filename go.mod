@@ -11,6 +11,7 @@ require (
 )
 
 require (
+	github.com/bytedance/go-tagexpr/v2 v2.9.2 // indirect
 	github.com/bytedance/mockey v1.2.1 // indirect
 	github.com/coreos/go-semver v0.3.0 // indirect
 	github.com/coreos/go-systemd/v22 v22.3.2 // indirect
@@ -18,10 +19,13 @@ require (
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
+	github.com/henrylee2cn/ameda v1.4.10 // indirect
+	github.com/henrylee2cn/goutil v0.0.0-20210127050712-89660552f6f8 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
+	github.com/nyaruka/phonenumbers v1.0.55 // indirect
 	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
 	github.com/spf13/afero v1.9.5 // indirect
@@ -48,6 +52,7 @@ require (
 	github.com/cloudwego/configmanager v0.2.0 // indirect
 	github.com/cloudwego/fastpb v0.0.4 // indirect
 	github.com/cloudwego/frugal v0.1.6 // indirect
+	github.com/cloudwego/hertz v0.6.7
 	github.com/cloudwego/netpoll v0.4.0 // indirect
 	github.com/cloudwego/thriftgo v0.2.11 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.0
