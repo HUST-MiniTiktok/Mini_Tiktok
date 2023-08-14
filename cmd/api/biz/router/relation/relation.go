@@ -3,7 +3,7 @@
 package relation
 
 import (
-	relation "github.com/HUST-MiniTiktok/mini_tiktok/biz/handler/relation"
+	relation "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/handler/relation"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 

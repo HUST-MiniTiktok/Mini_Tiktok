@@ -5,7 +5,7 @@ package publish
 import (
 	"context"
 
-	publish "github.com/HUST-MiniTiktok/mini_tiktok/biz/model/publish"
+	publish "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/publish"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )

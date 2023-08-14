@@ -3,7 +3,7 @@
 package main
 
 import (
-	router "github.com/HUST-MiniTiktok/mini_tiktok/biz/router"
+	router "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/router"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 

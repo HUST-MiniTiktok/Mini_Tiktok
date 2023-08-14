@@ -3,7 +3,7 @@
 package user
 
 import (
-	user "github.com/HUST-MiniTiktok/mini_tiktok/biz/handler/user"
+	user "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/handler/user"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 

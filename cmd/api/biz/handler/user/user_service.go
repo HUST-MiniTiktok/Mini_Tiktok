@@ -5,7 +5,7 @@ package user
 import (
 	"context"
 
-	user "github.com/HUST-MiniTiktok/mini_tiktok/biz/model/user"
+	user "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/user"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )

@@ -3,7 +3,7 @@
 package message
 
 import (
-	message "github.com/HUST-MiniTiktok/mini_tiktok/biz/handler/message"
+	message "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/handler/message"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 

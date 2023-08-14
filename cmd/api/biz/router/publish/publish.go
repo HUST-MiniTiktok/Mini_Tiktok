@@ -3,7 +3,7 @@
 package publish
 
 import (
-	publish "github.com/HUST-MiniTiktok/mini_tiktok/biz/handler/publish"
+	publish "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/handler/publish"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 

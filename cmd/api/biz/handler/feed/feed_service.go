@@ -5,7 +5,7 @@ package feed
 import (
 	"context"
 
-	feed "github.com/HUST-MiniTiktok/mini_tiktok/biz/model/feed"
+	feed "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/feed"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )

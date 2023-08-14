@@ -5,7 +5,7 @@ package comment
 import (
 	"context"
 
-	comment "github.com/HUST-MiniTiktok/mini_tiktok/biz/model/comment"
+	comment "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/comment"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )

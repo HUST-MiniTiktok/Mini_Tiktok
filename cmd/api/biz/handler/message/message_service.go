@@ -5,7 +5,7 @@ package message
 import (
 	"context"
 
-	message "github.com/HUST-MiniTiktok/mini_tiktok/biz/model/message"
+	message "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/message"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )

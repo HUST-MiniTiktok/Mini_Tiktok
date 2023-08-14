@@ -3,7 +3,7 @@
 package favorite
 
 import (
-	favorite "github.com/HUST-MiniTiktok/mini_tiktok/biz/handler/favorite"
+	favorite "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/handler/favorite"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 
