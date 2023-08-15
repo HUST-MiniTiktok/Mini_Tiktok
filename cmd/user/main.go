@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"net"
 
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/user/dal"
@@ -35,6 +34,6 @@ func main() {
 	err = svr.Run()
 
 	if err != nil {
-		log.Println(err.Error())
+		klog.Fatalf("run user rpc server failed: %v", err)
 	}
 }

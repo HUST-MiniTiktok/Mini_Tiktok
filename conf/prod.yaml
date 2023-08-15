@@ -13,6 +13,13 @@ db:
     password: ""
     auth: ""
 
+oss:
+    endpoint: "127.0.0.1:12001"
+    accesskey: "mini_tiktok_user"
+    secretkey: "mini_tiktok_pass"
+    videobucket: "video"
+    imagebucket: "image"
+
 registry:
   address:
     - 127.0.0.1:12004

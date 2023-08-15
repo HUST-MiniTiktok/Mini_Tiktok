@@ -5,3 +5,4 @@
 .nfs*
 node_modules
 **/data/*
+.idea

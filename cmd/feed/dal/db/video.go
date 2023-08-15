@@ -10,11 +10,11 @@ const VideoTableName = "video"
 
 type Video struct {
 	gorm.Model
-	AuthorID    int64     `json:"authorID"`
-	PlayURL     string    `json:"playURL"`
-	CoverURL    string    `json:"coverURL"`
-	PublishTime time.Time `json:"publishTime"`
-	Title       string    `json:"title"`
+	AuthorID    int64
+	PlayURL     string
+	CoverURL    string
+	PublishTime time.Time
+	Title       string
 }
 
 func (Video) TableName() string {

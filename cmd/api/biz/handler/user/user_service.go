@@ -7,10 +7,10 @@ import (
 
 	user "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/user"
 	rpc "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/rpc"
-	kitex_user "github.com/HUST-MiniTiktok/mini_tiktok/cmd/user/kitex_gen/user"
-	_ "github.com/HUST-MiniTiktok/mini_tiktok/cmd/user/kitex_gen/user/userservice"
+	"github.com/HUST-MiniTiktok/mini_tiktok/utils"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
 )
 
 // User .
@@ -20,37 +20,17 @@ func User(ctx context.Context, c *app.RequestContext) {
 	var req user.UserRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		c.JSON(consts.StatusBadRequest, utils.NewErrorResp(int32(codes.InvalidArgument), err.Error()))
 		return
 	}
 
-	kitex_resp, err := rpc.User(ctx, &kitex_user.UserRequest{
-		UserId: req.UserID,
-		Token:  req.Token,
-	})
+	kitex_resp, err := rpc.User(ctx, utils.ToKitexUserRequest(&req))
 
-	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error())
-		return
+	if err == nil {
+		c.JSON(consts.StatusOK, utils.ToHertzUserResponse(kitex_resp))
+	} else {
+		c.JSON(consts.StatusOK, utils.NewErrorResp(int32(codes.Internal), err.Error()))
 	}
-
-	resp := &user.UserResponse{
-		StatusCode: kitex_resp.StatusCode,
-		StatusMsg:  kitex_resp.StatusMsg,
-		User: &user.User{ID: kitex_resp.User.Id,
-			Name:            kitex_resp.User.Name,
-			FollowCount:     kitex_resp.User.FollowCount,
-			FollowerCount:   kitex_resp.User.FollowerCount,
-			IsFollow:        kitex_resp.User.IsFollow,
-			Avatar:          kitex_resp.User.Avatar,
-			BackgroundImage: kitex_resp.User.BackgroundImage,
-			Signature:       kitex_resp.User.Signature,
-			TotalFavorited:  kitex_resp.User.TotalFavorited,
-			WorkCount:       kitex_resp.User.WorkCount,
-			FavoriteCount:   kitex_resp.User.FavoriteCount,
-		},
-	}
-	c.JSON(consts.StatusOK, resp)
 }
 
 // Register .
@@ -60,28 +40,17 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	var req user.UserRegisterRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		c.JSON(consts.StatusBadRequest, utils.NewErrorResp(int32(codes.InvalidArgument), err.Error()))
 		return
 	}
 
-	kitex_resp, err := rpc.Register(ctx, &kitex_user.UserRegisterRequest{
-		Username: req.Username,
-		Password: req.Password,
-	})
+	kitex_resp, err := rpc.Register(ctx, utils.ToKitexUserRegisterRequest(&req))
 
-	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error())
-		return
+	if err == nil {
+		c.JSON(consts.StatusOK, utils.ToHertzUserRegisterResponse(kitex_resp))
+	} else {
+		c.JSON(consts.StatusOK, utils.NewErrorResp(int32(codes.Internal), err.Error()))
 	}
-
-	resp := &user.UserRegisterResponse{
-		StatusCode: kitex_resp.StatusCode,
-		StatusMsg:  kitex_resp.StatusMsg,
-		UserID:     kitex_resp.UserId,
-		Token:      kitex_resp.Token,
-	}
-
-	c.JSON(consts.StatusOK, resp)
 }
 
 // Login .
@@ -91,26 +60,15 @@ func Login(ctx context.Context, c *app.RequestContext) {
 	var req user.UserLoginRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		c.JSON(consts.StatusBadRequest, utils.NewErrorResp(int32(codes.InvalidArgument), err.Error()))
 		return
 	}
 
-	kitex_resp, err := rpc.Login(ctx, &kitex_user.UserLoginRequest{
-		Username: req.Username,
-		Password: req.Password,
-	})
+	kitex_resp, err := rpc.Login(ctx, utils.ToKitexUserLoginRequest(&req))
 
-	if err != nil {
-		c.String(consts.StatusInternalServerError, err.Error())
-		return
+	if err == nil {
+		c.JSON(consts.StatusOK, utils.ToHertzUserLoginResponse(kitex_resp))
+	} else {
+		c.JSON(consts.StatusOK, utils.NewErrorResp(int32(codes.Internal), err.Error()))
 	}
-
-	resp := &user.UserLoginResponse{
-		StatusCode: kitex_resp.StatusCode,
-		StatusMsg:  kitex_resp.StatusMsg,
-		UserID:     kitex_resp.UserId,
-		Token:      kitex_resp.Token,
-	}
-
-	c.JSON(consts.StatusOK, resp)
 }
