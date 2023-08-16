@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"sync"
 	"time"
 )
 
@@ -66,11 +65,9 @@ func GetVideosByLastPublishTime(ctx context.Context, lastPublishTime time.Time) 
 func GetVideosByIDs(ctx context.Context, ids []int64) (videos []*Video, err error) {
 	err_chan := make(chan error)
 	video_chan := make(chan *Video, len(ids))
-	var wg sync.WaitGroup
+
 	for _, id := range ids {
-		wg.Add(1)
 		go func(id int64) {
-			defer wg.Done()
 			video, err := GetVideoById(ctx, id)
 			err_chan <- err
 			video_chan <- video

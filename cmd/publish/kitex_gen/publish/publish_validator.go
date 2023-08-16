@@ -44,3 +44,20 @@ func (p *PublishListRequest) IsValid() error {
 func (p *PublishListResponse) IsValid() error {
 	return nil
 }
+func (p *GetVideoByIdRequest) IsValid() error {
+	return nil
+}
+func (p *GetVideoByIdResponse) IsValid() error {
+	if p.Video != nil {
+		if err := p.Video.IsValid(); err != nil {
+			return fmt.Errorf("field Video not valid, %w", err)
+		}
+	}
+	return nil
+}
+func (p *GetVideoByIdListRequest) IsValid() error {
+	return nil
+}
+func (p *GetVideoByIdListResponse) IsValid() error {
+	return nil
+}
