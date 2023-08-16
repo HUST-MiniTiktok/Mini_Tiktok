@@ -6,7 +6,7 @@ import (
 	"context"
 
 	user "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/user"
-	rpc "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/rpc"
+	rpc "github.com/HUST-MiniTiktok/mini_tiktok/rpc"
 	"github.com/HUST-MiniTiktok/mini_tiktok/utils"
 	"github.com/HUST-MiniTiktok/mini_tiktok/utils/conv"
 	"github.com/cloudwego/hertz/pkg/app"
