@@ -2,19 +2,20 @@ package db
 
 import (
 	"context"
-	"gorm.io/gorm"
+	"sync"
 	"time"
+
 )
 
 const VideoTableName = "video"
 
 type Video struct {
-	gorm.Model
-	AuthorID    int64
-	PlayURL     string
-	CoverURL    string
-	PublishTime time.Time
-	Title       string
+	ID          int64     `json:"id"`
+	AuthorID    int64     `json:"author_id"`
+	PlayURL     string    `json:"play_url"`
+	CoverURL    string    `json:"cover_url"`
+	PublishTime time.Time `json:"publish_time"`
+	Title       string    `json:"title"`
 }
 
 func (Video) TableName() string {
@@ -64,12 +65,24 @@ func GetVideosByLastPublishTime(ctx context.Context, lastPublishTime time.Time) 
 }
 
 func GetVideosByIDs(ctx context.Context, ids []int64) (videos []*Video, err error) {
+	err_chan := make(chan error)
+	video_chan := make(chan *Video, len(ids))
+	var wg sync.WaitGroup
 	for _, id := range ids {
-		video, err := GetVideoById(ctx, id)
+		wg.Add(1)
+		go func(id int64) {
+			defer wg.Done()
+			video, err := GetVideoById(ctx, id)
+			err_chan <- err
+			video_chan <- video
+		}(id)
+	}
+	for i := 0; i < len(ids); i++ {
+		err = <- err_chan
 		if err != nil {
 			return nil, err
 		}
-		videos = append(videos, video)
+		videos = append(videos, <-video_chan)
 	}
 	return
 }

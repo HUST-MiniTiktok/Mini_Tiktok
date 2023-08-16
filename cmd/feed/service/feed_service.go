@@ -46,6 +46,6 @@ func (s *FeedService) GetFeed(request *feed.FeedRequest) (resp *feed.FeedRespons
 	}
 
 	// TODO: 从数据库中获取db.Video，转换为feed.Video
-
+	_ = db_videos
 	return
 }

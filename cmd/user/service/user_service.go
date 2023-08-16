@@ -28,7 +28,7 @@ func (s *UserService) GetUserById(ctx context.Context, request *user.UserRequest
 		return
 	}
 	resp_user = &user.User{
-		Id:              int64(db_user.ID),
+		Id:              db_user.ID,
 		Name:            db_user.UserName,
 		Avatar:          &db_user.Avatar,
 		BackgroundImage: &db_user.BackgroundImage,

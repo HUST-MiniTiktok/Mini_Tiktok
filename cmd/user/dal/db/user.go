@@ -2,20 +2,18 @@ package db
 
 import (
 	"context"
-
 	"github.com/cloudwego/kitex/pkg/klog"
-	"gorm.io/gorm"
 )
 
 const UserTableName = "user"
 
 type User struct {
-	gorm.Model
-	UserName        string
-	Password        string
-	Avatar          string
-	BackgroundImage string
-	Signature       string
+	ID              int64  `json:"id"`
+	UserName        string `json:"user_name"`
+	Password        string `json:"password"`
+	Avatar          string `json:"avatar"`
+	BackgroundImage string `json:"background_image"`
+	Signature       string `json:"signature"`
 }
 
 func (User) TableName() string {
