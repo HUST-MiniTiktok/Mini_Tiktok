@@ -6,3 +6,5 @@
 node_modules
 **/data/*
 .idea
+docker/minio/
+docker/mysql/
