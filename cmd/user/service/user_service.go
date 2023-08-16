@@ -33,11 +33,6 @@ func (s *UserService) GetUserById(ctx context.Context, request *user.UserRequest
 		Avatar:          &db_user.Avatar,
 		BackgroundImage: &db_user.BackgroundImage,
 		Signature:       &db_user.Signature,
-		FavoriteCount:   new(int64),
-		TotalFavorited:  new(int64),
-		FollowCount:     new(int64),
-		FollowerCount:   new(int64),
-		IsFollow:        false,
 	}
 	return &user.UserResponse{StatusCode: int32(codes.OK), StatusMsg: nil, User: resp_user}, nil
 }

@@ -52,3 +52,29 @@ func PublishList(context context.Context, req *publish.PublishListRequest) (resp
 	}
 	return resp, nil
 }
+
+func GetVideoById(context context.Context, req *publish.GetVideoByIdRequest) (resp *publish.GetVideoByIdResponse, err error) {
+	resp, err = publishClient.GetVideoById(context, req)
+	if err != nil {
+		klog.Errorf("publish client failed: %v", err)
+		return nil, err
+	}
+	if resp.StatusCode != 0 {
+		klog.Errorf("publish client failed: %v -> %v", resp.StatusCode, resp.StatusMsg)
+		return nil, fmt.Errorf("publish client failed: %v", resp.StatusMsg)
+	}
+	return resp, nil
+}
+
+func GetVideoByIdList(context context.Context, req *publish.GetVideoByIdListRequest) (resp *publish.GetVideoByIdListResponse, err error) {
+	resp, err = publishClient.GetVideoByIdList(context, req)
+	if err != nil {
+		klog.Errorf("publish client failed: %v", err)
+		return nil, err
+	}
+	if resp.StatusCode != 0 {
+		klog.Errorf("publish client failed: %v -> %v", resp.StatusCode, resp.StatusMsg)
+		return nil, fmt.Errorf("publish client failed: %v", resp.StatusMsg)
+	}
+	return resp, nil
+}

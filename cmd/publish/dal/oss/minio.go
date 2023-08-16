@@ -5,6 +5,7 @@ import (
 	"context"
 	"mime/multipart"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/cloudwego/kitex/pkg/klog"
@@ -42,5 +43,23 @@ func GetObjectURL(ctx context.Context, bucketName, filename string) (obj_url *ur
 
 func PutToBucketWithBuf(ctx context.Context, bucketName, filename string, buf *bytes.Buffer) (info minio.UploadInfo, err error) {
 	info, err = Client.PutObject(ctx, bucketName, filename, buf, int64(buf.Len()), minio.PutObjectOptions{})
+	return
+}
+
+func ToRealURL(ctx context.Context, db_url string) (real_url string) {
+	names := strings.Split(db_url, "/")
+	bucket_name := names[0]
+	file_name := names[1]
+	real_url_, err := GetObjectURL(ctx, bucket_name, file_name)
+	if err != nil {
+		klog.Errorf("get object url failed: %v", err)
+	} else {
+		real_url = real_url_.String()
+	}
+	return
+}
+
+func ToDbURL(ctx context.Context, bucket_name string, file_name string) (db_url string) {
+	db_url = bucket_name + "/" + file_name
 	return
 }

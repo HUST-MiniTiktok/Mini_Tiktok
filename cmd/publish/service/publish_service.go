@@ -81,8 +81,8 @@ func (s *PublishService) PublishAction(request *publish.PublishActionRequest) (r
 
 	id, err := db.CreateVideo(s.ctx, &db.Video{
 		AuthorID:    author_id,
-		PlayURL:     VideoBucketName + "/" + video_filename,
-		CoverURL:    ImageBucketName + "/" + cover_filename,
+		PlayURL:     oss.ToDbURL(s.ctx, VideoBucketName, video_filename),
+		CoverURL:    oss.ToDbURL(s.ctx, ImageBucketName, cover_filename),
 		PublishTime: time.Now(),
 		Title:       request.Title,
 	})
@@ -100,6 +100,7 @@ func (s *PublishService) PublishAction(request *publish.PublishActionRequest) (r
 }
 
 func (s *PublishService) PublishList(request *publish.PublishListRequest) (resp *publish.PublishListResponse, err error) {
+	klog.Infof("publish_list request: %v", *request)
 	user_claims, err := jwt.Jwt.ExtractClaims(request.GetToken())
 	curr_user_id := user_claims.ID
 	query_user_id := request.UserId
@@ -128,8 +129,8 @@ func (s *PublishService) PublishList(request *publish.PublishListRequest) (resp 
 				video_chan <- &publish.Video{
 					Id:       db_video.ID,
 					Author:   (*publish.User)(kitex_author),
-					PlayUrl:  db_video.PlayURL,
-					CoverUrl: db_video.CoverURL,
+					PlayUrl:  oss.ToRealURL(s.ctx, db_video.PlayURL),
+					CoverUrl: oss.ToRealURL(s.ctx, db_video.CoverURL),
 					Title:    db_video.Title,
 				}
 			}
@@ -156,6 +157,7 @@ func (s *PublishService) PublishList(request *publish.PublishListRequest) (resp 
 }
 
 func (s *PublishService) GetVideoById(request *publish.GetVideoByIdRequest) (resp *publish.GetVideoByIdResponse, err error) {
+	klog.Infof("get_video_by_id request: %v", *request)
 	db_video, err := db.GetVideoById(s.ctx, request.Id)
 	if err != nil {
 		err_msg := err.Error()
@@ -173,8 +175,8 @@ func (s *PublishService) GetVideoById(request *publish.GetVideoByIdRequest) (res
 	kitex_video := &publish.Video{
 		Id:       db_video.ID,
 		Author:   (*publish.User)(kitex_author),
-		PlayUrl:  db_video.PlayURL,
-		CoverUrl: db_video.CoverURL,
+		PlayUrl:  oss.ToRealURL(s.ctx, db_video.PlayURL),
+		CoverUrl: oss.ToRealURL(s.ctx, db_video.CoverURL),
 		Title:    db_video.Title,
 	}
 	resp = &publish.GetVideoByIdResponse{
@@ -206,8 +208,8 @@ func (s *PublishService) GetVideoByIdList(request *publish.GetVideoByIdListReque
 				video_chan <- &publish.Video{
 					Id:       db_video.ID,
 					Author:   (*publish.User)(kitex_author),
-					PlayUrl:  db_video.PlayURL,
-					CoverUrl: db_video.CoverURL,
+					PlayUrl:  oss.ToRealURL(s.ctx, db_video.PlayURL),
+					CoverUrl: oss.ToRealURL(s.ctx, db_video.CoverURL),
 					Title:    db_video.Title,
 				}
 			}
