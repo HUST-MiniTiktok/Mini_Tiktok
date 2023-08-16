@@ -7,7 +7,6 @@ import (
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/dal/db"
 	feed "github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/kitex_gen/feed"
 	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
-	"github.com/HUST-MiniTiktok/mini_tiktok/utils"
 	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
 )
 
@@ -41,7 +40,8 @@ func (s *FeedService) GetFeed(request *feed.FeedRequest) (resp *feed.FeedRespons
 
 	db_videos, err = db.GetVideosByLastPublishTime(s.ctx, last_time)
 	if err != nil {
-		resp = utils.NewRespStruct(int32(codes.Internal), err.Error(), &feed.FeedResponse{}).(*feed.FeedResponse)
+		err_msg := err.Error()
+		resp = &feed.FeedResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}
 		return
 	}
 

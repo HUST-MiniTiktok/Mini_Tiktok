@@ -13,7 +13,6 @@ import (
 	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
 	"github.com/HUST-MiniTiktok/mini_tiktok/mw/ffmpeg"
 	"github.com/HUST-MiniTiktok/mini_tiktok/mw/jwt"
-	"github.com/HUST-MiniTiktok/mini_tiktok/utils"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
 )
@@ -52,7 +51,8 @@ func (s *PublishService) PublishAction(request *publish.PublishActionRequest) (r
 
 	cover_data, err := ffmpeg.GetVideoCover(request.Data)
 	if err != nil {
-		resp = utils.NewRespStruct(int32(codes.Internal), err.Error(), &publish.PublishActionResponse{}).(*publish.PublishActionResponse)
+		err_msg := err.Error()
+		resp = &publish.PublishActionResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}
 		return
 	}
 
@@ -60,7 +60,8 @@ func (s *PublishService) PublishAction(request *publish.PublishActionRequest) (r
 	video_filename := uuid.NewString() + ".mp4"
 	video_info, err := oss.PutToBucketWithBuf(s.ctx, VideoBucketName, video_filename, video_buf)
 	if err != nil {
-		resp = utils.NewRespStruct(int32(codes.Internal), err.Error(), &publish.PublishActionResponse{}).(*publish.PublishActionResponse)
+		err_msg := err.Error()
+		resp = &publish.PublishActionResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}
 		return
 	}
 	klog.Infof("upload_video_size=%v", strconv.FormatInt(video_info.Size, 10))
@@ -69,7 +70,8 @@ func (s *PublishService) PublishAction(request *publish.PublishActionRequest) (r
 	cover_filename := uuid.NewString() + ".png"
 	cover_info, err := oss.PutToBucketWithBuf(s.ctx, ImageBucketName, cover_filename, cover_buf)
 	if err != nil {
-		resp = utils.NewRespStruct(int32(codes.Internal), err.Error(), &publish.PublishActionResponse{}).(*publish.PublishActionResponse)
+		err_msg := err.Error()
+		resp = &publish.PublishActionResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}
 		return
 	}
 	klog.Infof("upload_cover_size=%v", strconv.FormatInt(cover_info.Size, 10))
@@ -82,10 +84,14 @@ func (s *PublishService) PublishAction(request *publish.PublishActionRequest) (r
 		Title:       request.Title,
 	})
 	if err != nil {
-		resp = utils.NewRespStruct(int32(codes.Internal), err.Error(), &publish.PublishActionResponse{}).(*publish.PublishActionResponse)
+		err_msg := err.Error()
+		resp = &publish.PublishActionResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}
 		return
 	}
 	klog.Infof("db create video_id=%v", id)
-	resp = utils.NewRespStruct(int32(codes.OK), "", &publish.PublishActionResponse{}).(*publish.PublishActionResponse)
+	resp = &publish.PublishActionResponse{
+		StatusCode: int32(codes.OK),
+		StatusMsg:  nil,
+	}
 	return
 }
