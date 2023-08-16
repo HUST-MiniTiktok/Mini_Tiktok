@@ -1,4 +1,4 @@
-package utils
+package conv
 
 import (
 	hertz_user "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/user"

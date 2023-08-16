@@ -8,6 +8,7 @@ import (
 	user "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/user"
 	rpc "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/rpc"
 	"github.com/HUST-MiniTiktok/mini_tiktok/utils"
+	"github.com/HUST-MiniTiktok/mini_tiktok/utils/conv"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
@@ -20,16 +21,16 @@ func User(ctx context.Context, c *app.RequestContext) {
 	var req user.UserRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.JSON(consts.StatusBadRequest, utils.NewErrorResp(int32(codes.InvalidArgument), err.Error()))
+		c.JSON(consts.StatusBadRequest, utils.NewRespMap(int32(codes.InvalidArgument), err.Error()))
 		return
 	}
 
-	kitex_resp, err := rpc.User(ctx, utils.ToKitexUserRequest(&req))
+	kitex_resp, err := rpc.User(ctx, conv.ToKitexUserRequest(&req))
 
 	if err == nil {
-		c.JSON(consts.StatusOK, utils.ToHertzUserResponse(kitex_resp))
+		c.JSON(consts.StatusOK, conv.ToHertzUserResponse(kitex_resp))
 	} else {
-		c.JSON(consts.StatusOK, utils.NewErrorResp(int32(codes.Internal), err.Error()))
+		c.JSON(consts.StatusOK, utils.NewRespMap(int32(codes.Internal), err.Error()))
 	}
 }
 
@@ -40,16 +41,16 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	var req user.UserRegisterRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.JSON(consts.StatusBadRequest, utils.NewErrorResp(int32(codes.InvalidArgument), err.Error()))
+		c.JSON(consts.StatusBadRequest, utils.NewRespMap(int32(codes.InvalidArgument), err.Error()))
 		return
 	}
 
-	kitex_resp, err := rpc.Register(ctx, utils.ToKitexUserRegisterRequest(&req))
+	kitex_resp, err := rpc.Register(ctx, conv.ToKitexUserRegisterRequest(&req))
 
 	if err == nil {
-		c.JSON(consts.StatusOK, utils.ToHertzUserRegisterResponse(kitex_resp))
+		c.JSON(consts.StatusOK, conv.ToHertzUserRegisterResponse(kitex_resp))
 	} else {
-		c.JSON(consts.StatusOK, utils.NewErrorResp(int32(codes.Internal), err.Error()))
+		c.JSON(consts.StatusOK, utils.NewRespMap(int32(codes.Internal), err.Error()))
 	}
 }
 
@@ -60,15 +61,15 @@ func Login(ctx context.Context, c *app.RequestContext) {
 	var req user.UserLoginRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.JSON(consts.StatusBadRequest, utils.NewErrorResp(int32(codes.InvalidArgument), err.Error()))
+		c.JSON(consts.StatusBadRequest, utils.NewRespMap(int32(codes.InvalidArgument), err.Error()))
 		return
 	}
 
-	kitex_resp, err := rpc.Login(ctx, utils.ToKitexUserLoginRequest(&req))
+	kitex_resp, err := rpc.Login(ctx, conv.ToKitexUserLoginRequest(&req))
 
 	if err == nil {
-		c.JSON(consts.StatusOK, utils.ToHertzUserLoginResponse(kitex_resp))
+		c.JSON(consts.StatusOK, conv.ToHertzUserLoginResponse(kitex_resp))
 	} else {
-		c.JSON(consts.StatusOK, utils.NewErrorResp(int32(codes.Internal), err.Error()))
+		c.JSON(consts.StatusOK, utils.NewRespMap(int32(codes.Internal), err.Error()))
 	}
 }

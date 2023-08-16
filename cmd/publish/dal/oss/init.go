@@ -11,19 +11,19 @@ import (
 
 var (
 	Client *minio.Client
-	err   error
+	err    error
 )
 
 func Init() {
 	ctx := context.Background()
 	Client, err = minio.New(conf.GetConf().GetString("oss.endpoint"), &minio.Options{
-		Creds:  credentials.NewStaticV4(conf.GetConf().GetString("oss.accesskey"), conf.GetConf().GetString("oss.secretkey"), ""),
+		Creds: credentials.NewStaticV4(conf.GetConf().GetString("oss.accesskey"), conf.GetConf().GetString("oss.secretkey"), ""),
 	})
 
 	if err != nil {
 		klog.Fatalf("init minio client failed: %v", err)
 	}
 
-	MakeBucket(ctx, conf.GetConf().GetString("oss.videobucket"))
-	MakeBucket(ctx, conf.GetConf().GetString("oss.imagebucket"))
+	CreateBucket(ctx, conf.GetConf().GetString("oss.videobucket"))
+	CreateBucket(ctx, conf.GetConf().GetString("oss.imagebucket"))
 }
