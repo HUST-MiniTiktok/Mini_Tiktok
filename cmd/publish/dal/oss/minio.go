@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/minio/minio-go/v7"
 )
@@ -37,7 +38,8 @@ func PutToBucket(ctx context.Context, bucketName string, file *multipart.FileHea
 
 func GetObjectURL(ctx context.Context, bucketName, filename string) (obj_url *url.URL, err error) {
 	exp := time.Hour * 24
-	obj_url, err = Client.PresignedGetObject(ctx, bucketName, filename, exp, make(url.Values))
+	reqParams := make(url.Values)
+	obj_url, err = Client.PresignedGetObject(ctx, bucketName, filename, exp, reqParams)
 	return
 }
 
@@ -54,6 +56,8 @@ func ToRealURL(ctx context.Context, db_url string) (real_url string) {
 	if err != nil {
 		klog.Errorf("get object url failed: %v", err)
 	} else {
+		real_url_.Host = conf.GetConf().GetString("oss.endpoint")
+		real_url_.Path = "/src" + real_url_.Path
 		real_url = real_url_.String()
 	}
 	return

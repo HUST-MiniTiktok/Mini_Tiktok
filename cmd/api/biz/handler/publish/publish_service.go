@@ -11,23 +11,32 @@ import (
 	"github.com/HUST-MiniTiktok/mini_tiktok/utils/conv"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
 )
 
 // PublishAction .
 // @router /douyin/publish/action/ [POST]
 func PublishAction(ctx context.Context, c *app.RequestContext) {
-	klog.Info("1111111111111111111")
 	var err error
 	var req publish.PublishActionRequest
-	err = c.BindAndValidate(&req)
+	req.Token = c.PostForm("token")
+	req.Title = c.PostForm("title")
+	if err != nil {
+		c.JSON(consts.StatusBadRequest, utils.NewRespMap(int32(codes.Unauthenticated), err.Error()))
+		return
+	}
+
+	f, err := c.FormFile("data")
 	if err != nil {
 		c.JSON(consts.StatusBadRequest, utils.NewRespMap(int32(codes.InvalidArgument), err.Error()))
 		return
 	}
-	rpc.
-	klog.Infof("req: %+v", req)
+	req.Data, err = utils.ReadFile(f)
+	if err != nil {
+		c.JSON(consts.StatusBadRequest, utils.NewRespMap(int32(codes.InvalidArgument), err.Error()))
+		return
+	}
+
 	kitex_resp, err := rpc.PublishAction(ctx, conv.ToKitexPublishActionRequest(&req))
 
 	if err == nil {

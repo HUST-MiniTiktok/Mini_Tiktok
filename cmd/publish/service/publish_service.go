@@ -41,8 +41,10 @@ func NewPublishService(ctx context.Context) *PublishService {
 }
 
 func (s *PublishService) PublishAction(request *publish.PublishActionRequest) (resp *publish.PublishActionResponse, err error) {
+	klog.Infof("publish_action request")
 	user_claims, err := jwt.Jwt.ExtractClaims(request.GetToken())
 	author_id := user_claims.ID
+	klog.Infof("author_id=%v", author_id)
 
 	if err != nil {
 		err_msg := err.Error()
@@ -58,6 +60,7 @@ func (s *PublishService) PublishAction(request *publish.PublishActionRequest) (r
 		resp = &publish.PublishActionResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}
 		return
 	}
+	klog.Infof("cover_size=%v", strconv.FormatInt(int64(len(cover_data)), 10))
 
 	video_buf := bytes.NewBuffer(request.Data)
 	video_filename := uuid.NewString() + ".mp4"
@@ -126,6 +129,8 @@ func (s *PublishService) PublishList(request *publish.PublishListRequest) (resp 
 			if err != nil {
 				err_chan <- err
 			} else {
+				klog.Infof("real_play_url=%v", oss.ToRealURL(s.ctx, db_video.PlayURL))
+				klog.Infof("real_cover_url=%v", oss.ToRealURL(s.ctx, db_video.CoverURL))
 				video_chan <- &publish.Video{
 					Id:       db_video.ID,
 					Author:   (*publish.User)(kitex_author),

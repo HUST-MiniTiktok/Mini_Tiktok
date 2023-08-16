@@ -7,7 +7,9 @@ import (
 )
 
 func main() {
-	h := server.Default()
+	h := server.Default(
+		server.WithStreamBody(true),
+	)
 
 	register(h)
 	h.Spin()

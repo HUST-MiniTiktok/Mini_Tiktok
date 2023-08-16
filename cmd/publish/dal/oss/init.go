@@ -16,7 +16,7 @@ var (
 
 func Init() {
 	ctx := context.Background()
-	Client, err = minio.New(conf.GetConf().GetString("oss.endpoint"), &minio.Options{
+	Client, err = minio.New(conf.GetConf().GetString("oss.host"), &minio.Options{
 		Creds: credentials.NewStaticV4(conf.GetConf().GetString("oss.accesskey"), conf.GetConf().GetString("oss.secretkey"), ""),
 	})
 
