@@ -104,14 +104,16 @@ func (s *PublishService) PublishAction(request *publish.PublishActionRequest) (r
 }
 
 func (s *PublishService) PublishList(request *publish.PublishListRequest) (resp *publish.PublishListResponse, err error) {
-	klog.Infof("publish_list request: %v", *request)
+	klog.Infof("publish_list request")
 	user_claims, err := jwt.Jwt.ExtractClaims(request.GetToken())
-	curr_user_id := user_claims.ID
 	query_user_id := request.UserId
+	var curr_user_id int64
 	if err != nil {
 		curr_user_id = 0
+	} else {
+		curr_user_id = user_claims.ID
 	}
-
+	
 	db_videos, err := db.GetVideoByAuthorId(s.ctx, query_user_id)
 	if err != nil {
 		err_msg := err.Error()
@@ -179,7 +181,7 @@ func (s *PublishService) PublishList(request *publish.PublishListRequest) (resp 
 }
 
 func (s *PublishService) GetVideoById(request *publish.GetVideoByIdRequest) (resp *publish.GetVideoByIdResponse, err error) {
-	klog.Infof("get_video_by_id request: %v", *request)
+	klog.Infof("get_video_by_id request")
 	db_video, err := db.GetVideoById(s.ctx, request.Id)
 	if err != nil {
 		err_msg := err.Error()

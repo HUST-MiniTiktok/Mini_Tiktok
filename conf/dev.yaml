@@ -11,7 +11,7 @@ db:
     db: 0
 
 oss:
-    endpoint: "ti.geektip.cc:12001"
+    endpoint: "127.0.0.1:12001"
     accesskey: "mini_tiktok_user"
     secretkey: "mini_tiktok_pass"
     videobucket: "video"

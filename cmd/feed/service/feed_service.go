@@ -38,7 +38,12 @@ func NewFeedService(ctx context.Context) *FeedService {
 func (s *FeedService) GetFeed(request *feed.FeedRequest) (resp *feed.FeedResponse, err error) {
 	klog.Infof("publish_list request: %v", *request)
 	user_claims, err := jwt.Jwt.ExtractClaims(request.GetToken())
-	curr_user_id := user_claims.ID
+	var curr_user_id int64
+	if err != nil {
+		curr_user_id = 0
+	} else {
+		curr_user_id = user_claims.ID
+	}
 
 	
 	var last_time time.Time
