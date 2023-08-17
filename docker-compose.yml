@@ -69,14 +69,3 @@ services:
     profiles:
       - dev
       - release
-
-  tiktok:
-    image: tiktok:latest
-    container_name: tiktok_main
-    depends_on:
-      - mysql
-      - redis
-      - minio
-    restart: always
-    profiles:
-      - release
