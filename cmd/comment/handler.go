@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	comment "github.com/HUST-MiniTiktok/mini_tiktok/cmd/comment/kitex_gen/comment"
+	comment "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/comment"
 )
 
 // CommentServiceImpl implements the last service interface defined in the IDL.

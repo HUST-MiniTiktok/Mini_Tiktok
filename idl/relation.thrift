@@ -1,21 +1,9 @@
 namespace go relation
 
-struct User {
-    1: i64 id                           // 用户id
-    2: string name                      // 用户名称
-    3: optional i64 follow_count        // 关注总数
-    4: optional i64 follower_count      // 粉丝总数
-    5: bool is_follow                   // true-已关注，false-未关注
-    6: optional string avatar           // 用户头像
-    7: optional string background_image // 用户个人页顶部大图
-    8: optional string signature        // 个人简介
-    9: optional i64 total_favorited     // 获赞数量
-    10: optional i64 work_count         // 作品数量
-    11: optional i64 favorite_count     // 点赞数量
-}
+include "common.thrift"
 
 struct FriendUser {
-    1: User user                        // 用户信息
+    1: common.User user                        // 用户信息
     2: optional string message         // 和该好友的最新聊天消息
     3: optional i64 msgType            // message消息的类型，0 => 当前请求用户接收的消息， 1 => 当前请求用户发送的消息
 }
@@ -39,7 +27,7 @@ struct RelationFollowListRequest {
 struct RelationFollowListResponse {
     1: i32 status_code (go.tag="json:\"status_code\"")  // 状态码，0-成功，其他值-失败
     2: optional string status_msg                       // 返回状态描述
-    3: list<User> user_list                             // 用户列表
+    3: list<common.User> user_list                             // 用户列表
 }
 
 struct RelationFollowerListRequest {
@@ -50,7 +38,7 @@ struct RelationFollowerListRequest {
 struct RelationFollowerListResponse {
     1: i32 status_code (go.tag="json:\"status_code\"")  // 状态码，0-成功，其他值-失败
     2: optional string status_msg                       // 返回状态描述
-    3: list<User> user_list                             // 用户列表
+    3: list<common.User> user_list                             // 用户列表
 }
 
 struct RelationFriendListRequest {

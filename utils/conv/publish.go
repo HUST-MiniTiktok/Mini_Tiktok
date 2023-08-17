@@ -1,23 +1,24 @@
 package conv
 
 import (
-	kitex_user "github.com/HUST-MiniTiktok/mini_tiktok/cmd/user/kitex_gen/user"
+	hertz_common "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/common"
+	kitex_common "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/common"
 	hertz_publish "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/publish"
-	kitex_publish "github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/kitex_gen/publish"
+	kitex_publish "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/publish"
 )
 
-func ToHertzVideo(video *kitex_publish.Video) *hertz_publish.Video {
-	return &hertz_publish.Video{
+func ToHertzVideo(video *kitex_common.Video) *hertz_common.Video {
+	return &hertz_common.Video{
 		ID: video.Id,
-		Author: (*hertz_publish.User)(ToHertzUser((*kitex_user.User) (video.Author))),
+		Author: (*hertz_common.User)(ToHertzUser(video.Author)),
 		PlayURL: video.PlayUrl,
 		CoverURL: video.CoverUrl,
 		Title: video.Title,
 	}
 }
 
-func ToHertzVideoList(videoList []*kitex_publish.Video) []*hertz_publish.Video {
-	var hertzVideoList []*hertz_publish.Video
+func ToHertzVideoList(videoList []*kitex_common.Video) []*hertz_common.Video {
+	var hertzVideoList []*hertz_common.Video
 	for _, video := range videoList {
 		hertzVideoList = append(hertzVideoList, ToHertzVideo(video))
 	}

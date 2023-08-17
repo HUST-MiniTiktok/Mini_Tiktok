@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/kitex_gen/feed"
-	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/kitex_gen/feed/feedservice"
+	"github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/feed"
+	"github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/feed/feedservice"
 	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
 	"github.com/cloudwego/kitex/client"
 	"github.com/cloudwego/kitex/pkg/klog"

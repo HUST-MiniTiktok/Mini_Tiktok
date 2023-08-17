@@ -5,7 +5,7 @@ import (
 	"context"
 
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/dal/db"
-	feed "github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/kitex_gen/feed"
+	feed "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/feed"
 	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
 	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
 )

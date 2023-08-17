@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 
-	feed "github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/kitex_gen/feed"
+	feed "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/feed"
 	service "github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/service"
 )
 

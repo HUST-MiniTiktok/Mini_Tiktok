@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	user "github.com/HUST-MiniTiktok/mini_tiktok/cmd/user/kitex_gen/user"
+	user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user"
 	service "github.com/HUST-MiniTiktok/mini_tiktok/cmd/user/service"
 )
 

@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	relation "github.com/HUST-MiniTiktok/mini_tiktok/cmd/relation/kitex_gen/relation"
+	relation "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/relation"
 )
 
 // RelationServiceImpl implements the last service interface defined in the IDL.

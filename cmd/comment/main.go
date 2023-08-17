@@ -1,7 +1,7 @@
 package main
 
 import (
-	comment "github.com/HUST-MiniTiktok/mini_tiktok/cmd/comment/kitex_gen/comment/commentservice"
+	comment "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/comment/commentservice"
 	"log"
 )
 

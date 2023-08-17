@@ -1,7 +1,7 @@
 package main
 
 import (
-	relation "github.com/HUST-MiniTiktok/mini_tiktok/cmd/relation/kitex_gen/relation/relationservice"
+	relation "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/relation/relationservice"
 	"log"
 )
 

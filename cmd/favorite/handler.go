@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 
-	favorite "github.com/HUST-MiniTiktok/mini_tiktok/cmd/favorite/kitex_gen/favorite"
+	favorite "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/favorite"
 	service "github.com/HUST-MiniTiktok/mini_tiktok/cmd/favorite/service"
 )
 

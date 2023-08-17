@@ -4,7 +4,8 @@ import (
 	"context"
 
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/user/dal/db"
-	user "github.com/HUST-MiniTiktok/mini_tiktok/cmd/user/kitex_gen/user"
+	common "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/common"
+	user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user"
 	crypt "github.com/HUST-MiniTiktok/mini_tiktok/mw/crypt"
 	jwt "github.com/HUST-MiniTiktok/mini_tiktok/mw/jwt"
 	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
@@ -20,14 +21,14 @@ func NewUserService(ctx context.Context) *UserService {
 
 func (s *UserService) GetUserById(ctx context.Context, request *user.UserRequest) (resp *user.UserResponse, err error) {
 	var db_user *db.User
-	var resp_user *user.User
+	var resp_user *common.User
 	db_user, err = db.GetUserById(ctx, request.UserId)
 	if err != nil {
 		errMsg := "db user not found"
 		resp = &user.UserResponse{StatusCode: int32(codes.NotFound), StatusMsg: &errMsg, User: nil}
 		return
 	}
-	resp_user = &user.User{
+	resp_user = &common.User{
 		Id:              db_user.ID,
 		Name:            db_user.UserName,
 		Avatar:          &db_user.Avatar,

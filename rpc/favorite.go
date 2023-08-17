@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/favorite/kitex_gen/favorite"
-	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/favorite/kitex_gen/favorite/favoriteservice"
+	"github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/favorite"
+	"github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/favorite/favoriteservice"
 	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
 	"github.com/cloudwego/kitex/client"
 	"github.com/cloudwego/kitex/pkg/klog"

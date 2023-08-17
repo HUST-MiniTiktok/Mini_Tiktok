@@ -10,8 +10,9 @@ import (
 
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/dal/db"
 	oss "github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/dal/oss"
-	publish "github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/kitex_gen/publish"
-	user "github.com/HUST-MiniTiktok/mini_tiktok/cmd/user/kitex_gen/user"
+	publish "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/publish"
+	user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user"
+	common "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/common"
 	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
 	"github.com/HUST-MiniTiktok/mini_tiktok/mw/ffmpeg"
 	"github.com/HUST-MiniTiktok/mini_tiktok/mw/jwt"
@@ -71,7 +72,7 @@ func (s *PublishService) PublishAction(request *publish.PublishActionRequest) (r
 		return
 	}
 	klog.Infof("upload_video_size=%v", strconv.FormatInt(video_info.Size, 10))
-
+	
 	cover_buf := bytes.NewBuffer(cover_data)
 	cover_filename := uuid.NewString() + ".png"
 	cover_info, err := oss.PutToBucketWithBuf(s.ctx, ImageBucketName, cover_filename, cover_buf)
@@ -119,8 +120,8 @@ func (s *PublishService) PublishList(request *publish.PublishListRequest) (resp 
 	}
 
 	err_chan := make(chan error)
-	video_chan := make(chan *publish.Video)
-	var kitex_videos []*publish.Video
+	video_chan := make(chan *common.Video)
+	var kitex_videos []*common.Video
 
 	for _, db_video := range db_videos {
 		go func(db_video *db.Video) {
@@ -131,9 +132,9 @@ func (s *PublishService) PublishList(request *publish.PublishListRequest) (resp 
 			} else {
 				klog.Infof("real_play_url=%v", oss.ToRealURL(s.ctx, db_video.PlayURL))
 				klog.Infof("real_cover_url=%v", oss.ToRealURL(s.ctx, db_video.CoverURL))
-				video_chan <- &publish.Video{
+				video_chan <- &common.Video{
 					Id:       db_video.ID,
-					Author:   (*publish.User)(kitex_author),
+					Author:   (*common.User)(kitex_author),
 					PlayUrl:  oss.ToRealURL(s.ctx, db_video.PlayURL),
 					CoverUrl: oss.ToRealURL(s.ctx, db_video.CoverURL),
 					Title:    db_video.Title,
@@ -177,9 +178,9 @@ func (s *PublishService) GetVideoById(request *publish.GetVideoByIdRequest) (res
 		return
 	}
 
-	kitex_video := &publish.Video{
+	kitex_video := &common.Video{
 		Id:       db_video.ID,
-		Author:   (*publish.User)(kitex_author),
+		Author:   kitex_author,
 		PlayUrl:  oss.ToRealURL(s.ctx, db_video.PlayURL),
 		CoverUrl: oss.ToRealURL(s.ctx, db_video.CoverURL),
 		Title:    db_video.Title,
@@ -200,8 +201,8 @@ func (s *PublishService) GetVideoByIdList(request *publish.GetVideoByIdListReque
 		return
 	}
 	err_chan := make(chan error)
-	video_chan := make(chan *publish.Video)
-	var kitex_videos []*publish.Video
+	video_chan := make(chan *common.Video)
+	var kitex_videos []*common.Video
 
 	for _, db_video := range db_videos {
 		go func(db_video *db.Video) {
@@ -210,9 +211,9 @@ func (s *PublishService) GetVideoByIdList(request *publish.GetVideoByIdListReque
 			if err != nil {
 				err_chan <- err
 			} else {
-				video_chan <- &publish.Video{
+				video_chan <- &common.Video{
 					Id:       db_video.ID,
-					Author:   (*publish.User)(kitex_author),
+					Author:   kitex_author,
 					PlayUrl:  oss.ToRealURL(s.ctx, db_video.PlayURL),
 					CoverUrl: oss.ToRealURL(s.ctx, db_video.CoverURL),
 					Title:    db_video.Title,

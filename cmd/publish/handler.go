@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 
-	publish "github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/kitex_gen/publish"
+	publish "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/publish"
 	service "github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/service"
 )
 

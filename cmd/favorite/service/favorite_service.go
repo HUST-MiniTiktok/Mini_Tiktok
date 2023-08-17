@@ -4,8 +4,9 @@ import (
 	"context"
 
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/favorite/dal/db"
-	favorite "github.com/HUST-MiniTiktok/mini_tiktok/cmd/favorite/kitex_gen/favorite"
-	publish "github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/kitex_gen/publish"
+	favorite "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/favorite"
+	publish "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/publish"
+	common "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/common"
 	"github.com/HUST-MiniTiktok/mini_tiktok/mw/jwt"
 	rpc "github.com/HUST-MiniTiktok/mini_tiktok/rpc"
 	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
@@ -93,8 +94,8 @@ func (s *FavoriteService) FavoriteList(ctx context.Context, req *favorite.Favori
 	}
 
 	err_chan := make(chan error)
-	video_chan := make(chan []*publish.Video)
-	var videoList []*favorite.Video
+	video_chan := make(chan []*common.Video)
+	var videoList []*common.Video
 
 	videosResponse, err := rpc.GetVideoByIdList(ctx, &publish.GetVideoByIdListRequest{Id: videoIDList})
 	if err != nil {
@@ -113,7 +114,7 @@ func (s *FavoriteService) FavoriteList(ctx context.Context, req *favorite.Favori
 		return resp, err
 	case PBvideoList := <-video_chan:
 		for _, video := range PBvideoList {
-			videoList = append(videoList, PubVideoToFavVideo(video))
+			videoList = append(videoList, video)
 		}
 
 	}
@@ -123,64 +124,3 @@ func (s *FavoriteService) FavoriteList(ctx context.Context, req *favorite.Favori
 		StatusMsg:  nil,
 		VideoList:  videoList}, nil
 }
-
-func PubVideoToFavVideo(video *publish.Video) *favorite.Video {
-	return &favorite.Video{
-		Id:            video.Id,
-		Author:        PubUserToFavUser(video.Author),
-		PlayUrl:       video.PlayUrl,
-		CoverUrl:      video.CoverUrl,
-		FavoriteCount: video.FavoriteCount,
-		CommentCount:  video.CommentCount,
-		IsFavorite:    video.IsFavorite,
-		Title:         video.Title,
-	}
-}
-
-func PubUserToFavUser(user *publish.User) *favorite.User {
-	return &favorite.User{
-		Id:              user.Id,
-		Name:            user.Name,
-		FollowCount:     user.FollowCount,
-		FollowerCount:   user.FollowerCount,
-		IsFollow:        user.IsFollow,
-		Avatar:          user.Avatar,
-		BackgroundImage: user.BackgroundImage,
-		Signature:       user.Signature,
-		TotalFavorited:  user.TotalFavorited,
-		WorkCount:       user.WorkCount,
-		FavoriteCount:   user.FavoriteCount,
-	}
-}
-
-// type FavoriteListRequest struct {
-// 	UserId int64  `thrift:"user_id,1" frugal:"1,default,i64" json:"user_id"`
-// 	Token  string `thrift:"token,2" frugal:"2,default,string" json:"token"`
-// }
-
-// type FavoriteListResponse struct {
-// 	StatusCode int32    `thrift:"status_code,1" frugal:"1,default,i32" json:"status_code"`
-// 	StatusMsg  *string  `thrift:"status_msg,2,optional" frugal:"2,optional,string" json:"status_msg,omitempty"`
-// 	VideoList  []*Video `thrift:"video_list,3" frugal:"3,default,list<Video>" json:"video_list"`
-// }
-
-// type FavoriteActionRequest struct {
-// 	Token      string `thrift:"token,1" frugal:"1,default,string" json:"token"`
-// 	VideoId    int64  `thrift:"video_id,2" frugal:"2,default,i64" json:"video_id"`
-// 	ActionType int32  `thrift:"action_type,3" frugal:"3,default,i32" json:"action_type"`
-// }
-
-// type FavoriteActionResponse struct {
-// 	StatusCode int32   `thrift:"status_code,1" frugal:"1,default,i32" json:"status_code"`
-// 	StatusMsg  *string `thrift:"status_msg,2,optional" frugal:"2,optional,string" json:"status_msg,omitempty"`
-// }
-
-// type GetVideoByIdListRequest struct {
-// 	Id []int64 `thrift:"id,1" frugal:"1,default,list<i64>" json:"id"`
-// }
-
-// type GetVideoByIdListResponse struct {
-// 	StatusCode int32    `thrift:"status_code,1" frugal:"1,default,i32" json:"status_code"`
-// 	StatusMsg  *string  `thrift:"status_msg,2,optional" frugal:"2,optional,string" json:"status_msg,omitempty"`
-// 	VideoList  []*Video `thrift:"video_list,3" frugal:"3,default,list<Video>" json:"video_list"`
-// }

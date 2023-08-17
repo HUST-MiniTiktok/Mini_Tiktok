@@ -1,12 +1,14 @@
 package conv
 
 import (
+	hertz_common "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/common"
+	kitex_common "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/common"
 	hertz_user "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/user"
-	kitex_user "github.com/HUST-MiniTiktok/mini_tiktok/cmd/user/kitex_gen/user"
+	kitex_user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user"
 )
 
-func ToHertzUser(user *kitex_user.User) *hertz_user.User {
-	return &hertz_user.User{
+func ToHertzUser(user *kitex_common.User) *hertz_common.User {
+	return &hertz_common.User{
 		ID:              user.Id,
 		Name:            user.Name,
 		FollowCount:     user.FollowCount,

@@ -2,7 +2,7 @@ package main
 
 import (
 	"net"
-	publish "github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/kitex_gen/publish/publishservice"
+	publish "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/publish/publishservice"
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/dal"
 	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
 	"github.com/cloudwego/kitex/pkg/klog"

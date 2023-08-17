@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/user/kitex_gen/user"
-	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/user/kitex_gen/user/userservice"
+	"github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user"
+	"github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user/userservice"
 	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
 	"github.com/cloudwego/kitex/client"
 	"github.com/cloudwego/kitex/pkg/klog"

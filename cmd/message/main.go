@@ -1,7 +1,7 @@
 package main
 
 import (
-	message "github.com/HUST-MiniTiktok/mini_tiktok/cmd/message/kitex_gen/message/messageservice"
+	message "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/message/messageservice"
 	"log"
 )
 

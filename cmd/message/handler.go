@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	message "github.com/HUST-MiniTiktok/mini_tiktok/cmd/message/kitex_gen/message"
+	message "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/message"
 )
 
 // MessageServiceImpl implements the last service interface defined in the IDL.

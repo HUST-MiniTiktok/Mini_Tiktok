@@ -2,7 +2,7 @@ package main
 
 import (
 	"net"
-	feed "github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/kitex_gen/feed/feedservice"
+	feed "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/feed/feedservice"
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/dal"
 	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
 	"github.com/cloudwego/kitex/pkg/klog"
