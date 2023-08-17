@@ -46,3 +46,9 @@ func (p *CommentListRequest) IsValid() error {
 func (p *CommentListResponse) IsValid() error {
 	return nil
 }
+func (p *GetVideoCommentCountRequest) IsValid() error {
+	return nil
+}
+func (p *GetVideoCommentCountResponse) IsValid() error {
+	return nil
+}

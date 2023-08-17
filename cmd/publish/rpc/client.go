@@ -6,8 +6,10 @@ import (
 
 var (
 	UserRPC *rpc.UserClient
+	FavoriteRPC *rpc.FavoriteClient
 )
 
 func init() {
 	UserRPC = rpc.NewUserClient()
+	FavoriteRPC = rpc.NewFavoriteClient()
 }

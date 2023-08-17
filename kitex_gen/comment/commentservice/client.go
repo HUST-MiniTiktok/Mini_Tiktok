@@ -13,6 +13,7 @@ import (
 type Client interface {
 	CommentAction(ctx context.Context, request *comment.CommentActionRequest, callOptions ...callopt.Option) (r *comment.CommentActionResponse, err error)
 	CommentList(ctx context.Context, request *comment.CommentListRequest, callOptions ...callopt.Option) (r *comment.CommentListResponse, err error)
+	GetVideoCommentCount(ctx context.Context, request *comment.GetVideoCommentCountRequest, callOptions ...callopt.Option) (r *comment.GetVideoCommentCountResponse, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -52,4 +53,9 @@ func (p *kCommentServiceClient) CommentAction(ctx context.Context, request *comm
 func (p *kCommentServiceClient) CommentList(ctx context.Context, request *comment.CommentListRequest, callOptions ...callopt.Option) (r *comment.CommentListResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.CommentList(ctx, request)
+}
+
+func (p *kCommentServiceClient) GetVideoCommentCount(ctx context.Context, request *comment.GetVideoCommentCountRequest, callOptions ...callopt.Option) (r *comment.GetVideoCommentCountResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetVideoCommentCount(ctx, request)
 }

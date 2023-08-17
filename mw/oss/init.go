@@ -3,6 +3,7 @@ package oss
 import (
 	"context"
 
+	"github.com/HUST-MiniTiktok/mini_tiktok/mw/redis"
 	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
 	"github.com/cloudwego/kitex/pkg/klog"
 	minio "github.com/minio/minio-go/v7"
@@ -10,13 +11,15 @@ import (
 )
 
 var (
-	Client *minio.Client
-	err    error
+	OSSClient *minio.Client
+	RDClient  *redis.RDClient
+	err       error
 )
 
-func Init() {
+func init() {
+	RDClient = redis.NewRDClient()
 	ctx := context.Background()
-	Client, err = minio.New(conf.GetConf().GetString("oss.endpoint"), &minio.Options{
+	OSSClient, err = minio.New(conf.GetConf().GetString("oss.endpoint"), &minio.Options{
 		Creds: credentials.NewStaticV4(conf.GetConf().GetString("oss.accesskey"), conf.GetConf().GetString("oss.secretkey"), ""),
 	})
 

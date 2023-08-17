@@ -19,8 +19,9 @@ func NewServiceInfo() *kitex.ServiceInfo {
 	serviceName := "CommentService"
 	handlerType := (*comment.CommentService)(nil)
 	methods := map[string]kitex.MethodInfo{
-		"CommentAction": kitex.NewMethodInfo(commentActionHandler, newCommentServiceCommentActionArgs, newCommentServiceCommentActionResult, false),
-		"CommentList":   kitex.NewMethodInfo(commentListHandler, newCommentServiceCommentListArgs, newCommentServiceCommentListResult, false),
+		"CommentAction":        kitex.NewMethodInfo(commentActionHandler, newCommentServiceCommentActionArgs, newCommentServiceCommentActionResult, false),
+		"CommentList":          kitex.NewMethodInfo(commentListHandler, newCommentServiceCommentListArgs, newCommentServiceCommentListResult, false),
+		"GetVideoCommentCount": kitex.NewMethodInfo(getVideoCommentCountHandler, newCommentServiceGetVideoCommentCountArgs, newCommentServiceGetVideoCommentCountResult, false),
 	}
 	extra := map[string]interface{}{
 		"PackageName":     "comment",
@@ -73,6 +74,24 @@ func newCommentServiceCommentListResult() interface{} {
 	return comment.NewCommentServiceCommentListResult()
 }
 
+func getVideoCommentCountHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*comment.CommentServiceGetVideoCommentCountArgs)
+	realResult := result.(*comment.CommentServiceGetVideoCommentCountResult)
+	success, err := handler.(comment.CommentService).GetVideoCommentCount(ctx, realArg.Request)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newCommentServiceGetVideoCommentCountArgs() interface{} {
+	return comment.NewCommentServiceGetVideoCommentCountArgs()
+}
+
+func newCommentServiceGetVideoCommentCountResult() interface{} {
+	return comment.NewCommentServiceGetVideoCommentCountResult()
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -98,6 +117,16 @@ func (p *kClient) CommentList(ctx context.Context, request *comment.CommentListR
 	_args.Request = request
 	var _result comment.CommentServiceCommentListResult
 	if err = p.c.Call(ctx, "CommentList", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetVideoCommentCount(ctx context.Context, request *comment.GetVideoCommentCountRequest) (r *comment.GetVideoCommentCountResponse, err error) {
+	var _args comment.CommentServiceGetVideoCommentCountArgs
+	_args.Request = request
+	var _result comment.CommentServiceGetVideoCommentCountResult
+	if err = p.c.Call(ctx, "GetVideoCommentCount", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

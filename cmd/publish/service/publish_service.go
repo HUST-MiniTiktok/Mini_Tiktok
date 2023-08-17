@@ -8,15 +8,16 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/rpc"
+	"github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/favorite"
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/dal/db"
-	oss "github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/dal/oss"
+	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/rpc"
 	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
 	common "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/common"
 	publish "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/publish"
 	user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user"
 	"github.com/HUST-MiniTiktok/mini_tiktok/mw/ffmpeg"
 	"github.com/HUST-MiniTiktok/mini_tiktok/mw/jwt"
+	"github.com/HUST-MiniTiktok/mini_tiktok/mw/oss"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
 )
@@ -110,7 +111,7 @@ func (s *PublishService) PublishList(request *publish.PublishListRequest) (resp 
 	if err != nil {
 		curr_user_id = 0
 	}
-	_ = curr_user_id
+
 	db_videos, err := db.GetVideoByAuthorId(s.ctx, query_user_id)
 	if err != nil {
 		err_msg := err.Error()
@@ -128,19 +129,32 @@ func (s *PublishService) PublishList(request *publish.PublishListRequest) (resp 
 	for _, db_video := range db_videos {
 		go func(db_video *db.Video) {
 			author, err := rpc.UserRPC.User(s.ctx, &user.UserRequest{UserId: db_video.AuthorID})
-			kitex_author := author.User
 			if err != nil {
 				err_chan <- err
-			} else {
-				klog.Infof("real_play_url=%v", oss.ToRealURL(s.ctx, db_video.PlayURL))
-				klog.Infof("real_cover_url=%v", oss.ToRealURL(s.ctx, db_video.CoverURL))
-				video_chan <- &common.Video{
-					Id:       db_video.ID,
-					Author:   (*common.User)(kitex_author),
-					PlayUrl:  oss.ToRealURL(s.ctx, db_video.PlayURL),
-					CoverUrl: oss.ToRealURL(s.ctx, db_video.CoverURL),
-					Title:    db_video.Title,
-				}
+				return
+			} 
+			favorite_count, err := rpc.FavoriteRPC.GetVideoFavoriteCount(s.ctx, &favorite.GetVideoFavoriteCountRequest{VideoId: db_video.ID})
+			if err != nil {
+				err_chan <- err
+				return
+			}
+			is_favorite, err := rpc.FavoriteRPC.CheckIsFavorite(s.ctx, &favorite.CheckIsFavoriteRequest{VideoId: db_video.ID, UserId: curr_user_id})
+			if err != nil {
+				err_chan <- err
+				return
+			}
+
+			klog.Infof("real_play_url=%v", oss.ToRealURL(s.ctx, db_video.PlayURL))
+			klog.Infof("real_cover_url=%v", oss.ToRealURL(s.ctx, db_video.CoverURL))
+
+			video_chan <- &common.Video{
+				Id:       db_video.ID,
+				Author:   author.User,
+				PlayUrl:  oss.ToRealURL(s.ctx, db_video.PlayURL),
+				CoverUrl: oss.ToRealURL(s.ctx, db_video.CoverURL),
+				Title:    db_video.Title,
+				FavoriteCount: favorite_count.FavoriteCount,
+				IsFavorite: is_favorite.IsFavorite,
 			}
 		}(db_video)
 	}
