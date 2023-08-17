@@ -25,11 +25,13 @@ import (
 var (
 	VideoBucketName string
 	ImageBucketName string
+	Jwt *jwt.JWT
 )
 
 func init() {
 	VideoBucketName = conf.GetConf().GetString("oss.videobucket")
 	ImageBucketName = conf.GetConf().GetString("oss.imagebucket")
+	Jwt = jwt.NewJWT()
 }
 
 type PublishService struct {
@@ -44,7 +46,7 @@ func NewPublishService(ctx context.Context) *PublishService {
 
 func (s *PublishService) PublishAction(request *publish.PublishActionRequest) (resp *publish.PublishActionResponse, err error) {
 	klog.Infof("publish_action request")
-	user_claims, err := jwt.Jwt.ExtractClaims(request.GetToken())
+	user_claims, err := Jwt.ExtractClaims(request.GetToken())
 	author_id := user_claims.ID
 
 	if err != nil {
@@ -105,7 +107,7 @@ func (s *PublishService) PublishAction(request *publish.PublishActionRequest) (r
 
 func (s *PublishService) PublishList(request *publish.PublishListRequest) (resp *publish.PublishListResponse, err error) {
 	klog.Infof("publish_list request")
-	user_claims, err := jwt.Jwt.ExtractClaims(request.GetToken())
+	user_claims, err := Jwt.ExtractClaims(request.GetToken())
 	query_user_id := request.UserId
 	var curr_user_id int64
 	if err != nil {

@@ -12,6 +12,14 @@ import (
 	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
 )
 
+var (
+	Jwt *jwt.JWT
+)
+
+func init() {
+	Jwt = jwt.NewJWT()
+}
+
 type FavoriteService struct {
 	ctx context.Context
 }
@@ -22,7 +30,7 @@ func NewFavoriteService(ctx context.Context) *FavoriteService {
 
 func (s *FavoriteService) FavoriteAction(ctx context.Context, req *favorite.FavoriteActionRequest) (resp *favorite.FavoriteActionResponse, err error) {
 
-	claim, err := jwt.Jwt.ExtractClaims(req.Token)
+	claim, err := Jwt.ExtractClaims(req.Token)
 	if err != nil {
 		msg := err.Error()
 		return &favorite.FavoriteActionResponse{
@@ -64,7 +72,7 @@ func (s *FavoriteService) FavoriteAction(ctx context.Context, req *favorite.Favo
 
 func (s *FavoriteService) FavoriteList(ctx context.Context, req *favorite.FavoriteListRequest) (resp *favorite.FavoriteListResponse, err error) {
 
-	claim, err := jwt.Jwt.ExtractClaims(req.Token)
+	claim, err := Jwt.ExtractClaims(req.Token)
 	if err != nil {
 		msg := err.Error()
 		return &favorite.FavoriteListResponse{

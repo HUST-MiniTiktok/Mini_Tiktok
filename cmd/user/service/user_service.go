@@ -11,6 +11,14 @@ import (
 	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
 )
 
+var (
+	Jwt *jwt.JWT
+)
+
+func init() {
+	Jwt = jwt.NewJWT()
+}
+
 type UserService struct {
 	ctx context.Context
 }
@@ -70,7 +78,7 @@ func (s *UserService) Register(ctx context.Context, request *user.UserRegisterRe
 		return
 	}
 
-	token, err := jwt.GetJwt().CreateToken(jwt.UserClaims{ID: user_id})
+	token, err := Jwt.CreateToken(jwt.UserClaims{ID: user_id})
 	if err != nil {
 		errMsg := "create token failed"
 		resp = &user.UserRegisterResponse{StatusCode: int32(codes.Internal), StatusMsg: &errMsg}
@@ -101,7 +109,7 @@ func (s *UserService) Login(ctx context.Context, request *user.UserLoginRequest)
 	}
 
 	user_id := int64(db_user_ck.ID)
-	token, err := jwt.GetJwt().CreateToken(jwt.UserClaims{ID: user_id})
+	token, err := Jwt.CreateToken(jwt.UserClaims{ID: user_id})
 	if err != nil {
 		errMsg := "create token failed"
 		resp = &user.UserLoginResponse{StatusCode: int32(codes.Internal), StatusMsg: &errMsg}

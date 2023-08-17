@@ -16,16 +16,10 @@ type UserClaims struct {
 	jwt.RegisteredClaims
 }
 
-var Jwt *JWT
-
-func init() {
-	Jwt = &JWT{
+func NewJWT() *JWT {
+	return &JWT{
 		SigningKey: []byte(conf.GetConf().GetString("jwt.signingkey")),
 	}
-}
-
-func GetJwt() *JWT {
-	return Jwt
 }
 
 func (j *JWT) CreateToken(claims UserClaims) (string, error) {
@@ -34,6 +28,9 @@ func (j *JWT) CreateToken(claims UserClaims) (string, error) {
 }
 
 func (j *JWT) ExtractClaims(tokenString string) (*UserClaims, error) {
+	if tokenString == "" {
+		return nil, errors.New("empty token")
+	}
 	token, err := jwt.ParseWithClaims(tokenString, &UserClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return j.SigningKey, nil
 	})

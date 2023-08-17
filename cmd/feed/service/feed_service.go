@@ -20,6 +20,7 @@ import (
 var (
 	VideoBucketName string
 	ImageBucketName string
+	Jwt *jwt.JWT
 )
 
 func init() {
@@ -37,7 +38,7 @@ func NewFeedService(ctx context.Context) *FeedService {
 
 func (s *FeedService) GetFeed(request *feed.FeedRequest) (resp *feed.FeedResponse, err error) {
 	klog.Infof("publish_list request: %v", *request)
-	user_claims, err := jwt.Jwt.ExtractClaims(request.GetToken())
+	user_claims, err := Jwt.ExtractClaims(request.GetToken())
 	var curr_user_id int64
 	if err != nil {
 		curr_user_id = 0
