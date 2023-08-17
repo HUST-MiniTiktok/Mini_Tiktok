@@ -4,6 +4,7 @@
 node_modules
 **/data/*
 **/certs/*
+**/certs
 .idea
 *.o
 *.a

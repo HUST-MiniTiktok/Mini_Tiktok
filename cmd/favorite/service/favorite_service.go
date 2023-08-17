@@ -4,9 +4,9 @@ import (
 	"context"
 
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/favorite/dal/db"
+	common "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/common"
 	favorite "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/favorite"
 	publish "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/publish"
-	common "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/common"
 	"github.com/HUST-MiniTiktok/mini_tiktok/mw/jwt"
 	rpc "github.com/HUST-MiniTiktok/mini_tiktok/rpc"
 	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
@@ -71,7 +71,7 @@ func (s *FavoriteService) FavoriteList(ctx context.Context, req *favorite.Favori
 			// status_code = 7 表示鉴权失败
 			StatusCode: int32(codes.PermissionDenied),
 			StatusMsg:  &msg,
-			VideoList:  nil}, nil
+			VideoList:  nil}, err
 	}
 
 	if req.UserId == 0 || claim.ID == 0 {
@@ -90,12 +90,12 @@ func (s *FavoriteService) FavoriteList(ctx context.Context, req *favorite.Favori
 			// 获取失败
 			StatusCode: int32(codes.Internal),
 			StatusMsg:  &msg,
-			VideoList:  nil}, nil
+			VideoList:  nil}, err
 	}
 
 	err_chan := make(chan error)
 	video_chan := make(chan []*common.Video)
-	var videoList []*common.Video
+	// var videoList []*common.Video
 
 	videosResponse, err := rpc.GetVideoByIdList(ctx, &publish.GetVideoByIdListRequest{Id: videoIDList})
 	if err != nil {
@@ -113,14 +113,47 @@ func (s *FavoriteService) FavoriteList(ctx context.Context, req *favorite.Favori
 			VideoList:  nil}
 		return resp, err
 	case PBvideoList := <-video_chan:
-		for _, video := range PBvideoList {
-			videoList = append(videoList, video)
-		}
-
+		// for _, video := range PBvideoList {
+		// 	videoList = append(videoList, video)
+		// }
+		return &favorite.FavoriteListResponse{
+			StatusCode: int32(codes.OK),
+			StatusMsg:  nil,
+			VideoList:  PBvideoList}, nil
 	}
 
-	return &favorite.FavoriteListResponse{
+}
+
+func (s *FavoriteService) CheckIsFavorite(ctx context.Context, req *favorite.CheckIsFavoriteRequest) (resp *favorite.CheckIsFavoriteResponse, err error) {
+
+	exist, err := db.CheckFavorite(ctx, req.UserId, req.VideoId)
+	if err != nil {
+		msg := "check favorite Failed"
+		return &favorite.CheckIsFavoriteResponse{
+			// 查找失败
+			StatusCode: int32(codes.Internal),
+			StatusMsg:  &msg,
+			IsFavorite: false}, err
+	}
+	return &favorite.CheckIsFavoriteResponse{
 		StatusCode: int32(codes.OK),
 		StatusMsg:  nil,
-		VideoList:  videoList}, nil
+		IsFavorite: exist}, nil
+}
+
+func (s *FavoriteService) GetVideoFavoriteCount(ctx context.Context, req *favorite.GetVideoFavoriteCountRequest) (resp *favorite.GetVideoFavoriteCountResponse, err error) {
+
+	count, err := db.VideoFavoriteCount(ctx, req.VideoId)
+	if err != nil {
+		msg := "check video favorite Failed"
+		return &favorite.GetVideoFavoriteCountResponse{
+			// 查找失败
+			StatusCode:    int32(codes.Internal),
+			StatusMsg:     &msg,
+			FavoriteCount: 0}, err
+	}
+	return &favorite.GetVideoFavoriteCountResponse{
+		StatusCode:    int32(codes.OK),
+		StatusMsg:     nil,
+		FavoriteCount: count}, nil
 }
