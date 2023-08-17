@@ -52,3 +52,29 @@ func FavoriteList(context context.Context, req *favorite.FavoriteListRequest) (r
 	}
 	return resp, nil
 }
+
+func GetVideoFavoriteCount(context context.Context, req *favorite.GetVideoFavoriteCountRequest) (resp *favorite.GetVideoFavoriteCountResponse, err error) {
+	resp, err = favoriteClient.GetVideoFavoriteCount(context, req)
+	if err != nil {
+		klog.Errorf("favorite client failed: %v", err)
+		return nil, err
+	}
+	if resp.StatusCode != 0 {
+		klog.Errorf("favorite client failed: %v -> %v", resp.StatusCode, resp.StatusMsg)
+		return nil, fmt.Errorf("favorite client failed: %v", resp.StatusMsg)
+	}
+	return resp, nil
+}
+
+func CheckIsFavorite(context context.Context, req *favorite.CheckIsFavoriteRequest) (resp *favorite.CheckIsFavoriteResponse, err error) {
+	resp, err = favoriteClient.CheckIsFavorite(context, req)
+	if err != nil {
+		klog.Errorf("favorite client failed: %v", err)
+		return nil, err
+	}
+	if resp.StatusCode != 0 {
+		klog.Errorf("favorite client failed: %v -> %v", resp.StatusCode, resp.StatusMsg)
+		return nil, fmt.Errorf("favorite client failed: %v", resp.StatusMsg)
+	}
+	return resp, nil
+}
