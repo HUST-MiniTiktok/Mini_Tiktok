@@ -109,5 +109,9 @@ func (s *FeedService) GetFeed(request *feed.FeedRequest) (resp *feed.FeedRespons
 		StatusMsg:  nil,
 		VideoList:  kitex_videos,
 	}
+	if len(db_videos) > 0 {
+		next_time := db_videos[len(db_videos)-1].PublishTime.Unix()
+		resp.NextTime = &next_time
+	}
 	return
 }

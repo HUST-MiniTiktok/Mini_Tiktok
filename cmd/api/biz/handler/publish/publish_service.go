@@ -22,18 +22,18 @@ func PublishAction(ctx context.Context, c *app.RequestContext) {
 	req.Token = c.PostForm("token")
 	req.Title = c.PostForm("title")
 	if err != nil {
-		c.JSON(consts.StatusBadRequest, utils.NewRespMap(int32(codes.Unauthenticated), err.Error()))
+		c.JSON(consts.StatusBadRequest, util.NewRespMap(int32(codes.Unauthenticated), err.Error()))
 		return
 	}
 
 	f, err := c.FormFile("data")
 	if err != nil {
-		c.JSON(consts.StatusBadRequest, utils.NewRespMap(int32(codes.InvalidArgument), err.Error()))
+		c.JSON(consts.StatusBadRequest, util.NewRespMap(int32(codes.InvalidArgument), err.Error()))
 		return
 	}
-	req.Data, err = utils.ReadFile(f)
+	req.Data, err = util.ReadFile(f)
 	if err != nil {
-		c.JSON(consts.StatusBadRequest, utils.NewRespMap(int32(codes.InvalidArgument), err.Error()))
+		c.JSON(consts.StatusBadRequest, util.NewRespMap(int32(codes.InvalidArgument), err.Error()))
 		return
 	}
 
@@ -42,7 +42,7 @@ func PublishAction(ctx context.Context, c *app.RequestContext) {
 	if err == nil {
 		c.JSON(consts.StatusOK, conv.ToHertzPublishActionResponse(kitex_resp))
 	} else {
-		c.JSON(consts.StatusOK, utils.NewRespMap(int32(codes.Internal), err.Error()))
+		c.JSON(consts.StatusOK, util.NewRespMap(int32(codes.Internal), err.Error()))
 	}
 }
 
@@ -53,7 +53,7 @@ func PublishList(ctx context.Context, c *app.RequestContext) {
 	var req publish.PublishListRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.JSON(consts.StatusBadRequest, utils.NewRespMap(int32(codes.InvalidArgument), err.Error()))
+		c.JSON(consts.StatusBadRequest, util.NewRespMap(int32(codes.InvalidArgument), err.Error()))
 		return
 	}
 
@@ -62,6 +62,6 @@ func PublishList(ctx context.Context, c *app.RequestContext) {
 	if err == nil {
 		c.JSON(consts.StatusOK, conv.ToHertzPublishListResponse(kitex_resp))
 	} else {
-		c.JSON(consts.StatusOK, utils.NewRespMap(int32(codes.Internal), err.Error()))
+		c.JSON(consts.StatusOK, util.NewRespMap(int32(codes.Internal), err.Error()))
 	}
 }

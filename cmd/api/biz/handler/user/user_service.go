@@ -21,7 +21,7 @@ func User(ctx context.Context, c *app.RequestContext) {
 	var req user.UserRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.JSON(consts.StatusBadRequest, utils.NewRespMap(int32(codes.InvalidArgument), err.Error()))
+		c.JSON(consts.StatusBadRequest, util.NewRespMap(int32(codes.InvalidArgument), err.Error()))
 		return
 	}
 
@@ -30,7 +30,7 @@ func User(ctx context.Context, c *app.RequestContext) {
 	if err == nil {
 		c.JSON(consts.StatusOK, conv.ToHertzUserResponse(kitex_resp))
 	} else {
-		c.JSON(consts.StatusOK, utils.NewRespMap(int32(codes.Internal), err.Error()))
+		c.JSON(consts.StatusOK, util.NewRespMap(int32(codes.Internal), err.Error()))
 	}
 }
 
@@ -41,7 +41,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	var req user.UserRegisterRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.JSON(consts.StatusBadRequest, utils.NewRespMap(int32(codes.InvalidArgument), err.Error()))
+		c.JSON(consts.StatusBadRequest, util.NewRespMap(int32(codes.InvalidArgument), err.Error()))
 		return
 	}
 
@@ -50,7 +50,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	if err == nil {
 		c.JSON(consts.StatusOK, conv.ToHertzUserRegisterResponse(kitex_resp))
 	} else {
-		c.JSON(consts.StatusOK, utils.NewRespMap(int32(codes.Internal), err.Error()))
+		c.JSON(consts.StatusOK, util.NewRespMap(int32(codes.Internal), err.Error()))
 	}
 }
 
@@ -61,7 +61,7 @@ func Login(ctx context.Context, c *app.RequestContext) {
 	var req user.UserLoginRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.JSON(consts.StatusBadRequest, utils.NewRespMap(int32(codes.InvalidArgument), err.Error()))
+		c.JSON(consts.StatusBadRequest, util.NewRespMap(int32(codes.InvalidArgument), err.Error()))
 		return
 	}
 
@@ -70,6 +70,6 @@ func Login(ctx context.Context, c *app.RequestContext) {
 	if err == nil {
 		c.JSON(consts.StatusOK, conv.ToHertzUserLoginResponse(kitex_resp))
 	} else {
-		c.JSON(consts.StatusOK, utils.NewRespMap(int32(codes.Internal), err.Error()))
+		c.JSON(consts.StatusOK, util.NewRespMap(int32(codes.Internal), err.Error()))
 	}
 }

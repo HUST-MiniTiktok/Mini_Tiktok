@@ -6,8 +6,12 @@ import (
 	"context"
 
 	favorite "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/favorite"
+	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/rpc"
+	"github.com/HUST-MiniTiktok/mini_tiktok/util"
+	"github.com/HUST-MiniTiktok/mini_tiktok/util/conv"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
 )
 
 // FavoriteAction .
@@ -17,13 +21,17 @@ func FavoriteAction(ctx context.Context, c *app.RequestContext) {
 	var req favorite.FavoriteActionRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		c.JSON(consts.StatusBadRequest, util.NewRespMap(int32(codes.InvalidArgument), err.Error()))
 		return
 	}
 
-	resp := new(favorite.FavoriteActionResponse)
+	kitex_resp, err := rpc.FavoriteRPC.FavoriteAction(ctx, conv.ToKitexFavoriteActionRequest(&req))
 
-	c.JSON(consts.StatusOK, resp)
+	if err == nil {
+		c.JSON(consts.StatusOK, conv.ToHertzFavoriteActionResponse(kitex_resp))
+	} else {
+		c.JSON(consts.StatusOK, util.NewRespMap(int32(codes.Internal), err.Error()))
+	}
 }
 
 // FavoriteList .
@@ -33,11 +41,15 @@ func FavoriteList(ctx context.Context, c *app.RequestContext) {
 	var req favorite.FavoriteListRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		c.JSON(consts.StatusBadRequest, util.NewRespMap(int32(codes.InvalidArgument), err.Error()))
 		return
 	}
 
-	resp := new(favorite.FavoriteListResponse)
+	kitex_resp, err := rpc.FavoriteRPC.FavoriteList(ctx, conv.ToKitexFavoriteListRequest(&req))
 
-	c.JSON(consts.StatusOK, resp)
+	if err == nil {
+		c.JSON(consts.StatusOK, conv.ToHertzFavoriteListResponse(kitex_resp))
+	} else {
+		c.JSON(consts.StatusOK, util.NewRespMap(int32(codes.Internal), err.Error()))
+	}
 }

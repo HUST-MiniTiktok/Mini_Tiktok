@@ -6,15 +6,12 @@ db:
   mysql:
     dsn: "mini_tiktok_user:mini_tiktok_pass@tcp(127.0.0.1:12000)/mini_tiktok?charset=utf8mb4&parseTime=True&loc=Local"
   redis:
-    host: 127.0.0.1
-    port: 6067
+    address: "127.0.0.1:12003"
+    password: "mini_tiktok_pass"
     db: 0
-    username: ""
-    password: ""
-    auth: ""
 
 oss:
-    endpoint: "127.0.0.1:12001"
+    endpoint: "ti.geektip.cc:12001"
     accesskey: "mini_tiktok_user"
     secretkey: "mini_tiktok_pass"
     videobucket: "video"

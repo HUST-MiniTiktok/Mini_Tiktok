@@ -6,8 +6,12 @@ import (
 	"context"
 
 	feed "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/feed"
+	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/rpc"
+	"github.com/HUST-MiniTiktok/mini_tiktok/util"
+	"github.com/HUST-MiniTiktok/mini_tiktok/util/conv"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
 )
 
 // GetFeed .
@@ -17,11 +21,15 @@ func GetFeed(ctx context.Context, c *app.RequestContext) {
 	var req feed.FeedRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		c.JSON(consts.StatusBadRequest, util.NewRespMap(int32(codes.InvalidArgument), err.Error()))
 		return
 	}
 
-	resp := new(feed.FeedResponse)
+	kitex_resp, err := rpc.FeedRPC.GetFeed(ctx, conv.ToKitexFeedRequest(&req))
 
-	c.JSON(consts.StatusOK, resp)
+	if err == nil {
+		c.JSON(consts.StatusOK, conv.ToHertzFeedResponse(kitex_resp))
+	} else {
+		c.JSON(consts.StatusOK, util.NewRespMap(int32(codes.Internal), err.Error()))
+	}
 }

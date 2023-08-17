@@ -12,13 +12,8 @@ type RDClient struct {
 func NewRDClient() *RDClient {
 	return &RDClient{
 		Client: redis.NewClient(&redis.Options{
-			Addr:     conf.GetConf().GetString("db.redis.host")+ ":" + conf.GetConf().GetString("db.redis.port"),
-			Username: conf.GetConf().GetString("db.redis.username"), 
+			Addr:     conf.GetConf().GetString("db.redis.address"),
 			Password: conf.GetConf().GetString("db.redis.password"),
 			DB:       conf.Conf.GetInt("db.redis.db"),
 		})}
-}
-
-func (c *RDClient) Close() {
-	c.Client.Close()
 }

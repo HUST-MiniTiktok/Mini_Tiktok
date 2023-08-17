@@ -6,12 +6,9 @@ db:
   mysql:
     dsn: "root:HlPgXaBF@tcp(172.16.32.4:59842)/mini_tiktok?charset=utf8mb4&parseTime=True&loc=Local"
   redis:
-    host: 172.16.32.4
-    port: 6067
+    address: "127.0.0.1:12003"
+    password: "mini_tiktok_pass"
     db: 0
-    username: ""
-    password: ""
-    auth: ""
 
 oss:
     endpoint: "127.0.0.1:12001"
