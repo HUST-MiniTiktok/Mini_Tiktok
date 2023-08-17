@@ -44,3 +44,15 @@ func (p *FavoriteListRequest) IsValid() error {
 func (p *FavoriteListResponse) IsValid() error {
 	return nil
 }
+func (p *GetVideoFavoriteCountRequest) IsValid() error {
+	return nil
+}
+func (p *GetVideoFavoriteCountResponse) IsValid() error {
+	return nil
+}
+func (p *CheckIsFavoriteRequest) IsValid() error {
+	return nil
+}
+func (p *CheckIsFavoriteResponse) IsValid() error {
+	return nil
+}
