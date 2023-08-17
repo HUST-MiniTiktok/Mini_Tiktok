@@ -26,7 +26,7 @@ func (s *FavoriteService) FavoriteAction(ctx context.Context, req *favorite.Favo
 		msg := err.Error()
 		return &favorite.FavoriteActionResponse{
 			// status_code = 7 表示鉴权失败
-			StatusCode: int32(codes.PermissionDenied),
+			StatusCode: int32(codes.Unauthenticated),
 			StatusMsg:  &msg}, nil
 	}
 

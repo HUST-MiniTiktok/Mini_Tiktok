@@ -12,14 +12,14 @@ type FavoriteServiceImpl struct{}
 
 // FavoriteAction implements the FavoriteServiceImpl interface.
 func (s *FavoriteServiceImpl) FavoriteAction(ctx context.Context, request *favorite.FavoriteActionRequest) (resp *favorite.FavoriteActionResponse, err error) {
-	user_service := service.NewFavoriteService(ctx)
-	resp, err = user_service.FavoriteAction(ctx, request)
+	favorite_service := service.NewFavoriteService(ctx)
+	resp, err = favorite_service.FavoriteAction(ctx, request)
 	return
 }
 
 // FavoriteList implements the FavoriteServiceImpl interface.
 func (s *FavoriteServiceImpl) FavoriteList(ctx context.Context, request *favorite.FavoriteListRequest) (resp *favorite.FavoriteListResponse, err error) {
-	user_service := service.NewFavoriteService(ctx)
-	resp, err = user_service.FavoriteList(ctx, request)
+	favorite_service := service.NewFavoriteService(ctx)
+	resp, err = favorite_service.FavoriteList(ctx, request)
 	return
 }
