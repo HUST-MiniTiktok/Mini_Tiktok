@@ -1,13 +1,10 @@
 .git/
-.1024.nix
-.1024nix
-.1024feature*
+.1024*
 .nfs*
 node_modules
 **/data/*
+**/certs/*
 .idea
-docker/minio/
-docker/mysql/
 *.o
 *.a
 *.so
