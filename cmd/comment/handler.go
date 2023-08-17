@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+
+	service "github.com/HUST-MiniTiktok/mini_tiktok/cmd/comment/service"
 	comment "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/comment"
 )
 
@@ -10,18 +12,21 @@ type CommentServiceImpl struct{}
 
 // CommentAction implements the CommentServiceImpl interface.
 func (s *CommentServiceImpl) CommentAction(ctx context.Context, request *comment.CommentActionRequest) (resp *comment.CommentActionResponse, err error) {
-	// TODO: Your code here...
+	comment_service := service.NewCommentService(ctx)
+	resp, err = comment_service.CommentAction(ctx, request)
 	return
 }
 
 // CommentList implements the CommentServiceImpl interface.
 func (s *CommentServiceImpl) CommentList(ctx context.Context, request *comment.CommentListRequest) (resp *comment.CommentListResponse, err error) {
-	// TODO: Your code here...
+	comment_service := service.NewCommentService(ctx)
+	resp, err = comment_service.CommentList(ctx, request)
 	return
 }
 
 // GetVideoCommentCount implements the CommentServiceImpl interface.
 func (s *CommentServiceImpl) GetVideoCommentCount(ctx context.Context, request *comment.GetVideoCommentCountRequest) (resp *comment.GetVideoCommentCountResponse, err error) {
-	// TODO: Your code here...
+	comment_service := service.NewCommentService(ctx)
+	resp, err = comment_service.GetVideoCommentCount(ctx, request)
 	return
 }
