@@ -4,11 +4,11 @@ import (
 	"context"
 
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/favorite/dal/db"
+	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/favorite/rpc"
 	common "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/common"
 	favorite "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/favorite"
 	publish "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/publish"
 	"github.com/HUST-MiniTiktok/mini_tiktok/mw/jwt"
-	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/favorite/rpc"
 	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
 )
 
@@ -102,8 +102,9 @@ func (s *FavoriteService) FavoriteList(ctx context.Context, req *favorite.Favori
 	}
 
 	err_chan := make(chan error)
+	defer close(err_chan)
 	video_chan := make(chan []*common.Video)
-	// var videoList []*common.Video
+	defer close(video_chan)
 
 	videosResponse, err := rpc.PublishRPC.GetVideoByIdList(ctx, &publish.GetVideoByIdListRequest{Id: videoIDList})
 	if err != nil {
@@ -121,9 +122,6 @@ func (s *FavoriteService) FavoriteList(ctx context.Context, req *favorite.Favori
 			VideoList:  nil}
 		return resp, err
 	case PBvideoList := <-video_chan:
-		// for _, video := range PBvideoList {
-		// 	videoList = append(videoList, video)
-		// }
 		return &favorite.FavoriteListResponse{
 			StatusCode: int32(codes.OK),
 			StatusMsg:  nil,
