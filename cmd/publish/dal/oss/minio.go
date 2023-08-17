@@ -57,7 +57,6 @@ func ToRealURL(ctx context.Context, db_url string) (real_url string) {
 		klog.Errorf("get object url failed: %v", err)
 	} else {
 		real_url_.Host = conf.GetConf().GetString("oss.endpoint")
-		real_url_.Path = "/src" + real_url_.Path
 		real_url = real_url_.String()
 	}
 	return
