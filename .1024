@@ -1,9 +1,0 @@
-run_command: go run main.go
-debug:
-  support: true
-  launch:
-    request: launch
-    mode: debug
-    program: .
-    console: integratedTerminal
-    cwd: .
