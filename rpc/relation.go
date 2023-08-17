@@ -12,23 +12,25 @@ import (
 	etcd "github.com/kitex-contrib/registry-etcd"
 )
 
-var (
-	relationClient relationservice.Client
-)
+type RelationClient struct {
+	client relationservice.Client
+}
 
-func init() {
+func NewRelationClient() (relationClient *RelationClient) {
 	r, err := etcd.NewEtcdResolver(conf.GetConf().GetStringSlice("registry.address"))
 	if err != nil {
 		klog.Fatalf("new resolver failed: %v", err)
 	}
-	relationClient, err = relationservice.NewClient("relation", client.WithResolver(r))
+	c, err := relationservice.NewClient("relation", client.WithResolver(r))
 	if err != nil {
 		klog.Fatalf("new relation client failed: %v", err)
 	}
+	relationClient = &RelationClient{client: c}
+	return
 }
 
-func RelationAction(context context.Context, req *relation.RelationActionRequest) (resp *relation.RelationActionResponse, err error) {
-	resp, err = relationClient.RelationAction(context, req)
+func (c *RelationClient) RelationAction(context context.Context, req *relation.RelationActionRequest) (resp *relation.RelationActionResponse, err error) {
+	resp, err = c.client.RelationAction(context, req)
 	if err != nil {
 		klog.Errorf("relation client failed: %v", err)
 		return nil, err
@@ -40,8 +42,8 @@ func RelationAction(context context.Context, req *relation.RelationActionRequest
 	return resp, nil
 }
 
-func RelationFollowList(context context.Context, req *relation.RelationFollowListRequest) (resp *relation.RelationFollowListResponse, err error) {
-	resp, err = relationClient.RelationFollowList(context, req)
+func (c *RelationClient) RelationFollowList(context context.Context, req *relation.RelationFollowListRequest) (resp *relation.RelationFollowListResponse, err error) {
+	resp, err = c.client.RelationFollowList(context, req)
 	if err != nil {
 		klog.Errorf("relation client failed: %v", err)
 		return nil, err
@@ -53,8 +55,8 @@ func RelationFollowList(context context.Context, req *relation.RelationFollowLis
 	return resp, nil
 }
 
-func RelationFollowerList(context context.Context, req *relation.RelationFollowerListRequest) (resp *relation.RelationFollowerListResponse, err error) {
-	resp, err = relationClient.RelationFollowerList(context, req)
+func (c *RelationClient) RelationFollowerList(context context.Context, req *relation.RelationFollowerListRequest) (resp *relation.RelationFollowerListResponse, err error) {
+	resp, err = c.client.RelationFollowerList(context, req)
 	if err != nil {
 		klog.Errorf("relation client failed: %v", err)
 		return nil, err
@@ -66,8 +68,8 @@ func RelationFollowerList(context context.Context, req *relation.RelationFollowe
 	return resp, nil
 }
 
-func RelationFriendList(context context.Context, req *relation.RelationFriendListRequest) (resp *relation.RelationFriendListResponse, err error) {
-	resp, err = relationClient.RelationFriendList(context, req)
+func (c *RelationClient) RelationFriendList(context context.Context, req *relation.RelationFriendListRequest) (resp *relation.RelationFriendListResponse, err error) {
+	resp, err = c.client.RelationFriendList(context, req)
 	if err != nil {
 		klog.Errorf("relation client failed: %v", err)
 		return nil, err

@@ -12,23 +12,25 @@ import (
 	etcd "github.com/kitex-contrib/registry-etcd"
 )
 
-var (
-	commentClient commentservice.Client
-)
+type CommentClient struct {
+	client commentservice.Client
+}
 
-func init() {
+func NewCommentClient() (commentClient *CommentClient) {
 	r, err := etcd.NewEtcdResolver(conf.GetConf().GetStringSlice("registry.address"))
 	if err != nil {
 		klog.Fatalf("new resolver failed: %v", err)
 	}
-	commentClient, err = commentservice.NewClient("comment", client.WithResolver(r))
+	c, err := commentservice.NewClient("comment", client.WithResolver(r))
 	if err != nil {
 		klog.Fatalf("new comment client failed: %v", err)
 	}
+	commentClient = &CommentClient{client: c}
+	return
 }
 
-func CommentAction(context context.Context, req *comment.CommentActionRequest) (resp *comment.CommentActionResponse, err error) {
-	resp, err = commentClient.CommentAction(context, req)
+func (c *CommentClient) CommentAction(context context.Context, req *comment.CommentActionRequest) (resp *comment.CommentActionResponse, err error) {
+	resp, err = c.client.CommentAction(context, req)
 	if err != nil {
 		klog.Errorf("comment client failed: %v", err)
 		return nil, err
@@ -40,8 +42,8 @@ func CommentAction(context context.Context, req *comment.CommentActionRequest) (
 	return resp, nil
 }
 
-func CommentList(context context.Context, req *comment.CommentListRequest) (resp *comment.CommentListResponse, err error) {
-	resp, err = commentClient.CommentList(context, req)
+func (c *CommentClient) CommentList(context context.Context, req *comment.CommentListRequest) (resp *comment.CommentListResponse, err error) {
+	resp, err = c.client.CommentList(context, req)
 	if err != nil {
 		klog.Errorf("comment client failed: %v", err)
 		return nil, err

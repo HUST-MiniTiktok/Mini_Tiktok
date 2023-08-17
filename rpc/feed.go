@@ -12,23 +12,25 @@ import (
 	etcd "github.com/kitex-contrib/registry-etcd"
 )
 
-var (
-	feedClient feedservice.Client
-)
+type FeedClient struct {
+	client feedservice.Client
+}
 
-func init() {
+func NewFeedClient() (feedClient *FeedClient) {
 	r, err := etcd.NewEtcdResolver(conf.GetConf().GetStringSlice("registry.address"))
 	if err != nil {
 		klog.Fatalf("new resolver failed: %v", err)
 	}
-	feedClient, err = feedservice.NewClient("feed", client.WithResolver(r))
+	c, err := feedservice.NewClient("feed", client.WithResolver(r))
 	if err != nil {
 		klog.Fatalf("new feed client failed: %v", err)
 	}
+	feedClient = &FeedClient{client: c}
+	return
 }
 
-func GetFeed(context context.Context, req *feed.FeedRequest) (resp *feed.FeedResponse, err error) {
-	resp, err = feedClient.GetFeed(context, req)
+func (c *FeedClient) GetFeed(context context.Context, req *feed.FeedRequest) (resp *feed.FeedResponse, err error) {
+	resp, err = c.client.GetFeed(context, req)
 	if err != nil {
 		klog.Errorf("feed client failed: %v", err)
 		return nil, err

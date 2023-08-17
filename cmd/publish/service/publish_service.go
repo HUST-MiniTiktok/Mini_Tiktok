@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/rpc"
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/dal/db"
 	oss "github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/dal/oss"
 	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
@@ -16,7 +17,6 @@ import (
 	user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user"
 	"github.com/HUST-MiniTiktok/mini_tiktok/mw/ffmpeg"
 	"github.com/HUST-MiniTiktok/mini_tiktok/mw/jwt"
-	rpc "github.com/HUST-MiniTiktok/mini_tiktok/rpc"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
 )
@@ -127,7 +127,7 @@ func (s *PublishService) PublishList(request *publish.PublishListRequest) (resp 
 
 	for _, db_video := range db_videos {
 		go func(db_video *db.Video) {
-			author, err := rpc.User(s.ctx, &user.UserRequest{UserId: db_video.AuthorID})
+			author, err := rpc.UserRPC.User(s.ctx, &user.UserRequest{UserId: db_video.AuthorID})
 			kitex_author := author.User
 			if err != nil {
 				err_chan <- err
@@ -172,7 +172,7 @@ func (s *PublishService) GetVideoById(request *publish.GetVideoByIdRequest) (res
 		resp = &publish.GetVideoByIdResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}
 		return
 	}
-	author, err := rpc.User(s.ctx, &user.UserRequest{UserId: db_video.AuthorID})
+	author, err := rpc.UserRPC.User(s.ctx, &user.UserRequest{UserId: db_video.AuthorID})
 	if err != nil {
 		err_msg := err.Error()
 		resp = &publish.GetVideoByIdResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}
@@ -209,7 +209,7 @@ func (s *PublishService) GetVideoByIdList(request *publish.GetVideoByIdListReque
 
 	for _, db_video := range db_videos {
 		go func(db_video *db.Video) {
-			author, err := rpc.User(s.ctx, &user.UserRequest{UserId: db_video.AuthorID})
+			author, err := rpc.UserRPC.User(s.ctx, &user.UserRequest{UserId: db_video.AuthorID})
 			kitex_author := author.User
 			if err != nil {
 				err_chan <- err

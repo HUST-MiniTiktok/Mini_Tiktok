@@ -6,9 +6,9 @@ import (
 	"context"
 
 	publish "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/publish"
-	rpc "github.com/HUST-MiniTiktok/mini_tiktok/rpc"
-	"github.com/HUST-MiniTiktok/mini_tiktok/utils"
-	"github.com/HUST-MiniTiktok/mini_tiktok/utils/conv"
+	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/rpc"
+	"github.com/HUST-MiniTiktok/mini_tiktok/util"
+	"github.com/HUST-MiniTiktok/mini_tiktok/util/conv"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
@@ -37,7 +37,7 @@ func PublishAction(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	kitex_resp, err := rpc.PublishAction(ctx, conv.ToKitexPublishActionRequest(&req))
+	kitex_resp, err := rpc.PublishRPC.PublishAction(ctx, conv.ToKitexPublishActionRequest(&req))
 
 	if err == nil {
 		c.JSON(consts.StatusOK, conv.ToHertzPublishActionResponse(kitex_resp))
@@ -57,7 +57,7 @@ func PublishList(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	kitex_resp, err := rpc.PublishList(ctx, conv.ToKitexPublishListRequest(&req))
+	kitex_resp, err := rpc.PublishRPC.PublishList(ctx, conv.ToKitexPublishListRequest(&req))
 
 	if err == nil {
 		c.JSON(consts.StatusOK, conv.ToHertzPublishListResponse(kitex_resp))

@@ -12,23 +12,25 @@ import (
 	etcd "github.com/kitex-contrib/registry-etcd"
 )
 
-var (
-	messageClient messageservice.Client
-)
+type MessageClient struct {
+	client messageservice.Client
+}
 
-func init() {
+func NewMessageClient() (messageClient *MessageClient) {
 	r, err := etcd.NewEtcdResolver(conf.GetConf().GetStringSlice("registry.address"))
 	if err != nil {
 		klog.Fatalf("new resolver failed: %v", err)
 	}
-	messageClient, err = messageservice.NewClient("message", client.WithResolver(r))
+	c, err := messageservice.NewClient("message", client.WithResolver(r))
 	if err != nil {
 		klog.Fatalf("new message client failed: %v", err)
 	}
+	messageClient = &MessageClient{client: c}
+	return
 }
 
-func MessageAction(context context.Context, req *message.MessageActionRequest) (resp *message.MessageActionResponse, err error) {
-	resp, err = messageClient.MessageAction(context, req)
+func (c *MessageClient) MessageAction(context context.Context, req *message.MessageActionRequest) (resp *message.MessageActionResponse, err error) {
+	resp, err = c.client.MessageAction(context, req)
 	if err != nil {
 		klog.Errorf("message client failed: %v", err)
 		return nil, err
@@ -40,8 +42,8 @@ func MessageAction(context context.Context, req *message.MessageActionRequest) (
 	return resp, nil
 }
 
-func MessageChat(context context.Context, req *message.MessageChatRequest) (resp *message.MessageChatResponse, err error) {
-	resp, err = messageClient.MessageChat(context, req)
+func (c *MessageClient) MessageChat(context context.Context, req *message.MessageChatRequest) (resp *message.MessageChatResponse, err error) {
+	resp, err = c.client.MessageChat(context, req)
 	if err != nil {
 		klog.Errorf("message client failed: %v", err)
 		return nil, err

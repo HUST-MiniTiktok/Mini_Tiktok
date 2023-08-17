@@ -10,7 +10,7 @@ import (
 	common "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/common"
 	feed "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/feed"
 	user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user"
-	"github.com/HUST-MiniTiktok/mini_tiktok/rpc"
+	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/rpc"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
 )
@@ -59,7 +59,7 @@ func (s *FeedService) GetFeed(request *feed.FeedRequest) (resp *feed.FeedRespons
 
 	for _, db_video := range db_videos {
 		go func(db_video *db.Video) {
-			author, err := rpc.User(s.ctx, &user.UserRequest{UserId: db_video.AuthorID})
+			author, err := rpc.UserRPC.User(s.ctx, &user.UserRequest{UserId: db_video.AuthorID})
 			kitex_author := author.User
 			if err != nil {
 				err_chan <- err

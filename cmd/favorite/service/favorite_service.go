@@ -8,7 +8,7 @@ import (
 	favorite "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/favorite"
 	publish "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/publish"
 	"github.com/HUST-MiniTiktok/mini_tiktok/mw/jwt"
-	rpc "github.com/HUST-MiniTiktok/mini_tiktok/rpc"
+	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/favorite/rpc"
 	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
 )
 
@@ -97,7 +97,7 @@ func (s *FavoriteService) FavoriteList(ctx context.Context, req *favorite.Favori
 	video_chan := make(chan []*common.Video)
 	// var videoList []*common.Video
 
-	videosResponse, err := rpc.GetVideoByIdList(ctx, &publish.GetVideoByIdListRequest{Id: videoIDList})
+	videosResponse, err := rpc.PublishRPC.GetVideoByIdList(ctx, &publish.GetVideoByIdListRequest{Id: videoIDList})
 	if err != nil {
 		err_chan <- err
 	} else {
