@@ -68,3 +68,9 @@ func (p *UserResponse) IsValid() error {
 	}
 	return nil
 }
+func (p *CheckUserIsExistRequest) IsValid() error {
+	return nil
+}
+func (p *CheckUserIsExistResponse) IsValid() error {
+	return nil
+}

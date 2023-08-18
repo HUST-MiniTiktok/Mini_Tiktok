@@ -32,9 +32,19 @@ struct UserRequest {
 }
 
 struct UserResponse {
-    1: i32 status_code (go.tag="json:\"status_code\"")  // 状态码，0-成功，其他值-失败
-    2: optional string status_msg                       // 返回状态描述
-    3: common.User user                                        // 用户信息
+    1: i32 status_code (go.tag="json:\"status_code\"")      // 状态码，0-成功，其他值-失败
+    2: optional string status_msg                           // 返回状态描述
+    3: common.User user                                     // 用户信息
+}
+
+struct CheckUserIsExistRequest {
+    1: i64 user_id  // 用户id
+}
+
+struct CheckUserIsExistResponse {
+    1: i32 status_code (go.tag="json:\"status_code\"")      // 状态码，0-成功，其他值-失败
+    2: optional string status_msg                           // 返回状态描述
+    3: bool is_exist                                        // 用户是否存在
 }
 
 service UserService {
@@ -44,4 +54,6 @@ service UserService {
     UserRegisterResponse Register(1: UserRegisterRequest request) (api.post = "/douyin/user/register/")
     // 用户登录
     UserLoginResponse Login(1: UserLoginRequest request) (api.post = "/douyin/user/login/")
+    // 检查用户是否存在
+    CheckUserIsExistResponse CheckUserIsExist(1: CheckUserIsExistRequest request)
 }

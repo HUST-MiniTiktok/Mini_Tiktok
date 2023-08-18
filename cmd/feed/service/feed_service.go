@@ -13,6 +13,7 @@ import (
 	user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user"
 	"github.com/HUST-MiniTiktok/mini_tiktok/mw/jwt"
 	"github.com/HUST-MiniTiktok/mini_tiktok/mw/oss"
+	"github.com/HUST-MiniTiktok/mini_tiktok/util"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
 )
@@ -49,7 +50,7 @@ func (s *FeedService) GetFeed(request *feed.FeedRequest) (resp *feed.FeedRespons
 	
 	var last_time time.Time
 	if request.LatestTimestamp != nil {
-		last_time = time.Unix((*request.LatestTimestamp)/1000, 0)
+		last_time = util.MillTimeStampToTime(*request.LatestTimestamp)
 	} else {
 		last_time = time.Now()
 	}

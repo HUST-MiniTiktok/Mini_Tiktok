@@ -91,7 +91,7 @@ func (s *UserService) Register(ctx context.Context, request *user.UserRegisterRe
 func (s *UserService) Login(ctx context.Context, request *user.UserLoginRequest) (resp *user.UserLoginResponse, err error) {
 	db_user_ck, err := db.GetUserByUserName(ctx, request.Username)
 	if err != nil {
-		errMsg := "db check username failed"
+		errMsg := "db check user name failed"
 		resp = &user.UserLoginResponse{StatusCode: int32(codes.Internal), StatusMsg: &errMsg}
 		return
 	}
@@ -117,4 +117,16 @@ func (s *UserService) Login(ctx context.Context, request *user.UserLoginRequest)
 	}
 
 	return &user.UserLoginResponse{StatusCode: int32(codes.OK), StatusMsg: nil, UserId: user_id, Token: token}, nil
+}
+
+func (s *UserService) CheckUserIsExist(ctx context.Context, request *user.CheckUserIsExistRequest) (resp *user.CheckUserIsExistResponse, err error) {
+	is_exist, err := db.CheckUserById(ctx, request.UserId)
+
+	if err != nil {
+		errMsg := "db check user id failed"
+		resp = &user.CheckUserIsExistResponse{StatusCode: int32(codes.Internal), StatusMsg: &errMsg}
+		return
+	}
+
+	return &user.CheckUserIsExistResponse{StatusCode: int32(codes.OK), StatusMsg: nil, IsExist: is_exist}, nil
 }

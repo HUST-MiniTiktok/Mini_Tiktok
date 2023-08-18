@@ -19,9 +19,10 @@ func NewServiceInfo() *kitex.ServiceInfo {
 	serviceName := "UserService"
 	handlerType := (*user.UserService)(nil)
 	methods := map[string]kitex.MethodInfo{
-		"User":     kitex.NewMethodInfo(userHandler, newUserServiceUserArgs, newUserServiceUserResult, false),
-		"Register": kitex.NewMethodInfo(registerHandler, newUserServiceRegisterArgs, newUserServiceRegisterResult, false),
-		"Login":    kitex.NewMethodInfo(loginHandler, newUserServiceLoginArgs, newUserServiceLoginResult, false),
+		"User":             kitex.NewMethodInfo(userHandler, newUserServiceUserArgs, newUserServiceUserResult, false),
+		"Register":         kitex.NewMethodInfo(registerHandler, newUserServiceRegisterArgs, newUserServiceRegisterResult, false),
+		"Login":            kitex.NewMethodInfo(loginHandler, newUserServiceLoginArgs, newUserServiceLoginResult, false),
+		"CheckUserIsExist": kitex.NewMethodInfo(checkUserIsExistHandler, newUserServiceCheckUserIsExistArgs, newUserServiceCheckUserIsExistResult, false),
 	}
 	extra := map[string]interface{}{
 		"PackageName":     "user",
@@ -92,6 +93,24 @@ func newUserServiceLoginResult() interface{} {
 	return user.NewUserServiceLoginResult()
 }
 
+func checkUserIsExistHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*user.UserServiceCheckUserIsExistArgs)
+	realResult := result.(*user.UserServiceCheckUserIsExistResult)
+	success, err := handler.(user.UserService).CheckUserIsExist(ctx, realArg.Request)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newUserServiceCheckUserIsExistArgs() interface{} {
+	return user.NewUserServiceCheckUserIsExistArgs()
+}
+
+func newUserServiceCheckUserIsExistResult() interface{} {
+	return user.NewUserServiceCheckUserIsExistResult()
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -127,6 +146,16 @@ func (p *kClient) Login(ctx context.Context, request *user.UserLoginRequest) (r 
 	_args.Request = request
 	var _result user.UserServiceLoginResult
 	if err = p.c.Call(ctx, "Login", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) CheckUserIsExist(ctx context.Context, request *user.CheckUserIsExistRequest) (r *user.CheckUserIsExistResponse, err error) {
+	var _args user.UserServiceCheckUserIsExistArgs
+	_args.Request = request
+	var _result user.UserServiceCheckUserIsExistResult
+	if err = p.c.Call(ctx, "CheckUserIsExist", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
