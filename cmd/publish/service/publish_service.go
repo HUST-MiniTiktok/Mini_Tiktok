@@ -8,12 +8,13 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/favorite"
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/dal/db"
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/rpc"
 	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
 	common "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/common"
+	favorite "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/favorite"
 	publish "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/publish"
+	comment "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/comment"
 	user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user"
 	"github.com/HUST-MiniTiktok/mini_tiktok/mw/ffmpeg"
 	"github.com/HUST-MiniTiktok/mini_tiktok/mw/jwt"
@@ -57,33 +58,48 @@ func (s *PublishService) PublishAction(request *publish.PublishActionRequest) (r
 		}
 	}
 
-	cover_data, err := ffmpeg.GetVideoCover(request.Data)
-	if err != nil {
-		err_msg := err.Error()
-		resp = &publish.PublishActionResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}
-		return
-	}
-	klog.Infof("cover_size=%v", strconv.FormatInt(int64(len(cover_data)), 10))
-
-	video_buf := bytes.NewBuffer(request.Data)
-	video_filename := uuid.NewString() + ".mp4"
-	video_info, err := oss.PutToBucketWithBuf(s.ctx, VideoBucketName, video_filename, video_buf)
-	if err != nil {
-		err_msg := err.Error()
-		resp = &publish.PublishActionResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}
-		return
-	}
-	klog.Infof("upload_video_size=%v", strconv.FormatInt(video_info.Size, 10))
-
-	cover_buf := bytes.NewBuffer(cover_data)
 	cover_filename := uuid.NewString() + ".png"
-	cover_info, err := oss.PutToBucketWithBuf(s.ctx, ImageBucketName, cover_filename, cover_buf)
-	if err != nil {
-		err_msg := err.Error()
-		resp = &publish.PublishActionResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}
-		return
+	video_filename := uuid.NewString() + ".mp4"
+	err_chan := make(chan error)
+	ok := make(chan bool)
+	go func () {
+		cover_data, err := ffmpeg.GetVideoCover(request.Data)
+		if err != nil {
+			err_chan <- err
+			return
+		}
+		klog.Infof("cover_size=%v", strconv.FormatInt(int64(len(cover_data)), 10))
+
+		cover_buf := bytes.NewBuffer(cover_data)
+
+		cover_info, err := oss.PutToBucketWithBuf(s.ctx, ImageBucketName, cover_filename, cover_buf)
+		if err != nil {
+			err_chan <- err
+			return
+		}
+		klog.Infof("upload_cover_size=%v", strconv.FormatInt(cover_info.Size, 10))
+		ok <- true
+	}()
+	go func () {
+		video_buf := bytes.NewBuffer(request.Data)
+		video_info, err := oss.PutToBucketWithBuf(s.ctx, VideoBucketName, video_filename, video_buf)
+		if err != nil {
+			err_chan <- err
+			return
+		} 
+		klog.Infof("upload_video_size=%v", strconv.FormatInt(video_info.Size, 10))
+		ok <- true
+	}()
+
+	for i := 0; i < 2; i++ {
+		select {
+		case err := <-err_chan:
+			err_msg := err.Error()
+			resp = &publish.PublishActionResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}
+			return resp, err
+		case <-ok:
+		}
 	}
-	klog.Infof("upload_cover_size=%v", strconv.FormatInt(cover_info.Size, 10))
 
 	id, err := db.CreateVideo(s.ctx, &db.Video{
 		AuthorID:    author_id,
@@ -147,6 +163,11 @@ func (s *PublishService) PublishList(request *publish.PublishListRequest) (resp 
 				err_chan <- err
 				return
 			}
+			comment_count, err := rpc.CommentRPC.GetVideoCommentCount(s.ctx, &comment.GetVideoCommentCountRequest{VideoId: db_video.ID})
+			if err != nil {
+				err_chan <- err
+				return
+			}
 
 			video_chan <- &common.Video{
 				Id:       db_video.ID,
@@ -156,6 +177,7 @@ func (s *PublishService) PublishList(request *publish.PublishListRequest) (resp 
 				Title:    db_video.Title,
 				FavoriteCount: favorite_count.FavoriteCount,
 				IsFavorite: is_favorite.IsFavorite,
+				CommentCount: comment_count.CommentCount,
 			}
 		}(db_video)
 	}
@@ -225,17 +247,17 @@ func (s *PublishService) GetVideoByIdList(request *publish.GetVideoByIdListReque
 	for _, db_video := range db_videos {
 		go func(db_video *db.Video) {
 			author, err := rpc.UserRPC.User(s.ctx, &user.UserRequest{UserId: db_video.AuthorID})
-			kitex_author := author.User
 			if err != nil {
 				err_chan <- err
-			} else {
-				video_chan <- &common.Video {
-					Id:       db_video.ID,
-					Author:   kitex_author,
-					PlayUrl:  oss.ToRealURL(s.ctx, db_video.PlayURL),
-					CoverUrl: oss.ToRealURL(s.ctx, db_video.CoverURL),
-					Title:    db_video.Title,
-				}
+				return
+			} 
+
+			video_chan <- &common.Video {
+				Id:       db_video.ID,
+				Author:   author.User,
+				PlayUrl:  oss.ToRealURL(s.ctx, db_video.PlayURL),
+				CoverUrl: oss.ToRealURL(s.ctx, db_video.CoverURL),
+				Title:    db_video.Title,	
 			}
 		}(db_video)
 	}
