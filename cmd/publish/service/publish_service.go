@@ -128,7 +128,7 @@ func (s *PublishService) PublishList(request *publish.PublishListRequest) (resp 
 
 	err_chan := make(chan error)
 	video_chan := make(chan *common.Video)
-	kitex_videos := make([]*common.Video, len(db_videos))
+	kitex_videos := make([]*common.Video, 0, len(db_videos))
 
 	for _, db_video := range db_videos {
 		go func(db_video *db.Video) {
@@ -284,7 +284,7 @@ func (s *PublishService) GetVideoByIdList(request *publish.GetVideoByIdListReque
 	
 	err_chan := make(chan error)
 	video_chan := make(chan *common.Video)
-	kitex_videos := make([]*common.Video, len(db_videos))
+	kitex_videos := make([]*common.Video, 0, len(db_videos))
 
 	for _, db_video := range db_videos {
 		go func(db_video *db.Video) {

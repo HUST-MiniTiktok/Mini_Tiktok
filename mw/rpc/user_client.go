@@ -30,7 +30,6 @@ func NewUserClient() (userClient *UserClient) {
 }
 
 func (c *UserClient) User(context context.Context, req *user.UserRequest) (resp *user.UserResponse, err error) {
-	klog.Warnf("user req: %v", req)
 	resp, err = c.client.User(context, req)
 	if err != nil {
 		klog.Errorf("user client failed: %v", err.Error())

@@ -14,7 +14,6 @@ import (
 	"github.com/HUST-MiniTiktok/mini_tiktok/mw/jwt"
 	"github.com/HUST-MiniTiktok/mini_tiktok/mw/oss"
 	"github.com/HUST-MiniTiktok/mini_tiktok/util"
-	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
 )
 
@@ -39,7 +38,6 @@ func NewFeedService(ctx context.Context) *FeedService {
 }
 
 func (s *FeedService) GetFeed(request *feed.FeedRequest) (resp *feed.FeedResponse, err error) {
-	klog.Infof("publish_list request: %v", *request)
 	user_claims, err := Jwt.ExtractClaims(request.GetToken())
 	var curr_user_id int64
 	if err != nil {
@@ -65,7 +63,7 @@ func (s *FeedService) GetFeed(request *feed.FeedRequest) (resp *feed.FeedRespons
 
 	err_chan := make(chan error)
 	video_chan := make(chan *common.Video)
-	kitex_videos := make([]*common.Video, len(db_videos))
+	kitex_videos := make([]*common.Video, 0, len(db_videos))
 
 	for _, db_video := range db_videos {
 		go func(db_video *db.Video) {

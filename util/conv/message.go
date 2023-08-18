@@ -16,7 +16,7 @@ func ToHertzMessage(message *kitex_message.Message) *hertz_message.Message {
 }
 
 func ToHertzMessageList(message_list []*kitex_message.Message) []*hertz_message.Message {
-	hertz_message_list := make([]*hertz_message.Message, len(message_list))
+	hertz_message_list := make([]*hertz_message.Message, 0, len(message_list))
 	for _, message := range message_list {
 		hertz_message_list = append(hertz_message_list, ToHertzMessage(message))
 	}

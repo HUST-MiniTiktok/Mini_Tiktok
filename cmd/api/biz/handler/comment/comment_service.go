@@ -6,8 +6,12 @@ import (
 	"context"
 
 	comment "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/comment"
+	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/rpc"
+	"github.com/HUST-MiniTiktok/mini_tiktok/util"
+	"github.com/HUST-MiniTiktok/mini_tiktok/util/conv"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
 )
 
 // CommentAction .
@@ -17,13 +21,17 @@ func CommentAction(ctx context.Context, c *app.RequestContext) {
 	var req comment.CommentActionRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		c.JSON(consts.StatusBadRequest, util.NewRespMap(int32(codes.InvalidArgument), err.Error()))
 		return
 	}
 
-	resp := new(comment.CommentActionResponse)
+	kitex_resp, err := rpc.CommentRPC.CommentAction(ctx, conv.ToKitexCommentActionRequest(&req))
 
-	c.JSON(consts.StatusOK, resp)
+	if err == nil {
+		c.JSON(consts.StatusOK, conv.ToHertzCommentActionResponse(kitex_resp))
+	} else {
+		c.JSON(consts.StatusOK, util.NewRespMap(int32(codes.Internal), err.Error()))
+	}
 }
 
 // CommentList .
@@ -33,11 +41,15 @@ func CommentList(ctx context.Context, c *app.RequestContext) {
 	var req comment.CommentListRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		c.JSON(consts.StatusBadRequest, util.NewRespMap(int32(codes.InvalidArgument), err.Error()))
 		return
 	}
 
-	resp := new(comment.CommentListResponse)
+	kitex_resp, err := rpc.CommentRPC.CommentList(ctx, conv.ToKitexCommentListRequest(&req))
 
-	c.JSON(consts.StatusOK, resp)
+	if err == nil {
+		c.JSON(consts.StatusOK, conv.ToHertzCommentListResponse(kitex_resp))
+	} else {
+		c.JSON(consts.StatusOK, util.NewRespMap(int32(codes.Internal), err.Error()))
+	}
 }

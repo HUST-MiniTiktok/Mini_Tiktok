@@ -48,7 +48,7 @@ func (s *MessageService) MessageChat(request *message.MessageChatRequest) (resp 
 		return &message.MessageChatResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}, err
 	}
 
-	kitex_messages := make([]*message.Message, len(db_messages))
+	kitex_messages := make([]*message.Message, 0, len(db_messages))
 	for _, db_message := range db_messages {
 		create_time := util.TimeToMillTimeStamp(db_message.CreatedAt)
 		kitex_messages = append(kitex_messages, &message.Message{

@@ -2,33 +2,32 @@ package conv
 
 import (
 	hertz_common "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/common"
-	kitex_common "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/common"
 	hertz_publish "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/publish"
+	kitex_common "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/common"
 	kitex_publish "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/publish"
 )
 
 func ToHertzVideo(video *kitex_common.Video) *hertz_common.Video {
 	return &hertz_common.Video{
-		ID: video.Id,
-		Author: ToHertzUser(video.Author),
-		PlayURL: video.PlayUrl,
+		ID:       video.Id,
+		Author:   ToHertzUser(video.Author),
+		PlayURL:  video.PlayUrl,
 		CoverURL: video.CoverUrl,
-		Title: video.Title,
+		Title:    video.Title,
 	}
 }
 
 func ToHertzVideoList(videoList []*kitex_common.Video) []*hertz_common.Video {
-	hertzVideoList := make([]*hertz_common.Video, len(videoList))
+	hertzVideoList := make([]*hertz_common.Video, 0, len(videoList))
 	for _, video := range videoList {
 		hertzVideoList = append(hertzVideoList, ToHertzVideo(video))
 	}
 	return hertzVideoList
 }
 
-
 func ToKitexPublishActionRequest(req *hertz_publish.PublishActionRequest) *kitex_publish.PublishActionRequest {
 	return &kitex_publish.PublishActionRequest{
-		Token:  req.Token,
+		Token: req.Token,
 		Data:  req.Data,
 		Title: req.Title,
 	}
@@ -52,6 +51,6 @@ func ToHertzPublishListResponse(resp *kitex_publish.PublishListResponse) *hertz_
 	return &hertz_publish.PublishListResponse{
 		StatusCode: resp.StatusCode,
 		StatusMsg:  resp.StatusMsg,
-		VideoList: ToHertzVideoList(resp.VideoList),
+		VideoList:  ToHertzVideoList(resp.VideoList),
 	}
 }

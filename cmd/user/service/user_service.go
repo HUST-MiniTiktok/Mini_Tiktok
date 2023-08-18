@@ -104,7 +104,7 @@ func (s *UserService) Login(ctx context.Context, request *user.UserLoginRequest)
 
 	if !crypt.VerifyPassword(request.Password, db_user_ck.Password) {
 		errMsg := "password incorrect"
-		resp = &user.UserLoginResponse{StatusCode: int32(codes.Unauthenticated), StatusMsg: &errMsg}
+		resp = &user.UserLoginResponse{StatusCode: int32(codes.PermissionDenied), StatusMsg: &errMsg}
 		return
 	}
 
