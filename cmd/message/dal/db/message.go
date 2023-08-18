@@ -36,8 +36,9 @@ func GetMessageById(ctx context.Context, id int64) (message *Message, err error)
 	return
 }
 
-func GetMessageByUserIdPair(ctx context.Context, toUserId, fromUserId int64) (messages []*Message, err error) {
-	err = DB.WithContext(ctx).Where("to_user_id = ? and from_user_id = ?", toUserId, fromUserId).Find(&messages).Error
+func GetMessageByUserIdPair(ctx context.Context, toUserId, fromUserId int64, preMsgTime time.Time) (messages []*Message, err error) {
+	//  preMsgTime 上次最新消息的时间
+	err = DB.WithContext(ctx).Where("to_user_id = ? AND from_user_id = ? AND created_at > ?", toUserId, fromUserId, preMsgTime).Find(&messages).Error
 	if err != nil {
 		return nil, err
 	}

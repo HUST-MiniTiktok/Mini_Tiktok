@@ -52,10 +52,7 @@ func (s *PublishService) PublishAction(request *publish.PublishActionRequest) (r
 
 	if err != nil {
 		err_msg := err.Error()
-		resp = &publish.PublishActionResponse{
-			StatusCode: int32(codes.PermissionDenied),
-			StatusMsg:  &err_msg,
-		}
+		return &publish.PublishActionResponse{StatusCode: int32(codes.PermissionDenied), StatusMsg: &err_msg}, err
 	}
 
 	cover_filename := uuid.NewString() + ".png"
@@ -94,13 +91,12 @@ func (s *PublishService) PublishAction(request *publish.PublishActionRequest) (r
 		select {
 		case err := <-err_chan:
 			err_msg := err.Error()
-			resp = &publish.PublishActionResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}
-			return resp, err
+			return &publish.PublishActionResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}, err
 		case <-ok:
 		}
 	}
 
-	id, err := db.CreateVideo(s.ctx, &db.Video{
+	_, err = db.CreateVideo(s.ctx, &db.Video{
 		AuthorID:    author_id,
 		PlayURL:     oss.ToDbURL(VideoBucketName, video_filename),
 		CoverURL:    oss.ToDbURL(ImageBucketName, cover_filename),
@@ -109,15 +105,9 @@ func (s *PublishService) PublishAction(request *publish.PublishActionRequest) (r
 	})
 	if err != nil {
 		err_msg := err.Error()
-		resp = &publish.PublishActionResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}
-		return
+		return &publish.PublishActionResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}, err
 	}
-	klog.Infof("db create video_id=%v", id)
-	resp = &publish.PublishActionResponse{
-		StatusCode: int32(codes.OK),
-		StatusMsg:  nil,
-	}
-	return
+	return &publish.PublishActionResponse{StatusCode: int32(codes.OK),StatusMsg: nil}, nil
 }
 
 func (s *PublishService) PublishList(request *publish.PublishListRequest) (resp *publish.PublishListResponse, err error) {
@@ -133,14 +123,12 @@ func (s *PublishService) PublishList(request *publish.PublishListRequest) (resp 
 	db_videos, err := db.GetVideoByAuthorId(s.ctx, query_user_id)
 	if err != nil {
 		err_msg := err.Error()
-		resp = &publish.PublishListResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}
-		return
+		return &publish.PublishListResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}, err
 	}
 
 	err_chan := make(chan error)
 	video_chan := make(chan *common.Video)
-
-	var kitex_videos []*common.Video
+	kitex_videos := make([]*common.Video, len(db_videos))
 
 	for _, db_video := range db_videos {
 		go func(db_video *db.Video) {
@@ -291,12 +279,12 @@ func (s *PublishService) GetVideoByIdList(request *publish.GetVideoByIdListReque
 	db_videos, err := db.GetVideosByIDs(s.ctx, request.Id)
 	if err != nil {
 		err_msg := err.Error()
-		resp = &publish.GetVideoByIdListResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}
-		return
+		return &publish.GetVideoByIdListResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}, err
 	}
+	
 	err_chan := make(chan error)
 	video_chan := make(chan *common.Video)
-	var kitex_videos []*common.Video
+	kitex_videos := make([]*common.Video, len(db_videos))
 
 	for _, db_video := range db_videos {
 		go func(db_video *db.Video) {

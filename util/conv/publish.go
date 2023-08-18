@@ -10,7 +10,7 @@ import (
 func ToHertzVideo(video *kitex_common.Video) *hertz_common.Video {
 	return &hertz_common.Video{
 		ID: video.Id,
-		Author: (*hertz_common.User)(ToHertzUser(video.Author)),
+		Author: ToHertzUser(video.Author),
 		PlayURL: video.PlayUrl,
 		CoverURL: video.CoverUrl,
 		Title: video.Title,
@@ -18,7 +18,7 @@ func ToHertzVideo(video *kitex_common.Video) *hertz_common.Video {
 }
 
 func ToHertzVideoList(videoList []*kitex_common.Video) []*hertz_common.Video {
-	var hertzVideoList []*hertz_common.Video
+	hertzVideoList := make([]*hertz_common.Video, len(videoList))
 	for _, video := range videoList {
 		hertzVideoList = append(hertzVideoList, ToHertzVideo(video))
 	}

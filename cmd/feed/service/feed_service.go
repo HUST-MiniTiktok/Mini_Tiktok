@@ -21,12 +21,13 @@ import (
 var (
 	VideoBucketName string
 	ImageBucketName string
-	Jwt *jwt.JWT
+	Jwt             *jwt.JWT
 )
 
 func init() {
 	VideoBucketName = conf.GetConf().GetString("oss.videobucket")
 	ImageBucketName = conf.GetConf().GetString("oss.imagebucket")
+	Jwt = jwt.NewJWT()
 }
 
 type FeedService struct {
@@ -47,14 +48,13 @@ func (s *FeedService) GetFeed(request *feed.FeedRequest) (resp *feed.FeedRespons
 		curr_user_id = user_claims.ID
 	}
 
-	
 	var last_time time.Time
 	if request.LatestTimestamp != nil {
 		last_time = util.MillTimeStampToTime(*request.LatestTimestamp)
 	} else {
 		last_time = time.Now()
 	}
-	
+
 	var db_videos []*db.Video
 	db_videos, err = db.GetVideosByLastPublishTime(s.ctx, last_time)
 	if err != nil {
@@ -64,11 +64,8 @@ func (s *FeedService) GetFeed(request *feed.FeedRequest) (resp *feed.FeedRespons
 	}
 
 	err_chan := make(chan error)
-	defer close(err_chan)
 	video_chan := make(chan *common.Video)
-	defer close(video_chan)
-
-	var kitex_videos []*common.Video
+	kitex_videos := make([]*common.Video, len(db_videos))
 
 	for _, db_video := range db_videos {
 		go func(db_video *db.Video) {
@@ -76,7 +73,7 @@ func (s *FeedService) GetFeed(request *feed.FeedRequest) (resp *feed.FeedRespons
 			if err != nil {
 				err_chan <- err
 				return
-			} 
+			}
 			favorite_count, err := rpc.FavoriteRPC.GetVideoFavoriteCount(s.ctx, &favorite.GetVideoFavoriteCountRequest{VideoId: db_video.ID})
 			if err != nil {
 				err_chan <- err
@@ -88,14 +85,14 @@ func (s *FeedService) GetFeed(request *feed.FeedRequest) (resp *feed.FeedRespons
 				return
 			}
 
-			video_chan <- &common.Video {
-				Id:       db_video.ID,
-				Author:   author.User,
-				PlayUrl:  oss.ToRealURL(s.ctx, db_video.PlayURL),
-				CoverUrl: oss.ToRealURL(s.ctx, db_video.CoverURL),
-				Title:    db_video.Title,
+			video_chan <- &common.Video{
+				Id:            db_video.ID,
+				Author:        author.User,
+				PlayUrl:       oss.ToRealURL(s.ctx, db_video.PlayURL),
+				CoverUrl:      oss.ToRealURL(s.ctx, db_video.CoverURL),
+				Title:         db_video.Title,
 				FavoriteCount: favorite_count.FavoriteCount,
-				IsFavorite: is_favorite.IsFavorite,
+				IsFavorite:    is_favorite.IsFavorite,
 			}
 
 		}(db_video)
@@ -105,8 +102,7 @@ func (s *FeedService) GetFeed(request *feed.FeedRequest) (resp *feed.FeedRespons
 		select {
 		case err := <-err_chan:
 			err_msg := err.Error()
-			resp = &feed.FeedResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}
-			return resp, err
+			return &feed.FeedResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}, err
 		case video := <-video_chan:
 			kitex_videos = append(kitex_videos, video)
 		}
@@ -120,5 +116,5 @@ func (s *FeedService) GetFeed(request *feed.FeedRequest) (resp *feed.FeedRespons
 		next_time := db_videos[len(db_videos)-1].PublishTime.Unix()
 		resp.NextTime = &next_time
 	}
-	return
+	return resp, nil
 }

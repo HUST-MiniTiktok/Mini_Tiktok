@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+
+	service "github.com/HUST-MiniTiktok/mini_tiktok/cmd/message/service"
 	message "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/message"
 )
 
@@ -10,12 +12,14 @@ type MessageServiceImpl struct{}
 
 // MessageChat implements the MessageServiceImpl interface.
 func (s *MessageServiceImpl) MessageChat(ctx context.Context, request *message.MessageChatRequest) (resp *message.MessageChatResponse, err error) {
-	// TODO: Your code here...
+	message_service := service.NewMessageService(ctx)
+	resp, err = message_service.MessageChat(request)
 	return
 }
 
 // MessageAction implements the MessageServiceImpl interface.
 func (s *MessageServiceImpl) MessageAction(ctx context.Context, request *message.MessageActionRequest) (resp *message.MessageActionResponse, err error) {
-	// TODO: Your code here...
+	message_service := service.NewMessageService(ctx)
+	resp, err = message_service.MessageAction(request)
 	return
 }
