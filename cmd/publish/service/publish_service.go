@@ -61,7 +61,9 @@ func (s *PublishService) PublishAction(request *publish.PublishActionRequest) (r
 	cover_filename := uuid.NewString() + ".png"
 	video_filename := uuid.NewString() + ".mp4"
 	err_chan := make(chan error)
+	defer close(err_chan)
 	ok := make(chan bool)
+	defer close(ok)
 	go func () {
 		cover_data, err := ffmpeg.GetVideoCover(request.Data)
 		if err != nil {
@@ -71,7 +73,6 @@ func (s *PublishService) PublishAction(request *publish.PublishActionRequest) (r
 		klog.Infof("cover_size=%v", strconv.FormatInt(int64(len(cover_data)), 10))
 
 		cover_buf := bytes.NewBuffer(cover_data)
-
 		cover_info, err := oss.PutToBucketWithBuf(s.ctx, ImageBucketName, cover_filename, cover_buf)
 		if err != nil {
 			err_chan <- err
