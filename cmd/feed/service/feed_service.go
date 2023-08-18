@@ -7,6 +7,7 @@ import (
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/dal/db"
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/rpc"
 	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
+	comment "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/comment"
 	common "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/common"
 	favorite "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/favorite"
 	feed "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/feed"
@@ -82,6 +83,11 @@ func (s *FeedService) GetFeed(request *feed.FeedRequest) (resp *feed.FeedRespons
 				err_chan <- err
 				return
 			}
+			comment_count, err := rpc.CommentRPC.GetVideoCommentCount(s.ctx, &comment.GetVideoCommentCountRequest{VideoId: db_video.ID})
+			if err != nil {
+				err_chan <- err
+				return
+			}
 
 			video_chan <- &common.Video{
 				Id:            db_video.ID,
@@ -91,8 +97,8 @@ func (s *FeedService) GetFeed(request *feed.FeedRequest) (resp *feed.FeedRespons
 				Title:         db_video.Title,
 				FavoriteCount: favorite_count.FavoriteCount,
 				IsFavorite:    is_favorite.IsFavorite,
+				CommentCount:  comment_count.CommentCount,
 			}
-
 		}(db_video)
 	}
 
