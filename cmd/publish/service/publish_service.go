@@ -52,7 +52,7 @@ func (s *PublishService) PublishAction(request *publish.PublishActionRequest) (r
 	if err != nil {
 		err_msg := err.Error()
 		resp = &publish.PublishActionResponse{
-			StatusCode: int32(codes.Unauthenticated),
+			StatusCode: int32(codes.PermissionDenied),
 			StatusMsg:  &err_msg,
 		}
 	}
@@ -87,8 +87,8 @@ func (s *PublishService) PublishAction(request *publish.PublishActionRequest) (r
 
 	id, err := db.CreateVideo(s.ctx, &db.Video{
 		AuthorID:    author_id,
-		PlayURL:     oss.ToDbURL(s.ctx, VideoBucketName, video_filename),
-		CoverURL:    oss.ToDbURL(s.ctx, ImageBucketName, cover_filename),
+		PlayURL:     oss.ToDbURL(VideoBucketName, video_filename),
+		CoverURL:    oss.ToDbURL(ImageBucketName, cover_filename),
 		PublishTime: time.Now(),
 		Title:       request.Title,
 	})
@@ -147,9 +147,6 @@ func (s *PublishService) PublishList(request *publish.PublishListRequest) (resp 
 				err_chan <- err
 				return
 			}
-
-			klog.Infof("real_play_url=%v", oss.ToRealURL(s.ctx, db_video.PlayURL))
-			klog.Infof("real_cover_url=%v", oss.ToRealURL(s.ctx, db_video.CoverURL))
 
 			video_chan <- &common.Video{
 				Id:       db_video.ID,
@@ -232,7 +229,7 @@ func (s *PublishService) GetVideoByIdList(request *publish.GetVideoByIdListReque
 			if err != nil {
 				err_chan <- err
 			} else {
-				video_chan <- &common.Video{
+				video_chan <- &common.Video {
 					Id:       db_video.ID,
 					Author:   kitex_author,
 					PlayUrl:  oss.ToRealURL(s.ctx, db_video.PlayURL),

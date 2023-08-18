@@ -6,7 +6,6 @@ import (
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/comment/dal/db"
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/rpc"
 	comment "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/comment"
-	common "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/common"
 	user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user"
 	"github.com/HUST-MiniTiktok/mini_tiktok/mw/jwt"
 	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
@@ -55,13 +54,12 @@ func (s *CommentService) CommentAction(ctx context.Context, request *comment.Com
 		comment_chan := make(chan *comment.Comment)
 		defer close(comment_chan)
 		author, err := rpc.UserRPC.User(s.ctx, &user.UserRequest{UserId: newcomment.UserId})
-		comment_author := author.User
 		if err != nil {
 			err_chan <- err
 		} else {
 			comment_chan <- &comment.Comment{
 				Id:         newcomment.ID,
-				User:       (*common.User)(comment_author),
+				User:       author.User,
 				Content:    newcomment.CommentText,
 				CreateDate: newcomment.CreatedAt.Format("01-02"),
 			}
@@ -143,13 +141,12 @@ func (s *CommentService) CommentList(ctx context.Context, request *comment.Comme
 	for _, db_comment := range Comments {
 		go func(db_comment *db.Comment) {
 			author, err := rpc.UserRPC.User(s.ctx, &user.UserRequest{UserId: db_comment.UserId})
-			comment_author := author.User
 			if err != nil {
 				err_chan <- err
 			} else {
 				comment_chan <- &comment.Comment{
 					Id:         db_comment.ID,
-					User:       (*common.User)(comment_author),
+					User:       author.User,
 					Content:    db_comment.CommentText,
 					CreateDate: db_comment.CreatedAt.Format("01-02"),
 				}
@@ -178,7 +175,6 @@ func (s *CommentService) CommentList(ctx context.Context, request *comment.Comme
 }
 
 func (s *CommentService) GetVideoCommentCount(ctx context.Context, request *comment.GetVideoCommentCountRequest) (resp *comment.GetVideoCommentCountResponse, er error) {
-	// TODO: Your code here...
 	count, err := db.GetVideoCommentCounts(s.ctx, request.VideoId)
 	if err != nil {
 		msg := "Get Video Comments Count Failed"

@@ -1,7 +1,7 @@
 package rpc
 
 import (
-	rpc "github.com/HUST-MiniTiktok/mini_tiktok/rpc"
+	rpc "github.com/HUST-MiniTiktok/mini_tiktok/mw/rpc"
 )
 
 var (

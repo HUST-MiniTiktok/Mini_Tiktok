@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/minio/minio-go/v7"
 )
@@ -57,18 +56,18 @@ func ToRealURL(ctx context.Context, db_url string) (real_url string) {
 	file_name := names[1]
 	real_url_, err := GetObjectURL(ctx, bucket_name, file_name)
 	go func() {
-		RDClient.Set(db_url, real_url_, time.Hour*24)
+		RDClient.Set(db_url, real_url_, time.Hour * 24)
 	}()
 	if err != nil {
 		klog.Errorf("get object url failed: %v", err)
 	} else {
-		real_url_.Host = conf.GetConf().GetString("oss.endpoint")
+		real_url_.Host = MinioHost
 		real_url = real_url_.String()
 	}
 	return
 }
 
-func ToDbURL(ctx context.Context, bucket_name string, file_name string) (db_url string) {
+func ToDbURL(bucket_name string, file_name string) (db_url string) {
 	db_url = bucket_name + "/" + file_name
 	return
 }
