@@ -13,7 +13,6 @@ import (
 )
 
 func main() {
-
 	dal.Init()
 
 	addr, err := net.ResolveTCPAddr("tcp", "127.0.0.1:8885")
@@ -32,9 +31,9 @@ func main() {
 		server.WithRegistry(r),
 	)
 
-	err = svr.Run()
-
-	if err != nil {
-		klog.Fatalf("run Comment rpc server failed: %v", err)
+	if err := svr.Run(); err != nil {
+		klog.Errorf("comment server stopped with error:", err)
+	} else {
+		klog.Infof("comment server stopped")
 	}
 }

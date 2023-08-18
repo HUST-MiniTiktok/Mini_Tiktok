@@ -4,8 +4,8 @@ import (
 	"net"
 
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/favorite/dal"
-	favorite "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/favorite/favoriteservice"
 	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
+	favorite "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/favorite/favoriteservice"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
@@ -31,10 +31,9 @@ func main() {
 		server.WithRegistry(r),
 	)
 
-	err = svr.Run()
-
-	if err != nil {
-		klog.Fatalf("run Favorite rpc server failed: %v", err)
+	if err := svr.Run(); err != nil {
+		klog.Errorf("favorite server stopped with error:", err)
+	} else {
+		klog.Infof("favorite server stopped")
 	}
-
 }

@@ -4,8 +4,8 @@ import (
 	"net"
 
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/user/dal"
-	user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user/userservice"
 	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
+	user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user/userservice"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
@@ -24,16 +24,16 @@ func main() {
 	if err != nil {
 		klog.Fatalf("new registry failed: %v", err)
 	}
-	
+
 	svr := user.NewServer(new(UserServiceImpl),
 		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: "user"}),
 		server.WithServiceAddr(addr),
 		server.WithRegistry(r),
 	)
 
-	err = svr.Run()
-
-	if err != nil {
-		klog.Fatalf("run user rpc server failed: %v", err)
+	if err := svr.Run(); err != nil {
+		klog.Errorf("user server stopped with error:", err)
+	} else {
+		klog.Infof("user server stopped")
 	}
 }

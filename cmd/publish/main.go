@@ -2,9 +2,10 @@ package main
 
 import (
 	"net"
-	publish "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/publish/publishservice"
+
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/dal"
 	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
+	publish "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/publish/publishservice"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
@@ -23,16 +24,16 @@ func main() {
 	if err != nil {
 		klog.Fatalf("new registry failed: %v", err)
 	}
-	
+
 	svr := publish.NewServer(new(PublishServiceImpl),
 		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: "publish"}),
 		server.WithServiceAddr(addr),
 		server.WithRegistry(r),
 	)
 
-	err = svr.Run()
-
-	if err != nil {
-		klog.Fatalf("run publish rpc server failed: %v", err)
+	if err := svr.Run(); err != nil {
+		klog.Errorf("publish server stopped with error:", err)
+	} else {
+		klog.Infof("publish server stopped")
 	}
 }

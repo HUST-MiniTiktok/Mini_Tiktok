@@ -2,9 +2,10 @@ package main
 
 import (
 	"net"
-	feed "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/feed/feedservice"
+
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/dal"
 	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
+	feed "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/feed/feedservice"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
@@ -23,16 +24,16 @@ func main() {
 	if err != nil {
 		klog.Fatalf("new registry failed: %v", err)
 	}
-	
+
 	svr := feed.NewServer(new(FeedServiceImpl),
 		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: "feed"}),
 		server.WithServiceAddr(addr),
 		server.WithRegistry(r),
 	)
 
-	err = svr.Run()
-
-	if err != nil {
-		klog.Fatalf("run feed rpc server failed: %v", err)
+	if err := svr.Run(); err != nil {
+		klog.Errorf("feed server stopped with error:", err)
+	} else {
+		klog.Infof("feed server stopped")
 	}
 }
