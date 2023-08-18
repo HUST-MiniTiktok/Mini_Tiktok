@@ -26,6 +26,7 @@ struct PublishListResponse {
 
 struct GetVideoByIdRequest {
     1: i64 id               // 视频唯一标识
+    2: string token // 用户鉴权token
 }
 
 struct GetVideoByIdResponse {
@@ -36,6 +37,7 @@ struct GetVideoByIdResponse {
 
 struct GetVideoByIdListRequest {
     1: list<i64> id                 // 视频唯一标识
+    2: string token // 用户鉴权token
 }
 
 struct GetVideoByIdListResponse {

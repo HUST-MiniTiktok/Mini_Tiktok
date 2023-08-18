@@ -50,9 +50,7 @@ func (s *CommentService) CommentAction(ctx context.Context, request *comment.Com
 		}
 		// 创建成功需要返回 comment类型的newcomment
 		err_chan := make(chan error)
-		defer close(err_chan)
 		comment_chan := make(chan *comment.Comment)
-		defer close(comment_chan)
 		author, err := rpc.UserRPC.User(s.ctx, &user.UserRequest{UserId: newcomment.UserId})
 		if err != nil {
 			err_chan <- err
@@ -134,9 +132,7 @@ func (s *CommentService) CommentList(ctx context.Context, request *comment.Comme
 
 	var comComments []*comment.Comment
 	err_chan := make(chan error)
-	defer close(err_chan)
 	comment_chan := make(chan *comment.Comment)
-	defer close(comment_chan)
 
 	for _, db_comment := range Comments {
 		go func(db_comment *db.Comment) {

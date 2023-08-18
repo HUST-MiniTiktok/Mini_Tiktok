@@ -101,7 +101,7 @@ func (s *FavoriteService) FavoriteList(ctx context.Context, req *favorite.Favori
 			VideoList:  nil}, err
 	}
 
-	videosResponse, err := rpc.PublishRPC.GetVideoByIdList(ctx, &publish.GetVideoByIdListRequest{Id: videoIDList})
+	videosResponse, err := rpc.PublishRPC.GetVideoByIdList(ctx, &publish.GetVideoByIdListRequest{Id: videoIDList, Token: req.Token})
 	if err != nil {
 		err_msg := err.Error()
 		return &favorite.FavoriteListResponse{
