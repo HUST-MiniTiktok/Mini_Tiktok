@@ -50,3 +50,9 @@ func (p *GetVideoByIdListRequest) IsValid() error {
 func (p *GetVideoByIdListResponse) IsValid() error {
 	return nil
 }
+func (p *GetPublishInfoByUserIdRequest) IsValid() error {
+	return nil
+}
+func (p *GetPublishInfoByUserIdResponse) IsValid() error {
+	return nil
+}

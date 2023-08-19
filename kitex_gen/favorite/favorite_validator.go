@@ -33,15 +33,15 @@ func (p *FavoriteListRequest) IsValid() error {
 func (p *FavoriteListResponse) IsValid() error {
 	return nil
 }
-func (p *GetVideoFavoriteCountRequest) IsValid() error {
+func (p *GetVideoFavoriteInfoRequest) IsValid() error {
 	return nil
 }
-func (p *GetVideoFavoriteCountResponse) IsValid() error {
+func (p *GetVideoFavoriteInfoResponse) IsValid() error {
 	return nil
 }
-func (p *CheckIsFavoriteRequest) IsValid() error {
+func (p *GetUserFavoriteInfoRequest) IsValid() error {
 	return nil
 }
-func (p *CheckIsFavoriteResponse) IsValid() error {
+func (p *GetUserFavoriteInfoResponse) IsValid() error {
 	return nil
 }

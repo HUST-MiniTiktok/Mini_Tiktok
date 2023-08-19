@@ -24,16 +24,16 @@ func (s *FavoriteServiceImpl) FavoriteList(ctx context.Context, request *favorit
 	return
 }
 
-// GetVideoFavoriteCount implements the FavoriteServiceImpl interface.
-func (s *FavoriteServiceImpl) GetVideoFavoriteCount(ctx context.Context, request *favorite.GetVideoFavoriteCountRequest) (resp *favorite.GetVideoFavoriteCountResponse, err error) {
+// GetFavoriteInfo implements the FavoriteServiceImpl interface.
+func (s *FavoriteServiceImpl) GetVideoFavoriteInfo(ctx context.Context, request *favorite.GetVideoFavoriteInfoRequest) (resp *favorite.GetVideoFavoriteInfoResponse, err error) {
 	favorite_service := service.NewFavoriteService(ctx)
-	resp, err = favorite_service.GetVideoFavoriteCount(ctx, request)
+	resp, err = favorite_service.GetVideoFavoriteInfo(ctx, request)
 	return
 }
 
-// CheckIsFavorite implements the FavoriteServiceImpl interface.
-func (s *FavoriteServiceImpl) CheckIsFavorite(ctx context.Context, request *favorite.CheckIsFavoriteRequest) (resp *favorite.CheckIsFavoriteResponse, err error) {
+// GetUserFavoriteInfo implements the FavoriteServiceImpl interface.
+func (s *FavoriteServiceImpl) GetUserFavoriteInfo(ctx context.Context, request *favorite.GetUserFavoriteInfoRequest) (resp *favorite.GetUserFavoriteInfoResponse, err error) {
 	favorite_service := service.NewFavoriteService(ctx)
-	resp, err = favorite_service.CheckIsFavorite(ctx, request)
+	resp, err = favorite_service.GetUserFavoriteInfo(ctx, request)
 	return
 }

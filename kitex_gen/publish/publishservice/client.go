@@ -15,6 +15,7 @@ type Client interface {
 	PublishList(ctx context.Context, request *publish.PublishListRequest, callOptions ...callopt.Option) (r *publish.PublishListResponse, err error)
 	GetVideoById(ctx context.Context, request *publish.GetVideoByIdRequest, callOptions ...callopt.Option) (r *publish.GetVideoByIdResponse, err error)
 	GetVideoByIdList(ctx context.Context, request *publish.GetVideoByIdListRequest, callOptions ...callopt.Option) (r *publish.GetVideoByIdListResponse, err error)
+	GetPublishInfoByUserId(ctx context.Context, request *publish.GetPublishInfoByUserIdRequest, callOptions ...callopt.Option) (r *publish.GetPublishInfoByUserIdResponse, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -64,4 +65,9 @@ func (p *kPublishServiceClient) GetVideoById(ctx context.Context, request *publi
 func (p *kPublishServiceClient) GetVideoByIdList(ctx context.Context, request *publish.GetVideoByIdListRequest, callOptions ...callopt.Option) (r *publish.GetVideoByIdListResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.GetVideoByIdList(ctx, request)
+}
+
+func (p *kPublishServiceClient) GetPublishInfoByUserId(ctx context.Context, request *publish.GetPublishInfoByUserIdRequest, callOptions ...callopt.Option) (r *publish.GetPublishInfoByUserIdResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetPublishInfoByUserId(ctx, request)
 }

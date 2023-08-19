@@ -53,3 +53,9 @@ func (p *RelationFriendListRequest) IsValid() error {
 func (p *RelationFriendListResponse) IsValid() error {
 	return nil
 }
+func (p *GetFollowInfoRequest) IsValid() error {
+	return nil
+}
+func (p *GetFollowInfoResponse) IsValid() error {
+	return nil
+}

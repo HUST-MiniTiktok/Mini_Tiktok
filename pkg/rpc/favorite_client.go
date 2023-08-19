@@ -66,8 +66,8 @@ func (c *FavoriteClient) FavoriteList(context context.Context, req *favorite.Fav
 	return resp, nil
 }
 
-func (c *FavoriteClient) GetVideoFavoriteCount(context context.Context, req *favorite.GetVideoFavoriteCountRequest) (resp *favorite.GetVideoFavoriteCountResponse, err error) {
-	resp, err = c.client.GetVideoFavoriteCount(context, req)
+func (c *FavoriteClient) GetVideoFavoriteInfo(context context.Context, req *favorite.GetVideoFavoriteInfoRequest) (resp *favorite.GetVideoFavoriteInfoResponse, err error) {
+	resp, err = c.client.GetVideoFavoriteInfo(context, req)
 	if err != nil {
 		klog.Errorf("favorite client failed: %v", err)
 		return nil, err
@@ -79,8 +79,8 @@ func (c *FavoriteClient) GetVideoFavoriteCount(context context.Context, req *fav
 	return resp, nil
 }
 
-func (c *FavoriteClient) CheckIsFavorite(context context.Context, req *favorite.CheckIsFavoriteRequest) (resp *favorite.CheckIsFavoriteResponse, err error) {
-	resp, err = c.client.CheckIsFavorite(context, req)
+func (c *FavoriteClient) GetUserFavoriteInfo(context context.Context, req *favorite.GetUserFavoriteInfoRequest) (resp *favorite.GetUserFavoriteInfoResponse, err error) {
+	resp, err = c.client.GetUserFavoriteInfo(context, req)
 	if err != nil {
 		klog.Errorf("favorite client failed: %v", err)
 		return nil, err

@@ -72,12 +72,7 @@ func (s *FeedService) GetFeed(request *feed.FeedRequest) (resp *feed.FeedRespons
 				err_chan <- err
 				return
 			}
-			favorite_count, err := client.FavoriteRPC.GetVideoFavoriteCount(s.ctx, &favorite.GetVideoFavoriteCountRequest{VideoId: db_video.ID})
-			if err != nil {
-				err_chan <- err
-				return
-			}
-			is_favorite, err := client.FavoriteRPC.CheckIsFavorite(s.ctx, &favorite.CheckIsFavoriteRequest{VideoId: db_video.ID, UserId: curr_user_id})
+			favorite_info, err := client.FavoriteRPC.GetVideoFavoriteInfo(s.ctx, &favorite.GetVideoFavoriteInfoRequest{UserId: curr_user_id, VideoId: db_video.ID})
 			if err != nil {
 				err_chan <- err
 				return
@@ -94,8 +89,8 @@ func (s *FeedService) GetFeed(request *feed.FeedRequest) (resp *feed.FeedRespons
 				PlayUrl:       oss.ToRealURL(s.ctx, db_video.PlayURL),
 				CoverUrl:      oss.ToRealURL(s.ctx, db_video.CoverURL),
 				Title:         db_video.Title,
-				FavoriteCount: favorite_count.FavoriteCount,
-				IsFavorite:    is_favorite.IsFavorite,
+				FavoriteCount: favorite_info.FavoriteCount,
+				IsFavorite:    favorite_info.IsFavorite,
 				CommentCount:  comment_count.CommentCount,
 			}
 		}(db_video)

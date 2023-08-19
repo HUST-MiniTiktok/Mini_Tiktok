@@ -13,6 +13,7 @@ import (
 type Client interface {
 	MessageChat(ctx context.Context, request *message.MessageChatRequest, callOptions ...callopt.Option) (r *message.MessageChatResponse, err error)
 	MessageAction(ctx context.Context, request *message.MessageActionRequest, callOptions ...callopt.Option) (r *message.MessageActionResponse, err error)
+	GetFriendLatestMsg(ctx context.Context, request *message.GetFriendLatestMsgRequest, callOptions ...callopt.Option) (r *message.GetFriendLatestMsgResponse, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -52,4 +53,9 @@ func (p *kMessageServiceClient) MessageChat(ctx context.Context, request *messag
 func (p *kMessageServiceClient) MessageAction(ctx context.Context, request *message.MessageActionRequest, callOptions ...callopt.Option) (r *message.MessageActionResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.MessageAction(ctx, request)
+}
+
+func (p *kMessageServiceClient) GetFriendLatestMsg(ctx context.Context, request *message.GetFriendLatestMsgRequest, callOptions ...callopt.Option) (r *message.GetFriendLatestMsgResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetFriendLatestMsg(ctx, request)
 }

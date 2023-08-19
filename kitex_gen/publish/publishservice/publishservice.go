@@ -19,10 +19,11 @@ func NewServiceInfo() *kitex.ServiceInfo {
 	serviceName := "PublishService"
 	handlerType := (*publish.PublishService)(nil)
 	methods := map[string]kitex.MethodInfo{
-		"PublishAction":    kitex.NewMethodInfo(publishActionHandler, newPublishServicePublishActionArgs, newPublishServicePublishActionResult, false),
-		"PublishList":      kitex.NewMethodInfo(publishListHandler, newPublishServicePublishListArgs, newPublishServicePublishListResult, false),
-		"GetVideoById":     kitex.NewMethodInfo(getVideoByIdHandler, newPublishServiceGetVideoByIdArgs, newPublishServiceGetVideoByIdResult, false),
-		"GetVideoByIdList": kitex.NewMethodInfo(getVideoByIdListHandler, newPublishServiceGetVideoByIdListArgs, newPublishServiceGetVideoByIdListResult, false),
+		"PublishAction":          kitex.NewMethodInfo(publishActionHandler, newPublishServicePublishActionArgs, newPublishServicePublishActionResult, false),
+		"PublishList":            kitex.NewMethodInfo(publishListHandler, newPublishServicePublishListArgs, newPublishServicePublishListResult, false),
+		"GetVideoById":           kitex.NewMethodInfo(getVideoByIdHandler, newPublishServiceGetVideoByIdArgs, newPublishServiceGetVideoByIdResult, false),
+		"GetVideoByIdList":       kitex.NewMethodInfo(getVideoByIdListHandler, newPublishServiceGetVideoByIdListArgs, newPublishServiceGetVideoByIdListResult, false),
+		"GetPublishInfoByUserId": kitex.NewMethodInfo(getPublishInfoByUserIdHandler, newPublishServiceGetPublishInfoByUserIdArgs, newPublishServiceGetPublishInfoByUserIdResult, false),
 	}
 	extra := map[string]interface{}{
 		"PackageName":     "publish",
@@ -111,6 +112,24 @@ func newPublishServiceGetVideoByIdListResult() interface{} {
 	return publish.NewPublishServiceGetVideoByIdListResult()
 }
 
+func getPublishInfoByUserIdHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*publish.PublishServiceGetPublishInfoByUserIdArgs)
+	realResult := result.(*publish.PublishServiceGetPublishInfoByUserIdResult)
+	success, err := handler.(publish.PublishService).GetPublishInfoByUserId(ctx, realArg.Request)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newPublishServiceGetPublishInfoByUserIdArgs() interface{} {
+	return publish.NewPublishServiceGetPublishInfoByUserIdArgs()
+}
+
+func newPublishServiceGetPublishInfoByUserIdResult() interface{} {
+	return publish.NewPublishServiceGetPublishInfoByUserIdResult()
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -156,6 +175,16 @@ func (p *kClient) GetVideoByIdList(ctx context.Context, request *publish.GetVide
 	_args.Request = request
 	var _result publish.PublishServiceGetVideoByIdListResult
 	if err = p.c.Call(ctx, "GetVideoByIdList", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetPublishInfoByUserId(ctx context.Context, request *publish.GetPublishInfoByUserIdRequest) (r *publish.GetPublishInfoByUserIdResponse, err error) {
+	var _args publish.PublishServiceGetPublishInfoByUserIdArgs
+	_args.Request = request
+	var _result publish.PublishServiceGetPublishInfoByUserIdResult
+	if err = p.c.Call(ctx, "GetPublishInfoByUserId", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

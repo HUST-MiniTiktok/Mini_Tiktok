@@ -52,6 +52,19 @@ struct RelationFriendListResponse {
     3: list<FriendUser> user_list                             // 用户列表
 }
 
+struct GetFollowInfoRequest {
+    1: string token     // 用户token
+    2: i64 to_user_id   // 对方用户id
+}
+
+struct GetFollowInfoResponse {
+    1: i32 status_code (go.tag="json:\"status_code\"")  // 状态码，0-成功，其他值-失败
+    2: optional string status_msg                       // 返回状态描述
+    3: i64 follow_count                                 // 关注总数
+    4: i64 follower_count                               // 粉丝总数
+    5: bool is_follow                                   // 是否关注
+}
+
 service RelationService {
     // 关注操作
     RelationActionResponse RelationAction(RelationActionRequest request) (api.post = "/douyin/relation/action/")
@@ -61,4 +74,6 @@ service RelationService {
     RelationFollowerListResponse RelationFollowerList(RelationFollowerListRequest request) (api.get = "/douyin/relation/follower/list/")
     // 好友列表
     RelationFriendListResponse RelationFriendList(RelationFriendListRequest request) (api.get = "/douyin/relation/friend/list/")
+    // 获取关注信息
+    GetFollowInfoResponse GetFollowInfo(GetFollowInfoRequest request)
 }

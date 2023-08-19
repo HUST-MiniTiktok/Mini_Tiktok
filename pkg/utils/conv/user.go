@@ -2,8 +2,8 @@ package conv
 
 import (
 	hertz_common "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/common"
-	kitex_common "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/common"
 	hertz_user "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/user"
+	kitex_common "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/common"
 	kitex_user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user"
 )
 
@@ -21,6 +21,14 @@ func ToHertzUser(user *kitex_common.User) *hertz_common.User {
 		WorkCount:       user.WorkCount,
 		FavoriteCount:   user.FavoriteCount,
 	}
+}
+
+func ToHertzUserList(user_list []*kitex_common.User) []*hertz_common.User {
+	hertz_user_list := make([]*hertz_common.User, 0, len(user_list))
+	for _, user := range user_list {
+		hertz_user_list = append(hertz_user_list, ToHertzUser(user))
+	}
+	return hertz_user_list
 }
 
 func ToKitexUserRequest(req *hertz_user.UserRequest) *kitex_user.UserRequest {

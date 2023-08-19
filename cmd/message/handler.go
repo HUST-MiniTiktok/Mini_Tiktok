@@ -23,3 +23,10 @@ func (s *MessageServiceImpl) MessageAction(ctx context.Context, request *message
 	resp, err = message_service.MessageAction(request)
 	return
 }
+
+// GetFriendLatestMsg implements the MessageServiceImpl interface.
+func (s *MessageServiceImpl) GetFriendLatestMsg(ctx context.Context, request *message.GetFriendLatestMsgRequest) (resp *message.GetFriendLatestMsgResponse, err error) {
+	message_service := service.NewMessageService(ctx)
+	resp, err = message_service.GetFriendLatestMsg(request)
+	return
+}

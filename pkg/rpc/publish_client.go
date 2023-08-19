@@ -91,3 +91,16 @@ func (c *PublishClient) GetVideoByIdList(context context.Context, req *publish.G
 	}
 	return resp, nil
 }
+
+func (c *PublishClient) GetPublishInfoByUserId(context context.Context, req *publish.GetPublishInfoByUserIdRequest) (resp *publish.GetPublishInfoByUserIdResponse, err error) {
+	resp, err = c.client.GetPublishInfoByUserId(context, req)
+	if err != nil {
+		klog.Errorf("publish client failed: %v", err)
+		return nil, err
+	}
+	if resp.StatusCode != 0 {
+		klog.Errorf("publish client failed: %v -> %v", resp.StatusCode, resp.StatusMsg)
+		return nil, fmt.Errorf("publish client failed: %v", resp.StatusMsg)
+	}
+	return resp, nil
+}

@@ -36,3 +36,9 @@ func (p *MessageActionRequest) IsValid() error {
 func (p *MessageActionResponse) IsValid() error {
 	return nil
 }
+func (p *GetFriendLatestMsgRequest) IsValid() error {
+	return nil
+}
+func (p *GetFriendLatestMsgResponse) IsValid() error {
+	return nil
+}

@@ -8,14 +8,10 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/client"
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/dal/db"
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/pack"
-	comment "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/comment"
 	common "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/common"
-	favorite "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/favorite"
 	publish "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/publish"
-	user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/errno"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/ffmpeg"
@@ -129,36 +125,11 @@ func (s *PublishService) PublishList(request *publish.PublishListRequest) (resp 
 
 	for _, db_video := range db_videos {
 		go func(db_video *db.Video) {
-			author, err := client.UserRPC.User(s.ctx, &user.UserRequest{UserId: db_video.AuthorID})
+			kitex_video, err := pack.ToKitexVideo(s.ctx, db_video, curr_user_id)
 			if err != nil {
 				err_chan <- err
-				return
-			}
-			favorite_count, err := client.FavoriteRPC.GetVideoFavoriteCount(s.ctx, &favorite.GetVideoFavoriteCountRequest{VideoId: db_video.ID})
-			if err != nil {
-				err_chan <- err
-				return
-			}
-			is_favorite, err := client.FavoriteRPC.CheckIsFavorite(s.ctx, &favorite.CheckIsFavoriteRequest{VideoId: db_video.ID, UserId: curr_user_id})
-			if err != nil {
-				err_chan <- err
-				return
-			}
-			comment_count, err := client.CommentRPC.GetVideoCommentCount(s.ctx, &comment.GetVideoCommentCountRequest{VideoId: db_video.ID})
-			if err != nil {
-				err_chan <- err
-				return
-			}
-
-			video_chan <- &common.Video{
-				Id:            db_video.ID,
-				Author:        author.User,
-				PlayUrl:       oss.ToRealURL(s.ctx, db_video.PlayURL),
-				CoverUrl:      oss.ToRealURL(s.ctx, db_video.CoverURL),
-				Title:         db_video.Title,
-				FavoriteCount: favorite_count.FavoriteCount,
-				IsFavorite:    is_favorite.IsFavorite,
-				CommentCount:  comment_count.CommentCount,
+			} else {
+				video_chan <- kitex_video
 			}
 		}(db_video)
 	}
@@ -191,61 +162,9 @@ func (s *PublishService) GetVideoById(request *publish.GetVideoByIdRequest) (res
 		return pack.NewGetVideoByIdResponse(err), err
 	}
 
-	authorChan := make(chan *user.UserResponse)
-	favoriteCountChan := make(chan *favorite.GetVideoFavoriteCountResponse)
-	isFavoriteChan := make(chan *favorite.CheckIsFavoriteResponse)
-	commentCountChan := make(chan *comment.GetVideoCommentCountResponse)
-
-	go func() {
-		author, err := client.UserRPC.User(s.ctx, &user.UserRequest{UserId: db_video.AuthorID})
-		if err != nil {
-			klog.Errorf("RPC User Error: %v", err)
-			return
-		}
-		authorChan <- author
-	}()
-
-	go func() {
-		favorite_count, err := client.FavoriteRPC.GetVideoFavoriteCount(s.ctx, &favorite.GetVideoFavoriteCountRequest{VideoId: db_video.ID})
-		if err != nil {
-			klog.Errorf("RPC GetVideoFavoriteCount Error: %v", err)
-			return
-		}
-		favoriteCountChan <- favorite_count
-	}()
-
-	go func() {
-		is_favorite, err := client.FavoriteRPC.CheckIsFavorite(s.ctx, &favorite.CheckIsFavoriteRequest{VideoId: db_video.ID, UserId: curr_user_id})
-		if err != nil {
-			klog.Errorf("RPC CheckIsFavorite Error: %v", err)
-			return
-		}
-		isFavoriteChan <- is_favorite
-	}()
-
-	go func() {
-		comment_count, err := client.CommentRPC.GetVideoCommentCount(s.ctx, &comment.GetVideoCommentCountRequest{VideoId: db_video.ID})
-		if err != nil {
-			klog.Errorf("RPC GetVideoCommentCount Error: %v", err)
-			return
-		}
-		commentCountChan <- comment_count
-	}()
-
-	author := <-authorChan
-	favorite_count := <-favoriteCountChan
-	is_favorite := <-isFavoriteChan
-	comment_count := <-commentCountChan
-
-	kitex_video := &common.Video{
-		Id:            db_video.ID,
-		Author:        author.User,
-		PlayUrl:       oss.ToRealURL(s.ctx, db_video.PlayURL),
-		CoverUrl:      oss.ToRealURL(s.ctx, db_video.CoverURL),
-		Title:         db_video.Title,
-		FavoriteCount: favorite_count.FavoriteCount,
-		IsFavorite:    is_favorite.IsFavorite,
-		CommentCount:  comment_count.CommentCount,
+	kitex_video, err := pack.ToKitexVideo(s.ctx, db_video, curr_user_id)
+	if err != nil {
+		return pack.NewGetVideoByIdResponse(err), err
 	}
 
 	resp = pack.NewGetVideoByIdResponse(errno.Success)
@@ -262,7 +181,7 @@ func (s *PublishService) GetVideoByIdList(request *publish.GetVideoByIdListReque
 		curr_user_id = user_claims.ID
 	}
 
-	db_videos, err := db.GetVideosByIDs(s.ctx, request.Id)
+	db_videos, err := db.GetVideosByIdList(s.ctx, request.Id)
 	if err != nil {
 		return pack.NewGetVideoByIdListResponse(err), err
 	}
@@ -273,36 +192,11 @@ func (s *PublishService) GetVideoByIdList(request *publish.GetVideoByIdListReque
 
 	for _, db_video := range db_videos {
 		go func(db_video *db.Video) {
-			author, err := client.UserRPC.User(s.ctx, &user.UserRequest{UserId: db_video.AuthorID})
+			kitex_video, err := pack.ToKitexVideo(s.ctx, db_video, curr_user_id)
 			if err != nil {
 				err_chan <- err
-				return
-			}
-			favorite_count, err := client.FavoriteRPC.GetVideoFavoriteCount(s.ctx, &favorite.GetVideoFavoriteCountRequest{VideoId: db_video.ID})
-			if err != nil {
-				err_chan <- err
-				return
-			}
-			is_favorite, err := client.FavoriteRPC.CheckIsFavorite(s.ctx, &favorite.CheckIsFavoriteRequest{VideoId: db_video.ID, UserId: curr_user_id})
-			if err != nil {
-				err_chan <- err
-				return
-			}
-			comment_count, err := client.CommentRPC.GetVideoCommentCount(s.ctx, &comment.GetVideoCommentCountRequest{VideoId: db_video.ID})
-			if err != nil {
-				err_chan <- err
-				return
-			}
-
-			video_chan <- &common.Video{
-				Id:            db_video.ID,
-				Author:        author.User,
-				PlayUrl:       oss.ToRealURL(s.ctx, db_video.PlayURL),
-				CoverUrl:      oss.ToRealURL(s.ctx, db_video.CoverURL),
-				Title:         db_video.Title,
-				FavoriteCount: favorite_count.FavoriteCount,
-				IsFavorite:    is_favorite.IsFavorite,
-				CommentCount:  comment_count.CommentCount,
+			} else {
+				video_chan <- kitex_video
 			}
 		}(db_video)
 	}
@@ -319,4 +213,16 @@ func (s *PublishService) GetVideoByIdList(request *publish.GetVideoByIdListReque
 	resp = pack.NewGetVideoByIdListResponse(errno.Success)
 	resp.VideoList = kitex_videos
 	return resp, nil
+}
+
+func (s *PublishService) GetPublishInfoByUserId(request *publish.GetPublishInfoByUserIdRequest) (resp *publish.GetPublishInfoByUserIdResponse, err error) {
+	video_ids, err := db.GetVideoIdListByAuthorId(s.ctx, request.UserId)
+	if err != nil {
+		return pack.NewGetPublishInfoByUserIdResponse(err), err
+	}
+
+	resp = pack.NewGetPublishInfoByUserIdResponse(errno.Success)
+	resp.WorkCount = int64(len(video_ids))
+	resp.VideoIds = video_ids
+	return
 }

@@ -95,6 +95,15 @@ func VideoFavoriteCount(ctx context.Context, video_id int64) (count int64, err e
 	return count, nil
 }
 
+func UserFavoriteCount(ctx context.Context, user_id int64) (count int64, err error) {
+
+	err = DB.WithContext(ctx).Model(&Favorite{}).Where(&Favorite{UserId: user_id}).Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
 func GetFavoriteList(ctx context.Context, user_id int64) (status int32, videoIDList []int64, err error) { //仅返回videoID
 
 	var favoriteList []Favorite

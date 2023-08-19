@@ -26,24 +26,35 @@ struct PublishListResponse {
 
 struct GetVideoByIdRequest {
     1: i64 id               // 视频唯一标识
-    2: string token // 用户鉴权token
+    2: string token         // 用户鉴权token
 }
 
 struct GetVideoByIdResponse {
     1: i32 status_code (go.tag="json:\"status_code\"")  // 状态码，0-成功，其他值-失败
     2: optional string status_msg                       // 返回状态描述
-    3: optional common.Video video                             // 视频
+    3: optional common.Video video                      // 视频
 }
 
 struct GetVideoByIdListRequest {
     1: list<i64> id                 // 视频唯一标识
-    2: string token // 用户鉴权token
+    2: string token                 // 用户鉴权token
 }
 
 struct GetVideoByIdListResponse {
     1: i32 status_code (go.tag="json:\"status_code\"")  // 状态码，0-成功，其他值-失败
     2: optional string status_msg                       // 返回状态描述
     3: list<common.Video> video_list                           // 视频列表
+}
+
+struct GetPublishInfoByUserIdRequest {
+    1: i64 user_id  // 用户id
+}
+
+struct GetPublishInfoByUserIdResponse {
+    1: i32 status_code (go.tag="json:\"status_code\"")  // 状态码，0-成功，其他值-失败
+    2: optional string status_msg                       // 返回状态描述
+    3: i64 work_count                                   // 视频数量
+    4: list<i64> video_ids                              // 视频id列表
 }
 
 service PublishService {
@@ -54,4 +65,6 @@ service PublishService {
     // 查询视频
     GetVideoByIdResponse GetVideoById (1: GetVideoByIdRequest request)
     GetVideoByIdListResponse GetVideoByIdList (1: GetVideoByIdListRequest request)
+    // 查询发布信息
+    GetPublishInfoByUserIdResponse GetPublishInfoByUserId (1: GetPublishInfoByUserIdRequest request)
 }

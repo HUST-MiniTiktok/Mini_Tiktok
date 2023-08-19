@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/client"
+	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/message/client"
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/message/dal/db"
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/message/pack"
 	message "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/message"
@@ -84,4 +84,37 @@ func (s *MessageService) MessageAction(request *message.MessageActionRequest) (r
 	}
 
 	return pack.NewMessageActionResponse(errno.Success), nil
+}
+
+func (s *MessageService) GetFriendLatestMsg(request *message.GetFriendLatestMsgRequest) (resp *message.GetFriendLatestMsgResponse, err error) {
+	user_claims, err := Jwt.ExtractClaims(request.Token)
+	curr_user_id := user_claims.ID
+	if err != nil {
+		return pack.NewGetFriendLatestMsgResponse(errno.AuthorizationFailedErr), err
+	}
+
+	var db_message *db.Message
+	db_message, err = db.GetLastestMsgByUserIdPair(s.ctx, curr_user_id, request.FriendUserId)
+	if err != nil {
+		return pack.NewGetFriendLatestMsgResponse(err), err
+	}
+	// db_message == nil means no message between friend users
+	if db_message == nil {
+		return pack.NewGetFriendLatestMsgResponse(errno.Success), nil
+	}
+
+	var msgType int64
+	if db_message.ToUserId == curr_user_id {
+		msgType = 0
+		resp = pack.NewGetFriendLatestMsgResponse(errno.Success)
+		resp.MsgType = &msgType
+		resp.Message = &db_message.Content
+	} else {
+		msgType = 1
+		resp = pack.NewGetFriendLatestMsgResponse(errno.Success)
+		resp.MsgType = &msgType
+		resp.Message = &db_message.Content
+	}
+
+	return resp, nil
 }

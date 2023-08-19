@@ -5,7 +5,6 @@ import (
 
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/user/dal/db"
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/user/pack"
-	common "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/common"
 	user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/errno"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/crypt"
@@ -30,7 +29,6 @@ func NewUserService(ctx context.Context) *UserService {
 
 func (s *UserService) GetUserById(ctx context.Context, request *user.UserRequest) (resp *user.UserResponse, err error) {
 	var db_user *db.User
-	var resp_user *common.User
 	db_user, err = db.GetUserById(ctx, request.UserId)
 	if err != nil {
 		return pack.NewUserResponse(err), err
@@ -39,12 +37,9 @@ func (s *UserService) GetUserById(ctx context.Context, request *user.UserRequest
 		return pack.NewUserResponse(errno.UserIsNotExistErr), errno.UserIsNotExistErr
 	}
 
-	resp_user = &common.User{
-		Id:              db_user.ID,
-		Name:            db_user.UserName,
-		Avatar:          &db_user.Avatar,
-		BackgroundImage: &db_user.BackgroundImage,
-		Signature:       &db_user.Signature,
+	resp_user, err := pack.ToKitexUser(ctx, request.Token, db_user)
+	if err != nil {
+		return pack.NewUserResponse(err), err
 	}
 
 	resp = pack.NewUserResponse(errno.Success)

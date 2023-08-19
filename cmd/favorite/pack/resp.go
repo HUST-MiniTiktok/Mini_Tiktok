@@ -13,10 +13,10 @@ func NewFavoriteListResponse(err error) *favorite.FavoriteListResponse {
 	return conv.ToKitexBaseResponse(err, &favorite.FavoriteListResponse{}).(*favorite.FavoriteListResponse)
 }
 
-func NewCheckIsFavoriteResponse(err error) *favorite.CheckIsFavoriteResponse {
-	return conv.ToKitexBaseResponse(err, &favorite.CheckIsFavoriteResponse{}).(*favorite.CheckIsFavoriteResponse)
+func NewGetVideoFavoriteInfoResponse(err error) *favorite.GetVideoFavoriteInfoResponse {
+	return conv.ToKitexBaseResponse(err, &favorite.GetVideoFavoriteInfoResponse{}).(*favorite.GetVideoFavoriteInfoResponse)
 }
 
-func NewGetVideoFavoriteCountResponse(err error) *favorite.GetVideoFavoriteCountResponse {
-	return conv.ToKitexBaseResponse(err, &favorite.GetVideoFavoriteCountResponse{}).(*favorite.GetVideoFavoriteCountResponse)
+func NewGetUserFavoriteInfoResponse(err error) *favorite.GetUserFavoriteInfoResponse {
+	return conv.ToKitexBaseResponse(err, &favorite.GetUserFavoriteInfoResponse{}).(*favorite.GetUserFavoriteInfoResponse)
 }

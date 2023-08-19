@@ -13,8 +13,8 @@ import (
 type Client interface {
 	FavoriteAction(ctx context.Context, request *favorite.FavoriteActionRequest, callOptions ...callopt.Option) (r *favorite.FavoriteActionResponse, err error)
 	FavoriteList(ctx context.Context, request *favorite.FavoriteListRequest, callOptions ...callopt.Option) (r *favorite.FavoriteListResponse, err error)
-	GetVideoFavoriteCount(ctx context.Context, request *favorite.GetVideoFavoriteCountRequest, callOptions ...callopt.Option) (r *favorite.GetVideoFavoriteCountResponse, err error)
-	CheckIsFavorite(ctx context.Context, request *favorite.CheckIsFavoriteRequest, callOptions ...callopt.Option) (r *favorite.CheckIsFavoriteResponse, err error)
+	GetVideoFavoriteInfo(ctx context.Context, request *favorite.GetVideoFavoriteInfoRequest, callOptions ...callopt.Option) (r *favorite.GetVideoFavoriteInfoResponse, err error)
+	GetUserFavoriteInfo(ctx context.Context, request *favorite.GetUserFavoriteInfoRequest, callOptions ...callopt.Option) (r *favorite.GetUserFavoriteInfoResponse, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -56,12 +56,12 @@ func (p *kFavoriteServiceClient) FavoriteList(ctx context.Context, request *favo
 	return p.kClient.FavoriteList(ctx, request)
 }
 
-func (p *kFavoriteServiceClient) GetVideoFavoriteCount(ctx context.Context, request *favorite.GetVideoFavoriteCountRequest, callOptions ...callopt.Option) (r *favorite.GetVideoFavoriteCountResponse, err error) {
+func (p *kFavoriteServiceClient) GetVideoFavoriteInfo(ctx context.Context, request *favorite.GetVideoFavoriteInfoRequest, callOptions ...callopt.Option) (r *favorite.GetVideoFavoriteInfoResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.GetVideoFavoriteCount(ctx, request)
+	return p.kClient.GetVideoFavoriteInfo(ctx, request)
 }
 
-func (p *kFavoriteServiceClient) CheckIsFavorite(ctx context.Context, request *favorite.CheckIsFavoriteRequest, callOptions ...callopt.Option) (r *favorite.CheckIsFavoriteResponse, err error) {
+func (p *kFavoriteServiceClient) GetUserFavoriteInfo(ctx context.Context, request *favorite.GetUserFavoriteInfoRequest, callOptions ...callopt.Option) (r *favorite.GetUserFavoriteInfoResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.CheckIsFavorite(ctx, request)
+	return p.kClient.GetUserFavoriteInfo(ctx, request)
 }

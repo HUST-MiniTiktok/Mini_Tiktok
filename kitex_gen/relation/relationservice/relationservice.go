@@ -23,6 +23,7 @@ func NewServiceInfo() *kitex.ServiceInfo {
 		"RelationFollowList":   kitex.NewMethodInfo(relationFollowListHandler, newRelationServiceRelationFollowListArgs, newRelationServiceRelationFollowListResult, false),
 		"RelationFollowerList": kitex.NewMethodInfo(relationFollowerListHandler, newRelationServiceRelationFollowerListArgs, newRelationServiceRelationFollowerListResult, false),
 		"RelationFriendList":   kitex.NewMethodInfo(relationFriendListHandler, newRelationServiceRelationFriendListArgs, newRelationServiceRelationFriendListResult, false),
+		"GetFollowInfo":        kitex.NewMethodInfo(getFollowInfoHandler, newRelationServiceGetFollowInfoArgs, newRelationServiceGetFollowInfoResult, false),
 	}
 	extra := map[string]interface{}{
 		"PackageName":     "relation",
@@ -111,6 +112,24 @@ func newRelationServiceRelationFriendListResult() interface{} {
 	return relation.NewRelationServiceRelationFriendListResult()
 }
 
+func getFollowInfoHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*relation.RelationServiceGetFollowInfoArgs)
+	realResult := result.(*relation.RelationServiceGetFollowInfoResult)
+	success, err := handler.(relation.RelationService).GetFollowInfo(ctx, realArg.Request)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newRelationServiceGetFollowInfoArgs() interface{} {
+	return relation.NewRelationServiceGetFollowInfoArgs()
+}
+
+func newRelationServiceGetFollowInfoResult() interface{} {
+	return relation.NewRelationServiceGetFollowInfoResult()
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -156,6 +175,16 @@ func (p *kClient) RelationFriendList(ctx context.Context, request *relation.Rela
 	_args.Request = request
 	var _result relation.RelationServiceRelationFriendListResult
 	if err = p.c.Call(ctx, "RelationFriendList", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetFollowInfo(ctx context.Context, request *relation.GetFollowInfoRequest) (r *relation.GetFollowInfoResponse, err error) {
+	var _args relation.RelationServiceGetFollowInfoArgs
+	_args.Request = request
+	var _result relation.RelationServiceGetFollowInfoResult
+	if err = p.c.Call(ctx, "GetFollowInfo", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

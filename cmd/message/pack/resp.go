@@ -12,3 +12,7 @@ func NewMessageChatResponse(err error) *message.MessageChatResponse {
 func NewMessageActionResponse(err error) *message.MessageActionResponse {
 	return conv.ToKitexBaseResponse(err, &message.MessageActionResponse{}).(*message.MessageActionResponse)
 }
+
+func NewGetFriendLatestMsgResponse(err error) *message.GetFriendLatestMsgResponse {
+	return conv.ToKitexBaseResponse(err, &message.GetFriendLatestMsgResponse{}).(*message.GetFriendLatestMsgResponse)
+}

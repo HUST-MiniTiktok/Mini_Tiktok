@@ -5,7 +5,10 @@ package relation
 import (
 	"context"
 
+	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/client"
 	relation "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/relation"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/errno"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/utils/conv"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
@@ -17,13 +20,17 @@ func RelationAction(ctx context.Context, c *app.RequestContext) {
 	var req relation.RelationActionRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		c.JSON(consts.StatusBadRequest, conv.ToHertzBaseResponse(errno.ParamErr))
 		return
 	}
 
-	resp := new(relation.RelationActionResponse)
+	kitex_resp, err := client.RelationRPC.RelationAction(ctx, conv.ToKitexRelationActionRequest(&req))
 
-	c.JSON(consts.StatusOK, resp)
+	if err == nil {
+		c.JSON(consts.StatusOK, conv.ToHertzRelationActionResponse(kitex_resp))
+	} else {
+		c.JSON(consts.StatusOK, conv.ToHertzBaseResponse(err))
+	}
 }
 
 // RelationFollowList .
@@ -33,13 +40,17 @@ func RelationFollowList(ctx context.Context, c *app.RequestContext) {
 	var req relation.RelationFollowListRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		c.JSON(consts.StatusBadRequest, conv.ToHertzBaseResponse(errno.ParamErr))
 		return
 	}
 
-	resp := new(relation.RelationFollowListResponse)
+	kitex_resp, err := client.RelationRPC.RelationFollowList(ctx, conv.ToKitexRelationFollowListRequest(&req))
 
-	c.JSON(consts.StatusOK, resp)
+	if err == nil {
+		c.JSON(consts.StatusOK, conv.ToHertzRelationFollowListResponse(kitex_resp))
+	} else {
+		c.JSON(consts.StatusOK, conv.ToHertzBaseResponse(err))
+	}
 }
 
 // RelationFollowerList .
@@ -49,13 +60,17 @@ func RelationFollowerList(ctx context.Context, c *app.RequestContext) {
 	var req relation.RelationFollowerListRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		c.JSON(consts.StatusBadRequest, conv.ToHertzBaseResponse(errno.ParamErr))
 		return
 	}
 
-	resp := new(relation.RelationFollowerListResponse)
+	kitex_resp, err := client.RelationRPC.RelationFollowerList(ctx, conv.ToKitexRelationFollowerListRequest(&req))
 
-	c.JSON(consts.StatusOK, resp)
+	if err == nil {
+		c.JSON(consts.StatusOK, conv.ToHertzRelationFollowerListResponse(kitex_resp))
+	} else {
+		c.JSON(consts.StatusOK, conv.ToHertzBaseResponse(err))
+	}
 }
 
 // RelationFriendList .
@@ -65,11 +80,15 @@ func RelationFriendList(ctx context.Context, c *app.RequestContext) {
 	var req relation.RelationFriendListRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		c.JSON(consts.StatusBadRequest, conv.ToHertzBaseResponse(errno.ParamErr))
 		return
 	}
 
-	resp := new(relation.RelationFriendListResponse)
+	kitex_resp, err := client.RelationRPC.RelationFriendList(ctx, conv.ToKitexRelationFriendListRequest(&req))
 
-	c.JSON(consts.StatusOK, resp)
+	if err == nil {
+		c.JSON(consts.StatusOK, conv.ToHertzRelationFriendListResponse(kitex_resp))
+	} else {
+		c.JSON(consts.StatusOK, conv.ToHertzBaseResponse(err))
+	}
 }

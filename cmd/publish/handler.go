@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 
-	publish "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/publish"
 	service "github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/service"
+	publish "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/publish"
 )
 
 // PublishServiceImpl implements the last service interface defined in the IDL.
@@ -35,5 +35,12 @@ func (s *PublishServiceImpl) GetVideoById(ctx context.Context, request *publish.
 func (s *PublishServiceImpl) GetVideoByIdList(ctx context.Context, request *publish.GetVideoByIdListRequest) (resp *publish.GetVideoByIdListResponse, err error) {
 	publish_service := service.NewPublishService(ctx)
 	resp, err = publish_service.GetVideoByIdList(request)
+	return
+}
+
+// GetPublishInfoByUserId implements the PublishServiceImpl interface.
+func (s *PublishServiceImpl) GetPublishInfoByUserId(ctx context.Context, request *publish.GetPublishInfoByUserIdRequest) (resp *publish.GetPublishInfoByUserIdResponse, err error) {
+	publish_service := service.NewPublishService(ctx)
+	resp, err = publish_service.GetPublishInfoByUserId(request)
 	return
 }

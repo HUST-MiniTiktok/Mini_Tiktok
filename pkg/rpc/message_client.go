@@ -65,3 +65,16 @@ func (c *MessageClient) MessageChat(context context.Context, req *message.Messag
 	}
 	return resp, nil
 }
+
+func (c *MessageClient) GetFriendLatestMsg(context context.Context, req *message.GetFriendLatestMsgRequest) (resp *message.GetFriendLatestMsgResponse, err error) {
+	resp, err = c.client.GetFriendLatestMsg(context, req)
+	if err != nil {
+		klog.Errorf("message client failed: %v", err)
+		return nil, err
+	}
+	if resp.StatusCode != 0 {
+		klog.Errorf("message client failed: %v -> %v", resp.StatusCode, resp.StatusMsg)
+		return nil, fmt.Errorf("message client failed: %v", resp.StatusMsg)
+	}
+	return resp, nil
+}

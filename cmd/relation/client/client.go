@@ -5,9 +5,11 @@ import (
 )
 
 var (
-	UserRPC *rpc.UserClient
+	UserRPC    *rpc.UserClient
+	MessageRPC *rpc.MessageClient
 )
 
 func init() {
 	UserRPC = rpc.NewUserClient()
+	MessageRPC = rpc.NewMessageClient()
 }

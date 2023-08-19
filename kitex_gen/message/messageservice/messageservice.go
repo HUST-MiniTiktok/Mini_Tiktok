@@ -19,8 +19,9 @@ func NewServiceInfo() *kitex.ServiceInfo {
 	serviceName := "MessageService"
 	handlerType := (*message.MessageService)(nil)
 	methods := map[string]kitex.MethodInfo{
-		"MessageChat":   kitex.NewMethodInfo(messageChatHandler, newMessageServiceMessageChatArgs, newMessageServiceMessageChatResult, false),
-		"MessageAction": kitex.NewMethodInfo(messageActionHandler, newMessageServiceMessageActionArgs, newMessageServiceMessageActionResult, false),
+		"MessageChat":        kitex.NewMethodInfo(messageChatHandler, newMessageServiceMessageChatArgs, newMessageServiceMessageChatResult, false),
+		"MessageAction":      kitex.NewMethodInfo(messageActionHandler, newMessageServiceMessageActionArgs, newMessageServiceMessageActionResult, false),
+		"GetFriendLatestMsg": kitex.NewMethodInfo(getFriendLatestMsgHandler, newMessageServiceGetFriendLatestMsgArgs, newMessageServiceGetFriendLatestMsgResult, false),
 	}
 	extra := map[string]interface{}{
 		"PackageName":     "message",
@@ -73,6 +74,24 @@ func newMessageServiceMessageActionResult() interface{} {
 	return message.NewMessageServiceMessageActionResult()
 }
 
+func getFriendLatestMsgHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*message.MessageServiceGetFriendLatestMsgArgs)
+	realResult := result.(*message.MessageServiceGetFriendLatestMsgResult)
+	success, err := handler.(message.MessageService).GetFriendLatestMsg(ctx, realArg.Request)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newMessageServiceGetFriendLatestMsgArgs() interface{} {
+	return message.NewMessageServiceGetFriendLatestMsgArgs()
+}
+
+func newMessageServiceGetFriendLatestMsgResult() interface{} {
+	return message.NewMessageServiceGetFriendLatestMsgResult()
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -98,6 +117,16 @@ func (p *kClient) MessageAction(ctx context.Context, request *message.MessageAct
 	_args.Request = request
 	var _result message.MessageServiceMessageActionResult
 	if err = p.c.Call(ctx, "MessageAction", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetFriendLatestMsg(ctx context.Context, request *message.GetFriendLatestMsgRequest) (r *message.GetFriendLatestMsgResponse, err error) {
+	var _args message.MessageServiceGetFriendLatestMsgArgs
+	_args.Request = request
+	var _result message.MessageServiceGetFriendLatestMsgResult
+	if err = p.c.Call(ctx, "GetFriendLatestMsg", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

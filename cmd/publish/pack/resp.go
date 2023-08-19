@@ -20,3 +20,7 @@ func NewGetVideoByIdResponse(err error) *publish.GetVideoByIdResponse {
 func NewGetVideoByIdListResponse(err error) *publish.GetVideoByIdListResponse {
 	return conv.ToKitexBaseResponse(err, &publish.GetVideoByIdListResponse{}).(*publish.GetVideoByIdListResponse)
 }
+
+func NewGetPublishInfoByUserIdResponse(err error) *publish.GetPublishInfoByUserIdResponse {
+	return conv.ToKitexBaseResponse(err, &publish.GetPublishInfoByUserIdResponse{}).(*publish.GetPublishInfoByUserIdResponse)
+}

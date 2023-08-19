@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"time"
-
 )
 
 const VideoTableName = "video"
@@ -55,6 +54,14 @@ func GetVideoByAuthorId(ctx context.Context, authorId int64) (videos []*Video, e
 	return
 }
 
+func GetVideoIdListByAuthorId(ctx context.Context, authorId int64) (video_ids []int64, err error) {
+	err = DB.WithContext(ctx).Model(&Video{}).Where("author_id = ?", authorId).Pluck("id", &video_ids).Error
+	if err != nil {
+		return nil, err
+	}
+	return
+}
+
 func GetVideosByLastPublishTime(ctx context.Context, lastPublishTime time.Time) (videos []*Video, err error) {
 	err = DB.WithContext(ctx).Where("publish_time < ?", lastPublishTime).Order("publish_time desc").Limit(30).Find(&videos).Error
 	if err != nil {
@@ -63,26 +70,10 @@ func GetVideosByLastPublishTime(ctx context.Context, lastPublishTime time.Time) 
 	return
 }
 
-func GetVideosByIDs(ctx context.Context, ids []int64) (videos []*Video, err error) {
-	err_chan := make(chan error)
-	video_chan := make(chan *Video, len(ids))
-	for _, id := range ids {
-		go func(id int64) {
-			video, err := GetVideoById(ctx, id)
-			if err != nil {
-				err_chan <- err
-			} else {
-				video_chan <- video
-			}
-		}(id)
-	}
-	for i := 0; i < len(ids); i++ {
-		select {
-		case err := <-err_chan:
-			return nil, err
-		case video := <-video_chan:
-			videos = append(videos, video)
-		}
+func GetVideosByIdList(ctx context.Context, ids []int64) (videos []*Video, err error) {
+	err = DB.WithContext(ctx).Where("id in ?", ids).Find(&videos).Error
+	if err != nil {
+		return nil, err
 	}
 	return
 }

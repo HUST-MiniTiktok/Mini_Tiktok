@@ -91,3 +91,16 @@ func (c *RelationClient) RelationFriendList(context context.Context, req *relati
 	}
 	return resp, nil
 }
+
+func (c *RelationClient) GetFollowInfo(context context.Context, req *relation.GetFollowInfoRequest) (resp *relation.GetFollowInfoResponse, err error) {
+	resp, err = c.client.GetFollowInfo(context, req)
+	if err != nil {
+		klog.Errorf("relation client failed: %v", err)
+		return nil, err
+	}
+	if resp.StatusCode != 0 {
+		klog.Errorf("relation client failed: %v -> %v", resp.StatusCode, resp.StatusMsg)
+		return nil, fmt.Errorf("relation client failed: %v", resp.StatusMsg)
+	}
+	return resp, nil
+}
