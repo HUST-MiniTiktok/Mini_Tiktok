@@ -10,15 +10,15 @@ import (
 
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/dal/db"
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/rpc"
-	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
 	comment "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/comment"
 	common "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/common"
 	favorite "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/favorite"
 	publish "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/publish"
 	user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user"
-	"github.com/HUST-MiniTiktok/mini_tiktok/mw/ffmpeg"
-	"github.com/HUST-MiniTiktok/mini_tiktok/mw/jwt"
-	"github.com/HUST-MiniTiktok/mini_tiktok/mw/oss"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/ffmpeg"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/jwt"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/oss"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
 )
@@ -107,7 +107,7 @@ func (s *PublishService) PublishAction(request *publish.PublishActionRequest) (r
 		err_msg := err.Error()
 		return &publish.PublishActionResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}, err
 	}
-	return &publish.PublishActionResponse{StatusCode: int32(codes.OK),StatusMsg: nil}, nil
+	return &publish.PublishActionResponse{StatusCode: int32(codes.OK), StatusMsg: nil}, nil
 }
 
 func (s *PublishService) PublishList(request *publish.PublishListRequest) (resp *publish.PublishListResponse, err error) {
@@ -177,7 +177,7 @@ func (s *PublishService) PublishList(request *publish.PublishListRequest) (resp 
 		}
 	}
 
-	resp = &publish.PublishListResponse {
+	resp = &publish.PublishListResponse{
 		StatusCode: int32(codes.OK),
 		StatusMsg:  nil,
 		VideoList:  kitex_videos,
@@ -281,7 +281,7 @@ func (s *PublishService) GetVideoByIdList(request *publish.GetVideoByIdListReque
 		err_msg := err.Error()
 		return &publish.GetVideoByIdListResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}, err
 	}
-	
+
 	err_chan := make(chan error)
 	video_chan := make(chan *common.Video)
 	kitex_videos := make([]*common.Video, 0, len(db_videos))
@@ -310,11 +310,11 @@ func (s *PublishService) GetVideoByIdList(request *publish.GetVideoByIdListReque
 			}
 
 			video_chan <- &common.Video{
-				Id:       db_video.ID,
-				Author:   author.User,
-				PlayUrl:  oss.ToRealURL(s.ctx, db_video.PlayURL),
-				CoverUrl: oss.ToRealURL(s.ctx, db_video.CoverURL),
-				Title:    db_video.Title,
+				Id:            db_video.ID,
+				Author:        author.User,
+				PlayUrl:       oss.ToRealURL(s.ctx, db_video.PlayURL),
+				CoverUrl:      oss.ToRealURL(s.ctx, db_video.CoverURL),
+				Title:         db_video.Title,
 				FavoriteCount: favorite_count.FavoriteCount,
 				IsFavorite:    is_favorite.IsFavorite,
 				CommentCount:  comment_count.CommentCount,

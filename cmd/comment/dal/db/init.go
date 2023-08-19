@@ -4,7 +4,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/driver/mysql"
 	"gorm.io/plugin/opentracing"
-	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
 )
 
 var DB *gorm.DB

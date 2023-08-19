@@ -4,7 +4,7 @@ import (
 	"net"
 
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/favorite/dal"
-	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
 	favorite "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/favorite/favoriteservice"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"

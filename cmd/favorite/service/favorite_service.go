@@ -8,7 +8,7 @@ import (
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/favorite/rpc"
 	favorite "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/favorite"
 	publish "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/publish"
-	"github.com/HUST-MiniTiktok/mini_tiktok/mw/jwt"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/jwt"
 	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
 )
 

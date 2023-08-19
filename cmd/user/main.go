@@ -4,8 +4,8 @@ import (
 	"net"
 
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/user/dal"
-	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
 	user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user/userservice"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"

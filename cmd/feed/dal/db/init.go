@@ -1,7 +1,7 @@
 package db
 
 import (
-	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/plugin/opentracing"

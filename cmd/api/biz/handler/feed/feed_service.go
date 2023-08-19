@@ -7,8 +7,8 @@ import (
 
 	feed "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/feed"
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/rpc"
-	"github.com/HUST-MiniTiktok/mini_tiktok/util"
-	"github.com/HUST-MiniTiktok/mini_tiktok/util/conv"
+	"github.com/HUST-MiniTiktok/mini_tiktok/utils"
+	"github.com/HUST-MiniTiktok/mini_tiktok/utils/conv"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"

@@ -3,7 +3,7 @@ package jwt
 import (
 	"errors"
 
-	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
 	"github.com/golang-jwt/jwt/v4"
 )
 

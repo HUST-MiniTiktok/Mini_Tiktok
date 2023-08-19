@@ -7,7 +7,7 @@ import (
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/rpc"
 	comment "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/comment"
 	user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user"
-	"github.com/HUST-MiniTiktok/mini_tiktok/mw/jwt"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/jwt"
 	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
 )
 

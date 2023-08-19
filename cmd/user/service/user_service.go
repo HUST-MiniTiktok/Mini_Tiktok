@@ -6,8 +6,8 @@ import (
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/user/dal/db"
 	common "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/common"
 	user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user"
-	crypt "github.com/HUST-MiniTiktok/mini_tiktok/mw/crypt"
-	jwt "github.com/HUST-MiniTiktok/mini_tiktok/mw/jwt"
+	crypt "github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/crypt"
+	jwt "github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/jwt"
 	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
 )
 

@@ -6,7 +6,7 @@ import (
 
 	"github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/message"
 	"github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/message/messageservice"
-	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
 	"github.com/cloudwego/kitex/client"
 	"github.com/cloudwego/kitex/pkg/klog"
 	etcd "github.com/kitex-contrib/registry-etcd"

@@ -1,7 +1,7 @@
 package redis
 
 import (
-	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
 	redis "github.com/go-redis/redis/v7"
 )
 

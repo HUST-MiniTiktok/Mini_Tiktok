@@ -3,8 +3,8 @@ package oss
 import (
 	"context"
 
-	"github.com/HUST-MiniTiktok/mini_tiktok/mw/redis"
-	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/redis"
 	"github.com/cloudwego/kitex/pkg/klog"
 	minio "github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"

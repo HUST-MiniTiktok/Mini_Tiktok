@@ -1,10 +1,10 @@
 package db
 
 import (
-	"gorm.io/gorm"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
 	"gorm.io/driver/mysql"
-	"gorm.io/plugin/opentracing"
-	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
+	"gorm.io/gorm"
+	gormopentracing "gorm.io/plugin/opentracing"
 )
 
 var DB *gorm.DB

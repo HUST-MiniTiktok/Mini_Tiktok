@@ -3,8 +3,8 @@ package main
 import (
 	"net"
 
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/comment/dal"
-	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
 	comment "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/comment/commentservice"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"

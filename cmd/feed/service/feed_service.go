@@ -6,15 +6,15 @@ import (
 
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/dal/db"
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/rpc"
-	"github.com/HUST-MiniTiktok/mini_tiktok/conf"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
 	comment "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/comment"
 	common "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/common"
 	favorite "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/favorite"
 	feed "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/feed"
 	user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user"
-	"github.com/HUST-MiniTiktok/mini_tiktok/mw/jwt"
-	"github.com/HUST-MiniTiktok/mini_tiktok/mw/oss"
-	"github.com/HUST-MiniTiktok/mini_tiktok/util"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/jwt"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/oss"
+	"github.com/HUST-MiniTiktok/mini_tiktok/utils"
 	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
 )
 

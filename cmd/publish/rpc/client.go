@@ -1,13 +1,13 @@
 package rpc
 
 import (
-	rpc "github.com/HUST-MiniTiktok/mini_tiktok/mw/rpc"
+	rpc "github.com/HUST-MiniTiktok/mini_tiktok/pkg/rpc"
 )
 
 var (
-	UserRPC *rpc.UserClient
+	UserRPC     *rpc.UserClient
 	FavoriteRPC *rpc.FavoriteClient
-	CommentRPC *rpc.CommentClient
+	CommentRPC  *rpc.CommentClient
 )
 
 func init() {
