@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"github.com/cloudwego/kitex/pkg/klog"
 )
 
 const UserTableName = "user"
@@ -22,20 +21,25 @@ func (User) TableName() string {
 
 func CreateUser(ctx context.Context, user *User) (id int64, err error) {
 	err = DB.WithContext(ctx).Create(user).Error
-	klog.Warnf("create user: %v", user)
 	id = int64(user.ID)
 	return
 }
 
 func GetUserById(ctx context.Context, id int64) (user *User, err error) {
-	klog.Warnf("get user by id: %v", id)
-	err = DB.WithContext(ctx).First(&user, id).Error
-	return
+	var db_user User
+	err = DB.WithContext(ctx).Where("id = ?", id).Find(&db_user).Error
+	if err != nil {
+		return nil, err
+	}
+	if db_user.ID == 0 {
+		return nil, nil
+	}
+	user = &db_user
+	return user, nil
 }
 
 func GetUserByUserName(ctx context.Context, userName string) (user *User, err error) {
 	users := make([]*User, 0)
-	klog.Warnf("get user by username: %v", userName)
 	err = DB.WithContext(ctx).Where("user_name = ?", userName).Find(&users).Error
 	if err != nil {
 		return nil, err
@@ -61,5 +65,5 @@ func CheckUserById(ctx context.Context, userId int64) (exist bool, err error) {
 	if user == (User{}) {
 		return false, nil
 	}
-	return true, nil 
+	return true, nil
 }

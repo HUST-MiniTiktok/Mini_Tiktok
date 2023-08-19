@@ -4,11 +4,12 @@ import (
 	"context"
 
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/user/dal/db"
+	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/user/pack"
 	common "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/common"
 	user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user"
-	crypt "github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/crypt"
-	jwt "github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/jwt"
-	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/errno"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/crypt"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/jwt"
 )
 
 var (
@@ -32,10 +33,12 @@ func (s *UserService) GetUserById(ctx context.Context, request *user.UserRequest
 	var resp_user *common.User
 	db_user, err = db.GetUserById(ctx, request.UserId)
 	if err != nil {
-		errMsg := "db user not found"
-		resp = &user.UserResponse{StatusCode: int32(codes.NotFound), StatusMsg: &errMsg, User: nil}
-		return
+		return pack.NewUserResponse(err), err
 	}
+	if db_user == nil {
+		return pack.NewUserResponse(errno.UserIsNotExistErr), errno.UserIsNotExistErr
+	}
+
 	resp_user = &common.User{
 		Id:              db_user.ID,
 		Name:            db_user.UserName,
@@ -43,27 +46,25 @@ func (s *UserService) GetUserById(ctx context.Context, request *user.UserRequest
 		BackgroundImage: &db_user.BackgroundImage,
 		Signature:       &db_user.Signature,
 	}
-	return &user.UserResponse{StatusCode: int32(codes.OK), StatusMsg: nil, User: resp_user}, nil
+
+	resp = pack.NewUserResponse(errno.Success)
+	resp.User = resp_user
+	return resp, nil
 }
 
 func (s *UserService) Register(ctx context.Context, request *user.UserRegisterRequest) (resp *user.UserRegisterResponse, err error) {
 	db_user_ck, err := db.GetUserByUserName(ctx, request.Username)
 	if err != nil {
-		errMsg := "db check username failed"
-		resp = &user.UserRegisterResponse{StatusCode: int32(codes.Internal), StatusMsg: &errMsg}
-		return
+		return pack.NewUserRegisterResponse(err), err
 	}
 
 	if db_user_ck != nil {
-		errMsg := "username already exists"
-		resp = &user.UserRegisterResponse{StatusCode: int32(codes.AlreadyExists), StatusMsg: &errMsg}
-		return
+		return pack.NewUserRegisterResponse(errno.UserAlreadyExistErr), errno.UserAlreadyExistErr
 	}
 
 	encrypted_password, err := crypt.HashPassword(request.Password)
 	if err != nil {
-		errMsg := "crypt password failed"
-		resp = &user.UserRegisterResponse{StatusCode: int32(codes.Internal), StatusMsg: &errMsg}
+		return pack.NewUserRegisterResponse(err), err
 	}
 
 	db_user_new := db.User{
@@ -73,60 +74,54 @@ func (s *UserService) Register(ctx context.Context, request *user.UserRegisterRe
 
 	user_id, err := db.CreateUser(ctx, &db_user_new)
 	if err != nil {
-		errMsg := "db create user failed"
-		resp = &user.UserRegisterResponse{StatusCode: int32(codes.Internal), StatusMsg: &errMsg}
-		return
+		return pack.NewUserRegisterResponse(err), err
 	}
 
 	token, err := Jwt.CreateToken(jwt.UserClaims{ID: user_id})
 	if err != nil {
-		errMsg := "create token failed"
-		resp = &user.UserRegisterResponse{StatusCode: int32(codes.Internal), StatusMsg: &errMsg}
-		return
+		return pack.NewUserRegisterResponse(err), err
 	}
 
-	return &user.UserRegisterResponse{StatusCode: int32(codes.OK), StatusMsg: nil, UserId: user_id, Token: token}, nil
+	resp = pack.NewUserRegisterResponse(errno.Success)
+	resp.UserId = user_id
+	resp.Token = token
+	return resp, nil
 }
 
 func (s *UserService) Login(ctx context.Context, request *user.UserLoginRequest) (resp *user.UserLoginResponse, err error) {
 	db_user_ck, err := db.GetUserByUserName(ctx, request.Username)
 	if err != nil {
-		errMsg := "db check user name failed"
-		resp = &user.UserLoginResponse{StatusCode: int32(codes.Internal), StatusMsg: &errMsg}
-		return
+		return pack.NewUserLoginResponse(err), err
 	}
 
 	if db_user_ck == nil {
-		errMsg := "username not exists"
-		resp = &user.UserLoginResponse{StatusCode: int32(codes.NotFound), StatusMsg: &errMsg}
-		return
+		return pack.NewUserLoginResponse(errno.UserIsNotExistErr), errno.UserIsNotExistErr
 	}
 
 	if !crypt.VerifyPassword(request.Password, db_user_ck.Password) {
-		errMsg := "password incorrect"
-		resp = &user.UserLoginResponse{StatusCode: int32(codes.PermissionDenied), StatusMsg: &errMsg}
-		return
+		return pack.NewUserLoginResponse(errno.UserPasswordErr), errno.UserPasswordErr
 	}
 
 	user_id := int64(db_user_ck.ID)
 	token, err := Jwt.CreateToken(jwt.UserClaims{ID: user_id})
 	if err != nil {
-		errMsg := "create token failed"
-		resp = &user.UserLoginResponse{StatusCode: int32(codes.Internal), StatusMsg: &errMsg}
-		return
+		return pack.NewUserLoginResponse(err), err
 	}
 
-	return &user.UserLoginResponse{StatusCode: int32(codes.OK), StatusMsg: nil, UserId: user_id, Token: token}, nil
+	resp = pack.NewUserLoginResponse(errno.Success)
+	resp.UserId = user_id
+	resp.Token = token
+	return resp, nil
 }
 
 func (s *UserService) CheckUserIsExist(ctx context.Context, request *user.CheckUserIsExistRequest) (resp *user.CheckUserIsExistResponse, err error) {
 	is_exist, err := db.CheckUserById(ctx, request.UserId)
 
 	if err != nil {
-		errMsg := "db check user id failed"
-		resp = &user.CheckUserIsExistResponse{StatusCode: int32(codes.Internal), StatusMsg: &errMsg}
-		return
+		return pack.NewCheckUserIsExistResponse(err), err
 	}
 
-	return &user.CheckUserIsExistResponse{StatusCode: int32(codes.OK), StatusMsg: nil, IsExist: is_exist}, nil
+	resp = pack.NewCheckUserIsExistResponse(errno.Success)
+	resp.IsExist = is_exist
+	return resp, nil
 }

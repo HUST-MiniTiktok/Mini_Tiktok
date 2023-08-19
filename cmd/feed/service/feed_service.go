@@ -5,17 +5,18 @@ import (
 	"time"
 
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/dal/db"
+	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/pack"
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/rpc"
-	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
 	comment "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/comment"
 	common "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/common"
 	favorite "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/favorite"
 	feed "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/feed"
 	user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/errno"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/jwt"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/oss"
-	"github.com/HUST-MiniTiktok/mini_tiktok/utils"
-	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/utils"
 )
 
 var (
@@ -39,17 +40,17 @@ func NewFeedService(ctx context.Context) *FeedService {
 }
 
 func (s *FeedService) GetFeed(request *feed.FeedRequest) (resp *feed.FeedResponse, err error) {
-	user_claims, err := Jwt.ExtractClaims(request.GetToken())
+	claim, err := Jwt.ExtractClaims(request.GetToken())
 	var curr_user_id int64
 	if err != nil {
 		curr_user_id = 0
 	} else {
-		curr_user_id = user_claims.ID
+		curr_user_id = claim.ID
 	}
 
 	var last_time time.Time
 	if request.LatestTimestamp != nil {
-		last_time = util.MillTimeStampToTime(*request.LatestTimestamp)
+		last_time = utils.MillTimeStampToTime(*request.LatestTimestamp)
 	} else {
 		last_time = time.Now()
 	}
@@ -57,9 +58,7 @@ func (s *FeedService) GetFeed(request *feed.FeedRequest) (resp *feed.FeedRespons
 	var db_videos []*db.Video
 	db_videos, err = db.GetVideosByLastPublishTime(s.ctx, last_time)
 	if err != nil {
-		err_msg := err.Error()
-		resp = &feed.FeedResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}
-		return
+		return pack.NewFeedResponse(err), err
 	}
 
 	err_chan := make(chan error)
@@ -105,17 +104,14 @@ func (s *FeedService) GetFeed(request *feed.FeedRequest) (resp *feed.FeedRespons
 	for i := 0; i < len(db_videos); i++ {
 		select {
 		case err := <-err_chan:
-			err_msg := err.Error()
-			return &feed.FeedResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}, err
+			return pack.NewFeedResponse(err), err
 		case video := <-video_chan:
 			kitex_videos = append(kitex_videos, video)
 		}
 	}
-	resp = &feed.FeedResponse{
-		StatusCode: int32(codes.OK),
-		StatusMsg:  nil,
-		VideoList:  kitex_videos,
-	}
+
+	resp = pack.NewFeedResponse(errno.Success)
+	resp.VideoList = kitex_videos
 	if len(db_videos) > 0 {
 		next_time := db_videos[len(db_videos)-1].PublishTime.Unix()
 		resp.NextTime = &next_time

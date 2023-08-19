@@ -7,11 +7,10 @@ import (
 
 	user "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/user"
 	rpc "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/rpc"
-	"github.com/HUST-MiniTiktok/mini_tiktok/utils"
-	"github.com/HUST-MiniTiktok/mini_tiktok/utils/conv"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/errno"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/utils/conv"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
 )
 
 // User .
@@ -21,7 +20,7 @@ func User(ctx context.Context, c *app.RequestContext) {
 	var req user.UserRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.JSON(consts.StatusBadRequest, util.NewRespMap(int32(codes.InvalidArgument), err.Error()))
+		c.JSON(consts.StatusBadRequest, conv.ToHertzBaseResponse(errno.ParamErr))
 		return
 	}
 
@@ -30,7 +29,7 @@ func User(ctx context.Context, c *app.RequestContext) {
 	if err == nil {
 		c.JSON(consts.StatusOK, conv.ToHertzUserResponse(kitex_resp))
 	} else {
-		c.JSON(consts.StatusOK, util.NewRespMap(int32(codes.Internal), err.Error()))
+		c.JSON(consts.StatusOK, conv.ToHertzBaseResponse(err))
 	}
 }
 
@@ -41,7 +40,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	var req user.UserRegisterRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.JSON(consts.StatusBadRequest, util.NewRespMap(int32(codes.InvalidArgument), err.Error()))
+		c.JSON(consts.StatusBadRequest, conv.ToHertzBaseResponse(errno.ParamErr))
 		return
 	}
 
@@ -50,7 +49,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	if err == nil {
 		c.JSON(consts.StatusOK, conv.ToHertzUserRegisterResponse(kitex_resp))
 	} else {
-		c.JSON(consts.StatusOK, util.NewRespMap(int32(codes.Internal), err.Error()))
+		c.JSON(consts.StatusOK, conv.ToHertzBaseResponse(err))
 	}
 }
 
@@ -61,7 +60,7 @@ func Login(ctx context.Context, c *app.RequestContext) {
 	var req user.UserLoginRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.JSON(consts.StatusBadRequest, util.NewRespMap(int32(codes.InvalidArgument), err.Error()))
+		c.JSON(consts.StatusBadRequest, conv.ToHertzBaseResponse(errno.ParamErr))
 		return
 	}
 
@@ -70,6 +69,6 @@ func Login(ctx context.Context, c *app.RequestContext) {
 	if err == nil {
 		c.JSON(consts.StatusOK, conv.ToHertzUserLoginResponse(kitex_resp))
 	} else {
-		c.JSON(consts.StatusOK, util.NewRespMap(int32(codes.Internal), err.Error()))
+		c.JSON(consts.StatusOK, conv.ToHertzBaseResponse(err))
 	}
 }

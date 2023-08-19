@@ -5,13 +5,13 @@ import (
 
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/rpc"
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/message/dal/db"
-	_ "github.com/HUST-MiniTiktok/mini_tiktok/cmd/message/rpc"
+	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/message/pack"
 	message "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/message"
 	"github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/errno"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/jwt"
-	util "github.com/HUST-MiniTiktok/mini_tiktok/utils"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/utils"
 	"github.com/cloudwego/kitex/pkg/klog"
-	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
 )
 
 var (
@@ -34,22 +34,19 @@ func (s *MessageService) MessageChat(request *message.MessageChatRequest) (resp 
 	klog.Infof("message_chat request: %v", *request)
 	user_claims, err := Jwt.ExtractClaims(request.Token)
 	curr_user_id := user_claims.ID
-
 	if err != nil {
-		err_msg := err.Error()
-		return &message.MessageChatResponse{StatusCode: int32(codes.PermissionDenied), StatusMsg: &err_msg}, err
+		return pack.NewMessageChatResponse(errno.AuthorizationFailedErr), err
 	}
 
 	var db_messages []*db.Message
-	db_messages, err = db.GetMessageByUserIdPair(s.ctx, curr_user_id, request.ToUserId, util.MillTimeStampToTime(request.PreMsgTime))
+	db_messages, err = db.GetMessageByUserIdPair(s.ctx, curr_user_id, request.ToUserId, utils.MillTimeStampToTime(request.PreMsgTime))
 	if err != nil {
-		err_msg := err.Error()
-		return &message.MessageChatResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}, err
+		return pack.NewMessageChatResponse(err), err
 	}
 
 	kitex_messages := make([]*message.Message, 0, len(db_messages))
 	for _, db_message := range db_messages {
-		create_time := util.TimeToMillTimeStamp(db_message.CreatedAt)
+		create_time := utils.TimeToMillTimeStamp(db_message.CreatedAt)
 		kitex_messages = append(kitex_messages, &message.Message{
 			Id:         db_message.ID,
 			FromUserId: db_message.FromUserId,
@@ -58,40 +55,36 @@ func (s *MessageService) MessageChat(request *message.MessageChatRequest) (resp 
 			CreateTime: &create_time,
 		})
 	}
-	return &message.MessageChatResponse{StatusCode: int32(codes.OK), StatusMsg: nil, MessageList: kitex_messages}, nil
+	resp = pack.NewMessageChatResponse(errno.Success)
+	resp.MessageList = kitex_messages
+	return resp, nil
 }
 
 func (s *MessageService) MessageAction(request *message.MessageActionRequest) (resp *message.MessageActionResponse, err error) {
 	klog.Infof("message_chat request: %v", *request)
 	user_claims, err := Jwt.ExtractClaims(request.Token)
 	from_user_id := user_claims.ID
-
 	if err != nil {
-		err_msg := err.Error()
-		return &message.MessageActionResponse{StatusCode: int32(codes.PermissionDenied), StatusMsg: &err_msg}, err
+		return pack.NewMessageActionResponse(errno.AuthorizationFailedErr), err
 	}
 
 	if request.ActionType != 1 {
-		err_msg := "invalid action_type"
-		return &message.MessageActionResponse{StatusCode: int32(codes.InvalidArgument), StatusMsg: &err_msg}, err
+		return pack.NewMessageActionResponse(errno.ParamErr), errno.ParamErr
 	}
 
 	to_user_ck, err := rpc.UserRPC.CheckUserIsExist(s.ctx, &user.CheckUserIsExistRequest{UserId: request.ToUserId})
 	if err != nil {
-		err_msg := err.Error()
-		return &message.MessageActionResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}, err
+		return pack.NewMessageActionResponse(err), err
 	}
 	if !to_user_ck.IsExist {
-		err_msg := "to_user is not exist"
-		return &message.MessageActionResponse{StatusCode: int32(codes.PermissionDenied), StatusMsg: &err_msg}, err
+		return pack.NewMessageActionResponse(errno.UserIsNotExistErr), errno.UserIsNotExistErr
 	}
 
 	db_message := db.Message{FromUserId: from_user_id, ToUserId: request.ToUserId, Content: request.Content}
 	_, err = db.CreateMessage(s.ctx, &db_message)
 	if err != nil {
-		err_msg := err.Error()
-		return &message.MessageActionResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}, err
+		return pack.NewMessageActionResponse(err), err
 	}
 
-	return &message.MessageActionResponse{StatusCode: int32(codes.OK), StatusMsg: nil}, nil
+	return pack.NewMessageActionResponse(errno.Success), nil
 }

@@ -7,11 +7,10 @@ import (
 
 	feed "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/feed"
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/rpc"
-	"github.com/HUST-MiniTiktok/mini_tiktok/utils"
-	"github.com/HUST-MiniTiktok/mini_tiktok/utils/conv"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/errno"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/utils/conv"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
 )
 
 // GetFeed .
@@ -21,7 +20,7 @@ func GetFeed(ctx context.Context, c *app.RequestContext) {
 	var req feed.FeedRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.JSON(consts.StatusBadRequest, util.NewRespMap(int32(codes.InvalidArgument), err.Error()))
+		c.JSON(consts.StatusBadRequest, conv.ToHertzBaseResponse(errno.ParamErr))
 		return
 	}
 
@@ -30,6 +29,6 @@ func GetFeed(ctx context.Context, c *app.RequestContext) {
 	if err == nil {
 		c.JSON(consts.StatusOK, conv.ToHertzFeedResponse(kitex_resp))
 	} else {
-		c.JSON(consts.StatusOK, util.NewRespMap(int32(codes.Internal), err.Error()))
+		c.JSON(consts.StatusOK, conv.ToHertzBaseResponse(err))
 	}
 }

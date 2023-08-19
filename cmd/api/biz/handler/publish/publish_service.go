@@ -7,11 +7,11 @@ import (
 
 	publish "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/publish"
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/rpc"
-	"github.com/HUST-MiniTiktok/mini_tiktok/utils"
-	"github.com/HUST-MiniTiktok/mini_tiktok/utils/conv"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/errno"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/utils"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/utils/conv"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
 )
 
 // PublishAction .
@@ -21,19 +21,15 @@ func PublishAction(ctx context.Context, c *app.RequestContext) {
 	var req publish.PublishActionRequest
 	req.Token = c.PostForm("token")
 	req.Title = c.PostForm("title")
-	if err != nil {
-		c.JSON(consts.StatusBadRequest, util.NewRespMap(int32(codes.Unauthenticated), err.Error()))
-		return
-	}
 
 	f, err := c.FormFile("data")
 	if err != nil {
-		c.JSON(consts.StatusBadRequest, util.NewRespMap(int32(codes.InvalidArgument), err.Error()))
+		c.JSON(consts.StatusBadRequest, conv.ToHertzBaseResponse(errno.ParamErr))
 		return
 	}
-	req.Data, err = util.ReadFile(f)
+	req.Data, err = utils.ReadFile(f)
 	if err != nil {
-		c.JSON(consts.StatusBadRequest, util.NewRespMap(int32(codes.InvalidArgument), err.Error()))
+		c.JSON(consts.StatusBadRequest, conv.ToHertzBaseResponse(errno.ParamErr))
 		return
 	}
 
@@ -42,7 +38,7 @@ func PublishAction(ctx context.Context, c *app.RequestContext) {
 	if err == nil {
 		c.JSON(consts.StatusOK, conv.ToHertzPublishActionResponse(kitex_resp))
 	} else {
-		c.JSON(consts.StatusOK, util.NewRespMap(int32(codes.Internal), err.Error()))
+		c.JSON(consts.StatusOK, conv.ToHertzBaseResponse(err))
 	}
 }
 
@@ -53,7 +49,7 @@ func PublishList(ctx context.Context, c *app.RequestContext) {
 	var req publish.PublishListRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.JSON(consts.StatusBadRequest, util.NewRespMap(int32(codes.InvalidArgument), err.Error()))
+		c.JSON(consts.StatusBadRequest, conv.ToHertzBaseResponse(errno.ParamErr))
 		return
 	}
 
@@ -62,6 +58,6 @@ func PublishList(ctx context.Context, c *app.RequestContext) {
 	if err == nil {
 		c.JSON(consts.StatusOK, conv.ToHertzPublishListResponse(kitex_resp))
 	} else {
-		c.JSON(consts.StatusOK, util.NewRespMap(int32(codes.Internal), err.Error()))
+		c.JSON(consts.StatusOK, conv.ToHertzBaseResponse(err))
 	}
 }

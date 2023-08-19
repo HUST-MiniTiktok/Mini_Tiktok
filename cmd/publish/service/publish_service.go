@@ -9,18 +9,19 @@ import (
 	"github.com/google/uuid"
 
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/dal/db"
+	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/pack"
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/rpc"
 	comment "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/comment"
 	common "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/common"
 	favorite "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/favorite"
 	publish "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/publish"
 	user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/errno"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/ffmpeg"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/jwt"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/oss"
-	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
 	"github.com/cloudwego/kitex/pkg/klog"
-	"github.com/cloudwego/kitex/pkg/remote/trans/nphttp2/codes"
 )
 
 var (
@@ -47,12 +48,11 @@ func NewPublishService(ctx context.Context) *PublishService {
 
 func (s *PublishService) PublishAction(request *publish.PublishActionRequest) (resp *publish.PublishActionResponse, err error) {
 	klog.Infof("publish_action request")
-	user_claims, err := Jwt.ExtractClaims(request.Token)
-	author_id := user_claims.ID
+	claim, err := Jwt.ExtractClaims(request.Token)
+	author_id := claim.ID
 
-	if err != nil {
-		err_msg := err.Error()
-		return &publish.PublishActionResponse{StatusCode: int32(codes.PermissionDenied), StatusMsg: &err_msg}, err
+	if err != nil || claim.ID == 0 {
+		return pack.NewPublishActionResponse(errno.AuthorizationFailedErr), err
 	}
 
 	cover_filename := uuid.NewString() + ".png"
@@ -90,8 +90,7 @@ func (s *PublishService) PublishAction(request *publish.PublishActionRequest) (r
 	for i := 0; i < 2; i++ {
 		select {
 		case err := <-err_chan:
-			err_msg := err.Error()
-			return &publish.PublishActionResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}, err
+			return pack.NewPublishActionResponse(err), err
 		case <-ok:
 		}
 	}
@@ -104,10 +103,10 @@ func (s *PublishService) PublishAction(request *publish.PublishActionRequest) (r
 		Title:       request.Title,
 	})
 	if err != nil {
-		err_msg := err.Error()
-		return &publish.PublishActionResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}, err
+		return pack.NewPublishActionResponse(err), err
 	}
-	return &publish.PublishActionResponse{StatusCode: int32(codes.OK), StatusMsg: nil}, nil
+
+	return pack.NewPublishActionResponse(errno.Success), nil
 }
 
 func (s *PublishService) PublishList(request *publish.PublishListRequest) (resp *publish.PublishListResponse, err error) {
@@ -122,8 +121,7 @@ func (s *PublishService) PublishList(request *publish.PublishListRequest) (resp 
 
 	db_videos, err := db.GetVideoByAuthorId(s.ctx, query_user_id)
 	if err != nil {
-		err_msg := err.Error()
-		return &publish.PublishListResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}, err
+		return pack.NewPublishListResponse(err), err
 	}
 
 	err_chan := make(chan error)
@@ -169,19 +167,14 @@ func (s *PublishService) PublishList(request *publish.PublishListRequest) (resp 
 	for i := 0; i < len(db_videos); i++ {
 		select {
 		case err := <-err_chan:
-			err_msg := err.Error()
-			resp = &publish.PublishListResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}
-			return resp, err
+			return pack.NewPublishListResponse(err), err
 		case video := <-video_chan:
 			kitex_videos = append(kitex_videos, video)
 		}
 	}
 
-	resp = &publish.PublishListResponse{
-		StatusCode: int32(codes.OK),
-		StatusMsg:  nil,
-		VideoList:  kitex_videos,
-	}
+	resp = pack.NewPublishListResponse(errno.Success)
+	resp.VideoList = kitex_videos
 	return
 }
 
@@ -196,11 +189,7 @@ func (s *PublishService) GetVideoById(request *publish.GetVideoByIdRequest) (res
 
 	db_video, err := db.GetVideoById(s.ctx, request.Id)
 	if err != nil {
-		errMsg := err.Error()
-		return &publish.GetVideoByIdResponse{
-			StatusCode: int32(codes.Internal),
-			StatusMsg:  &errMsg,
-		}, err
+		return pack.NewGetVideoByIdResponse(err), err
 	}
 
 	authorChan := make(chan *user.UserResponse)
@@ -260,11 +249,9 @@ func (s *PublishService) GetVideoById(request *publish.GetVideoByIdRequest) (res
 		CommentCount:  comment_count.CommentCount,
 	}
 
-	return &publish.GetVideoByIdResponse{
-		StatusCode: int32(codes.OK),
-		StatusMsg:  nil,
-		Video:      kitex_video,
-	}, nil
+	resp = pack.NewGetVideoByIdResponse(errno.Success)
+	resp.Video = kitex_video
+	return resp, nil
 }
 
 func (s *PublishService) GetVideoByIdList(request *publish.GetVideoByIdListRequest) (resp *publish.GetVideoByIdListResponse, err error) {
@@ -278,8 +265,7 @@ func (s *PublishService) GetVideoByIdList(request *publish.GetVideoByIdListReque
 
 	db_videos, err := db.GetVideosByIDs(s.ctx, request.Id)
 	if err != nil {
-		err_msg := err.Error()
-		return &publish.GetVideoByIdListResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}, err
+		return pack.NewGetVideoByIdListResponse(err), err
 	}
 
 	err_chan := make(chan error)
@@ -325,16 +311,13 @@ func (s *PublishService) GetVideoByIdList(request *publish.GetVideoByIdListReque
 	for i := 0; i < len(db_videos); i++ {
 		select {
 		case err := <-err_chan:
-			err_msg := err.Error()
-			return &publish.GetVideoByIdListResponse{StatusCode: int32(codes.Internal), StatusMsg: &err_msg}, err
+			return pack.NewGetVideoByIdListResponse(err), err
 		case video := <-video_chan:
 			kitex_videos = append(kitex_videos, video)
 		}
 	}
 
-	return &publish.GetVideoByIdListResponse{
-		StatusCode: int32(codes.OK),
-		StatusMsg:  nil,
-		VideoList:  kitex_videos,
-	}, nil
+	resp = pack.NewGetVideoByIdListResponse(errno.Success)
+	resp.VideoList = kitex_videos
+	return resp, nil
 }
