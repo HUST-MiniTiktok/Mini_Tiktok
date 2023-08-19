@@ -7,6 +7,8 @@ import (
 	"gorm.io/gorm"
 )
 
+const CommentTableName = "comment"
+
 type Comment struct {
 	ID          int64          `json:"id"`
 	UserId      int64          `json:"user_id"`
@@ -14,6 +16,10 @@ type Comment struct {
 	CommentText string         `json:"comment_text"`
 	CreatedAt   time.Time      `json:"created_at"`
 	DeletedAt   gorm.DeletedAt `gorm:"index" json:"deleted_at"`
+}
+
+func (Comment) TableName() string {
+	return CommentTableName
 }
 
 // NewComment creates a new Comment

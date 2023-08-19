@@ -1,7 +1,7 @@
-package rpc
+package client
 
 import (
-	rpc "github.com/HUST-MiniTiktok/mini_tiktok/pkg/rpc"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/rpc"
 )
 
 var (

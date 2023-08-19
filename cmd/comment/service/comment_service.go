@@ -3,9 +3,9 @@ package service
 import (
 	"context"
 
+	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/comment/client"
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/comment/dal/db"
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/comment/pack"
-	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/comment/rpc"
 	comment "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/comment"
 	user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/errno"
@@ -42,7 +42,7 @@ func (s *CommentService) CommentAction(ctx context.Context, request *comment.Com
 		}
 
 		// 创建成功需要返回 comment类型的newcomment
-		author, err := rpc.UserRPC.User(s.ctx, &user.UserRequest{UserId: newcomment.UserId})
+		author, err := client.UserRPC.User(s.ctx, &user.UserRequest{UserId: newcomment.UserId})
 		if err != nil {
 			return pack.NewCommentActionResponse(err), err
 		}
@@ -90,7 +90,7 @@ func (s *CommentService) CommentList(ctx context.Context, request *comment.Comme
 
 	for _, db_comment := range db_comments {
 		go func(db_comment *db.Comment) {
-			author, err := rpc.UserRPC.User(s.ctx, &user.UserRequest{UserId: db_comment.UserId})
+			author, err := client.UserRPC.User(s.ctx, &user.UserRequest{UserId: db_comment.UserId})
 			if err != nil {
 				err_chan <- err
 			} else {

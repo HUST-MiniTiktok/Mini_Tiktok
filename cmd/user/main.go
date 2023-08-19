@@ -6,6 +6,7 @@ import (
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/user/dal"
 	user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user/userservice"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/kitex"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
@@ -28,6 +29,9 @@ func main() {
 	svr := user.NewServer(new(UserServiceImpl),
 		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: "user"}),
 		server.WithServiceAddr(addr),
+		server.WithMiddleware(kitex.CommonMiddleware),
+		server.WithMiddleware(kitex.ServerMiddleware),
+		server.WithMuxTransport(),
 		server.WithRegistry(r),
 	)
 

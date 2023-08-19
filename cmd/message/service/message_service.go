@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/rpc"
+	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/client"
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/message/dal/db"
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/message/pack"
 	message "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/message"
@@ -11,7 +11,6 @@ import (
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/errno"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/jwt"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/utils"
-	"github.com/cloudwego/kitex/pkg/klog"
 )
 
 var (
@@ -31,7 +30,6 @@ func NewMessageService(ctx context.Context) *MessageService {
 }
 
 func (s *MessageService) MessageChat(request *message.MessageChatRequest) (resp *message.MessageChatResponse, err error) {
-	klog.Infof("message_chat request: %v", *request)
 	user_claims, err := Jwt.ExtractClaims(request.Token)
 	curr_user_id := user_claims.ID
 	if err != nil {
@@ -61,7 +59,6 @@ func (s *MessageService) MessageChat(request *message.MessageChatRequest) (resp 
 }
 
 func (s *MessageService) MessageAction(request *message.MessageActionRequest) (resp *message.MessageActionResponse, err error) {
-	klog.Infof("message_chat request: %v", *request)
 	user_claims, err := Jwt.ExtractClaims(request.Token)
 	from_user_id := user_claims.ID
 	if err != nil {
@@ -72,7 +69,7 @@ func (s *MessageService) MessageAction(request *message.MessageActionRequest) (r
 		return pack.NewMessageActionResponse(errno.ParamErr), errno.ParamErr
 	}
 
-	to_user_ck, err := rpc.UserRPC.CheckUserIsExist(s.ctx, &user.CheckUserIsExistRequest{UserId: request.ToUserId})
+	to_user_ck, err := client.UserRPC.CheckUserIsExist(s.ctx, &user.CheckUserIsExistRequest{UserId: request.ToUserId})
 	if err != nil {
 		return pack.NewMessageActionResponse(err), err
 	}

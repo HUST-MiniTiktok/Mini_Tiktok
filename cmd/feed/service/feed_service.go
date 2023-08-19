@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
+	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/client"
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/dal/db"
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/pack"
-	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/rpc"
 	comment "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/comment"
 	common "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/common"
 	favorite "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/favorite"
@@ -67,22 +67,22 @@ func (s *FeedService) GetFeed(request *feed.FeedRequest) (resp *feed.FeedRespons
 
 	for _, db_video := range db_videos {
 		go func(db_video *db.Video) {
-			author, err := rpc.UserRPC.User(s.ctx, &user.UserRequest{UserId: db_video.AuthorID})
+			author, err := client.UserRPC.User(s.ctx, &user.UserRequest{UserId: db_video.AuthorID})
 			if err != nil {
 				err_chan <- err
 				return
 			}
-			favorite_count, err := rpc.FavoriteRPC.GetVideoFavoriteCount(s.ctx, &favorite.GetVideoFavoriteCountRequest{VideoId: db_video.ID})
+			favorite_count, err := client.FavoriteRPC.GetVideoFavoriteCount(s.ctx, &favorite.GetVideoFavoriteCountRequest{VideoId: db_video.ID})
 			if err != nil {
 				err_chan <- err
 				return
 			}
-			is_favorite, err := rpc.FavoriteRPC.CheckIsFavorite(s.ctx, &favorite.CheckIsFavoriteRequest{VideoId: db_video.ID, UserId: curr_user_id})
+			is_favorite, err := client.FavoriteRPC.CheckIsFavorite(s.ctx, &favorite.CheckIsFavoriteRequest{VideoId: db_video.ID, UserId: curr_user_id})
 			if err != nil {
 				err_chan <- err
 				return
 			}
-			comment_count, err := rpc.CommentRPC.GetVideoCommentCount(s.ctx, &comment.GetVideoCommentCountRequest{VideoId: db_video.ID})
+			comment_count, err := client.CommentRPC.GetVideoCommentCount(s.ctx, &comment.GetVideoCommentCountRequest{VideoId: db_video.ID})
 			if err != nil {
 				err_chan <- err
 				return

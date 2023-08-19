@@ -1,4 +1,4 @@
-package rpc
+package client
 
 import (
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/rpc"

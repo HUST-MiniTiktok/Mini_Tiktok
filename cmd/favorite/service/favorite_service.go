@@ -3,9 +3,9 @@ package service
 import (
 	"context"
 
+	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/favorite/client"
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/favorite/dal/db"
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/favorite/pack"
-	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/favorite/rpc"
 	favorite "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/favorite"
 	publish "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/publish"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/errno"
@@ -61,7 +61,7 @@ func (s *FavoriteService) FavoriteList(ctx context.Context, req *favorite.Favori
 		return pack.NewFavoriteListResponse(err), err
 	}
 
-	videosResponse, err := rpc.PublishRPC.GetVideoByIdList(ctx, &publish.GetVideoByIdListRequest{Id: videoIDList, Token: req.Token})
+	videosResponse, err := client.PublishRPC.GetVideoByIdList(ctx, &publish.GetVideoByIdListRequest{Id: videoIDList, Token: req.Token})
 	if err != nil {
 		return pack.NewFavoriteListResponse(err), err
 	} else {

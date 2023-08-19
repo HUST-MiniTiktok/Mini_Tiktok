@@ -5,8 +5,8 @@ package message
 import (
 	"context"
 
+	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/client"
 	message "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/message"
-	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/rpc"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/errno"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/utils/conv"
 	"github.com/cloudwego/hertz/pkg/app"
@@ -24,7 +24,7 @@ func MessageChat(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	kitex_resp, err := rpc.MessageRPC.MessageChat(ctx, conv.ToKitexMessageChatRequest(&req))
+	kitex_resp, err := client.MessageRPC.MessageChat(ctx, conv.ToKitexMessageChatRequest(&req))
 
 	if err == nil {
 		c.JSON(consts.StatusOK, conv.ToHertzMessageChatResponse(kitex_resp))
@@ -44,7 +44,7 @@ func MessageAction(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	kitex_resp, err := rpc.MessageRPC.MessageAction(ctx, conv.ToKitexMessageActionRequest(&req))
+	kitex_resp, err := client.MessageRPC.MessageAction(ctx, conv.ToKitexMessageActionRequest(&req))
 
 	if err == nil {
 		c.JSON(consts.StatusOK, conv.ToHertzMessageActionResponse(kitex_resp))

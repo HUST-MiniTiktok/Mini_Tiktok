@@ -5,6 +5,7 @@ import (
 
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/dal"
 	message "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/message/messageservice"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/kitex"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
@@ -28,6 +29,9 @@ func main() {
 	svr := message.NewServer(new(MessageServiceImpl),
 		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: "message"}),
 		server.WithServiceAddr(addr),
+		server.WithMiddleware(kitex.CommonMiddleware),
+		server.WithMiddleware(kitex.ServerMiddleware),
+		server.WithMuxTransport(),
 		server.WithRegistry(r),
 	)
 

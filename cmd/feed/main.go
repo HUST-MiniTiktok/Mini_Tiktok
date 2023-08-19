@@ -4,8 +4,9 @@ import (
 	"net"
 
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/dal"
-	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
 	feed "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/feed/feedservice"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/kitex"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
@@ -28,6 +29,9 @@ func main() {
 	svr := feed.NewServer(new(FeedServiceImpl),
 		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: "feed"}),
 		server.WithServiceAddr(addr),
+		server.WithMiddleware(kitex.CommonMiddleware),
+		server.WithMiddleware(kitex.ServerMiddleware),
+		server.WithMuxTransport(),
 		server.WithRegistry(r),
 	)
 

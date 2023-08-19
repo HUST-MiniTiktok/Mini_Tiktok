@@ -3,9 +3,10 @@ package main
 import (
 	"net"
 
-	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/comment/dal"
 	comment "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/comment/commentservice"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/kitex"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
@@ -28,6 +29,9 @@ func main() {
 	svr := comment.NewServer(new(CommentServiceImpl),
 		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: "comment"}),
 		server.WithServiceAddr(addr),
+		server.WithMiddleware(kitex.CommonMiddleware),
+		server.WithMiddleware(kitex.ServerMiddleware),
+		server.WithMuxTransport(),
 		server.WithRegistry(r),
 	)
 

@@ -5,8 +5,8 @@ package publish
 import (
 	"context"
 
+	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/client"
 	publish "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/publish"
-	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/rpc"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/errno"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/utils"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/utils/conv"
@@ -33,7 +33,7 @@ func PublishAction(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	kitex_resp, err := rpc.PublishRPC.PublishAction(ctx, conv.ToKitexPublishActionRequest(&req))
+	kitex_resp, err := client.PublishRPC.PublishAction(ctx, conv.ToKitexPublishActionRequest(&req))
 
 	if err == nil {
 		c.JSON(consts.StatusOK, conv.ToHertzPublishActionResponse(kitex_resp))
@@ -53,7 +53,7 @@ func PublishList(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	kitex_resp, err := rpc.PublishRPC.PublishList(ctx, conv.ToKitexPublishListRequest(&req))
+	kitex_resp, err := client.PublishRPC.PublishList(ctx, conv.ToKitexPublishListRequest(&req))
 
 	if err == nil {
 		c.JSON(consts.StatusOK, conv.ToHertzPublishListResponse(kitex_resp))

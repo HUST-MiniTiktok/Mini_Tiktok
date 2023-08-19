@@ -8,9 +8,9 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/client"
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/dal/db"
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/pack"
-	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/rpc"
 	comment "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/comment"
 	common "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/common"
 	favorite "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/favorite"
@@ -47,7 +47,6 @@ func NewPublishService(ctx context.Context) *PublishService {
 }
 
 func (s *PublishService) PublishAction(request *publish.PublishActionRequest) (resp *publish.PublishActionResponse, err error) {
-	klog.Infof("publish_action request")
 	claim, err := Jwt.ExtractClaims(request.Token)
 	author_id := claim.ID
 
@@ -130,22 +129,22 @@ func (s *PublishService) PublishList(request *publish.PublishListRequest) (resp 
 
 	for _, db_video := range db_videos {
 		go func(db_video *db.Video) {
-			author, err := rpc.UserRPC.User(s.ctx, &user.UserRequest{UserId: db_video.AuthorID})
+			author, err := client.UserRPC.User(s.ctx, &user.UserRequest{UserId: db_video.AuthorID})
 			if err != nil {
 				err_chan <- err
 				return
 			}
-			favorite_count, err := rpc.FavoriteRPC.GetVideoFavoriteCount(s.ctx, &favorite.GetVideoFavoriteCountRequest{VideoId: db_video.ID})
+			favorite_count, err := client.FavoriteRPC.GetVideoFavoriteCount(s.ctx, &favorite.GetVideoFavoriteCountRequest{VideoId: db_video.ID})
 			if err != nil {
 				err_chan <- err
 				return
 			}
-			is_favorite, err := rpc.FavoriteRPC.CheckIsFavorite(s.ctx, &favorite.CheckIsFavoriteRequest{VideoId: db_video.ID, UserId: curr_user_id})
+			is_favorite, err := client.FavoriteRPC.CheckIsFavorite(s.ctx, &favorite.CheckIsFavoriteRequest{VideoId: db_video.ID, UserId: curr_user_id})
 			if err != nil {
 				err_chan <- err
 				return
 			}
-			comment_count, err := rpc.CommentRPC.GetVideoCommentCount(s.ctx, &comment.GetVideoCommentCountRequest{VideoId: db_video.ID})
+			comment_count, err := client.CommentRPC.GetVideoCommentCount(s.ctx, &comment.GetVideoCommentCountRequest{VideoId: db_video.ID})
 			if err != nil {
 				err_chan <- err
 				return
@@ -198,7 +197,7 @@ func (s *PublishService) GetVideoById(request *publish.GetVideoByIdRequest) (res
 	commentCountChan := make(chan *comment.GetVideoCommentCountResponse)
 
 	go func() {
-		author, err := rpc.UserRPC.User(s.ctx, &user.UserRequest{UserId: db_video.AuthorID})
+		author, err := client.UserRPC.User(s.ctx, &user.UserRequest{UserId: db_video.AuthorID})
 		if err != nil {
 			klog.Errorf("RPC User Error: %v", err)
 			return
@@ -207,7 +206,7 @@ func (s *PublishService) GetVideoById(request *publish.GetVideoByIdRequest) (res
 	}()
 
 	go func() {
-		favorite_count, err := rpc.FavoriteRPC.GetVideoFavoriteCount(s.ctx, &favorite.GetVideoFavoriteCountRequest{VideoId: db_video.ID})
+		favorite_count, err := client.FavoriteRPC.GetVideoFavoriteCount(s.ctx, &favorite.GetVideoFavoriteCountRequest{VideoId: db_video.ID})
 		if err != nil {
 			klog.Errorf("RPC GetVideoFavoriteCount Error: %v", err)
 			return
@@ -216,7 +215,7 @@ func (s *PublishService) GetVideoById(request *publish.GetVideoByIdRequest) (res
 	}()
 
 	go func() {
-		is_favorite, err := rpc.FavoriteRPC.CheckIsFavorite(s.ctx, &favorite.CheckIsFavoriteRequest{VideoId: db_video.ID, UserId: curr_user_id})
+		is_favorite, err := client.FavoriteRPC.CheckIsFavorite(s.ctx, &favorite.CheckIsFavoriteRequest{VideoId: db_video.ID, UserId: curr_user_id})
 		if err != nil {
 			klog.Errorf("RPC CheckIsFavorite Error: %v", err)
 			return
@@ -225,7 +224,7 @@ func (s *PublishService) GetVideoById(request *publish.GetVideoByIdRequest) (res
 	}()
 
 	go func() {
-		comment_count, err := rpc.CommentRPC.GetVideoCommentCount(s.ctx, &comment.GetVideoCommentCountRequest{VideoId: db_video.ID})
+		comment_count, err := client.CommentRPC.GetVideoCommentCount(s.ctx, &comment.GetVideoCommentCountRequest{VideoId: db_video.ID})
 		if err != nil {
 			klog.Errorf("RPC GetVideoCommentCount Error: %v", err)
 			return
@@ -274,22 +273,22 @@ func (s *PublishService) GetVideoByIdList(request *publish.GetVideoByIdListReque
 
 	for _, db_video := range db_videos {
 		go func(db_video *db.Video) {
-			author, err := rpc.UserRPC.User(s.ctx, &user.UserRequest{UserId: db_video.AuthorID})
+			author, err := client.UserRPC.User(s.ctx, &user.UserRequest{UserId: db_video.AuthorID})
 			if err != nil {
 				err_chan <- err
 				return
 			}
-			favorite_count, err := rpc.FavoriteRPC.GetVideoFavoriteCount(s.ctx, &favorite.GetVideoFavoriteCountRequest{VideoId: db_video.ID})
+			favorite_count, err := client.FavoriteRPC.GetVideoFavoriteCount(s.ctx, &favorite.GetVideoFavoriteCountRequest{VideoId: db_video.ID})
 			if err != nil {
 				err_chan <- err
 				return
 			}
-			is_favorite, err := rpc.FavoriteRPC.CheckIsFavorite(s.ctx, &favorite.CheckIsFavoriteRequest{VideoId: db_video.ID, UserId: curr_user_id})
+			is_favorite, err := client.FavoriteRPC.CheckIsFavorite(s.ctx, &favorite.CheckIsFavoriteRequest{VideoId: db_video.ID, UserId: curr_user_id})
 			if err != nil {
 				err_chan <- err
 				return
 			}
-			comment_count, err := rpc.CommentRPC.GetVideoCommentCount(s.ctx, &comment.GetVideoCommentCountRequest{VideoId: db_video.ID})
+			comment_count, err := client.CommentRPC.GetVideoCommentCount(s.ctx, &comment.GetVideoCommentCountRequest{VideoId: db_video.ID})
 			if err != nil {
 				err_chan <- err
 				return

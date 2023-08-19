@@ -5,8 +5,8 @@ package feed
 import (
 	"context"
 
+	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/client"
 	feed "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/feed"
-	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/rpc"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/errno"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/utils/conv"
 	"github.com/cloudwego/hertz/pkg/app"
@@ -24,7 +24,7 @@ func GetFeed(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	kitex_resp, err := rpc.FeedRPC.GetFeed(ctx, conv.ToKitexFeedRequest(&req))
+	kitex_resp, err := client.FeedRPC.GetFeed(ctx, conv.ToKitexFeedRequest(&req))
 
 	if err == nil {
 		c.JSON(consts.StatusOK, conv.ToHertzFeedResponse(kitex_resp))

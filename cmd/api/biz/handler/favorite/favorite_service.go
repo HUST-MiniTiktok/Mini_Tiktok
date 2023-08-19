@@ -5,8 +5,8 @@ package favorite
 import (
 	"context"
 
+	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/client"
 	favorite "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/favorite"
-	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/rpc"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/errno"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/utils/conv"
 	"github.com/cloudwego/hertz/pkg/app"
@@ -24,7 +24,7 @@ func FavoriteAction(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	kitex_resp, err := rpc.FavoriteRPC.FavoriteAction(ctx, conv.ToKitexFavoriteActionRequest(&req))
+	kitex_resp, err := client.FavoriteRPC.FavoriteAction(ctx, conv.ToKitexFavoriteActionRequest(&req))
 
 	if err == nil {
 		c.JSON(consts.StatusOK, conv.ToHertzFavoriteActionResponse(kitex_resp))
@@ -44,7 +44,7 @@ func FavoriteList(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	kitex_resp, err := rpc.FavoriteRPC.FavoriteList(ctx, conv.ToKitexFavoriteListRequest(&req))
+	kitex_resp, err := client.FavoriteRPC.FavoriteList(ctx, conv.ToKitexFavoriteListRequest(&req))
 
 	if err == nil {
 		c.JSON(consts.StatusOK, conv.ToHertzFavoriteListResponse(kitex_resp))

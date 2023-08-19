@@ -6,6 +6,7 @@ import (
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/favorite/dal"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
 	favorite "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/favorite/favoriteservice"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/kitex"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
@@ -28,6 +29,9 @@ func main() {
 	svr := favorite.NewServer(new(FavoriteServiceImpl),
 		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: "favorite"}),
 		server.WithServiceAddr(addr),
+		server.WithMiddleware(kitex.CommonMiddleware),
+		server.WithMiddleware(kitex.ServerMiddleware),
+		server.WithMuxTransport(),
 		server.WithRegistry(r),
 	)
 

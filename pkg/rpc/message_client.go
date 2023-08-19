@@ -3,12 +3,15 @@ package rpc
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/message"
 	"github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/message/messageservice"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/kitex"
 	"github.com/cloudwego/kitex/client"
 	"github.com/cloudwego/kitex/pkg/klog"
+	"github.com/cloudwego/kitex/pkg/retry"
 	etcd "github.com/kitex-contrib/registry-etcd"
 )
 
@@ -21,7 +24,15 @@ func NewMessageClient() (messageClient *MessageClient) {
 	if err != nil {
 		klog.Fatalf("new resolver failed: %v", err)
 	}
-	c, err := messageservice.NewClient("message", client.WithResolver(r))
+	c, err := messageservice.NewClient("message",
+		client.WithResolver(r),
+		client.WithMiddleware(kitex.CommonMiddleware),
+		client.WithInstanceMW(kitex.ClientMiddleware),
+		client.WithMuxConnection(1),
+		client.WithRPCTimeout(3*time.Second),
+		client.WithConnectTimeout(50*time.Millisecond),
+		client.WithFailureRetry(retry.NewFailurePolicy()),
+	)
 	if err != nil {
 		klog.Fatalf("new message client failed: %v", err)
 	}

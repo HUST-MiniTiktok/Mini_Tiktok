@@ -5,8 +5,8 @@ package user
 import (
 	"context"
 
+	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/client"
 	user "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/user"
-	rpc "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/rpc"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/errno"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/utils/conv"
 	"github.com/cloudwego/hertz/pkg/app"
@@ -24,7 +24,7 @@ func User(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	kitex_resp, err := rpc.UserRPC.User(ctx, conv.ToKitexUserRequest(&req))
+	kitex_resp, err := client.UserRPC.User(ctx, conv.ToKitexUserRequest(&req))
 
 	if err == nil {
 		c.JSON(consts.StatusOK, conv.ToHertzUserResponse(kitex_resp))
@@ -44,7 +44,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	kitex_resp, err := rpc.UserRPC.Register(ctx, conv.ToKitexUserRegisterRequest(&req))
+	kitex_resp, err := client.UserRPC.Register(ctx, conv.ToKitexUserRegisterRequest(&req))
 
 	if err == nil {
 		c.JSON(consts.StatusOK, conv.ToHertzUserRegisterResponse(kitex_resp))
@@ -64,7 +64,7 @@ func Login(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	kitex_resp, err := rpc.UserRPC.Login(ctx, conv.ToKitexUserLoginRequest(&req))
+	kitex_resp, err := client.UserRPC.Login(ctx, conv.ToKitexUserLoginRequest(&req))
 
 	if err == nil {
 		c.JSON(consts.StatusOK, conv.ToHertzUserLoginResponse(kitex_resp))

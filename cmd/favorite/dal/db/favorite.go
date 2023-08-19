@@ -2,9 +2,24 @@ package db
 
 import (
 	"context"
+	"time"
 
 	"gorm.io/gorm"
 )
+
+const FavoriteTableName = "favorite"
+
+type Favorite struct {
+	ID        int64          `json:"id"`
+	UserId    int64          `json:"user_id"`
+	VideoId   int64          `json:"video_id"`
+	CreatedAt time.Time      `json:"create_at"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"delete_at"`
+}
+
+func (Favorite) TableName() string {
+	return FavoriteTableName
+}
 
 // status 返回0——成功，返回1——失败
 // err 返回nil——成功，返回其他——失败原因

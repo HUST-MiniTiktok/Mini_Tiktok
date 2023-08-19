@@ -5,8 +5,8 @@ package comment
 import (
 	"context"
 
+	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/client"
 	comment "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/comment"
-	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/rpc"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/errno"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/utils/conv"
 	"github.com/cloudwego/hertz/pkg/app"
@@ -24,7 +24,7 @@ func CommentAction(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	kitex_resp, err := rpc.CommentRPC.CommentAction(ctx, conv.ToKitexCommentActionRequest(&req))
+	kitex_resp, err := client.CommentRPC.CommentAction(ctx, conv.ToKitexCommentActionRequest(&req))
 
 	if err == nil {
 		c.JSON(consts.StatusOK, conv.ToHertzCommentActionResponse(kitex_resp))
@@ -44,7 +44,7 @@ func CommentList(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	kitex_resp, err := rpc.CommentRPC.CommentList(ctx, conv.ToKitexCommentListRequest(&req))
+	kitex_resp, err := client.CommentRPC.CommentList(ctx, conv.ToKitexCommentListRequest(&req))
 
 	if err == nil {
 		c.JSON(consts.StatusOK, conv.ToHertzCommentListResponse(kitex_resp))
