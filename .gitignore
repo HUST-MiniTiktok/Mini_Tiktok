@@ -2,6 +2,7 @@
 .1024*
 .nfs*
 node_modules
+**/bin/*
 **/data/*
 **/certs/*
 **/certs
