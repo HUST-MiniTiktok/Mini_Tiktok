@@ -2,12 +2,14 @@ package db
 
 import (
 	"context"
+	"strconv"
 	"time"
 
 	"gorm.io/gorm"
 )
 
 const CommentTableName = "comment"
+const CommentCountSuffix = ":comment"
 
 type Comment struct {
 	ID          int64          `json:"id"`
@@ -30,13 +32,20 @@ func NewComment(ctx context.Context, user_id int64, video_id int64, comment_text
 		CommentText: comment_text,
 	}
 	err = DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		// 1.新增评论数据
 		err := tx.WithContext(ctx).Model(&Comment{}).Create(&comment).Error
 		if err != nil {
 			return err
 		}
 		return nil
 	})
+
+	go func() {
+		video_id_str := strconv.FormatInt(video_id, 10) + CommentCountSuffix
+		if RDClient.Exists(video_id_str) {
+			RDClient.IncrBy(video_id_str, 1)
+		}
+	}()
+
 	return comment, err
 }
 
@@ -54,6 +63,14 @@ func DelComment(ctx context.Context, commentID int64, vid int64) error {
 		}
 		return nil
 	})
+
+	go func() {
+		video_id_str := strconv.FormatInt(vid, 10) + CommentCountSuffix
+		if RDClient.Exists(video_id_str) {
+			RDClient.DecrBy(video_id_str, 1)
+		}
+	}()
+
 	return err
 }
 
@@ -70,9 +87,19 @@ func GetVideoComments(ctx context.Context, vid int64) ([]*Comment, error) {
 // GetVideoComments returns the number of comments of the inputed video.
 func GetVideoCommentCounts(ctx context.Context, vid int64) (count int64, err error) {
 
+	video_id_str := strconv.FormatInt(vid, 10) + CommentCountSuffix
+	if RDClient.Exists(video_id_str) {
+		return RDClient.GetInt(video_id_str), nil
+	}
+
 	err = DB.WithContext(ctx).Model(&Comment{}).Where(&Comment{VideoId: vid}).Count(&count).Error
 	if err != nil {
 		return 0, err
 	}
+
+	go func() {
+		RDClient.Set(video_id_str, count, time.Hour*24)
+	}()
+
 	return count, nil
 }

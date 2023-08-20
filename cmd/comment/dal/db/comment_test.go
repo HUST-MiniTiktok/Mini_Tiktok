@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"testing"
+	"time"
 )
 
 func TestInit(t *testing.T) {
@@ -46,17 +47,26 @@ func TestGetVideoComments(t *testing.T) {
 func TestGetVideoCommentCounts(t *testing.T) {
 	ctx := context.Background()
 	Init()
-	newcomment1, _ := NewComment(ctx, 1, 1, "亿烟丁真")
-	// NewComment(ctx, 1, 1, "亿烟丁真")
-	newcomment2, _ := NewComment(ctx, 2, 1, "鉴定为 王源剩太多导致的")
+
 	counts, err := GetVideoCommentCounts(ctx, 1)
 	log.Println(counts)
 	log.Println(err)
-	DelComment(ctx, newcomment1.ID, 1)
+
+	newcomment1, _ := NewComment(ctx, 1, 1, "亿烟丁真")
+	newcomment2, _ := NewComment(ctx, 2, 1, "鉴定为 王源剩太多导致的")
+	time.Sleep(time.Second)
 	counts, err = GetVideoCommentCounts(ctx, 1)
 	log.Println(counts)
 	log.Println(err)
+
+	DelComment(ctx, newcomment1.ID, 1)
+	time.Sleep(time.Second)
+	counts, err = GetVideoCommentCounts(ctx, 1)
+	log.Println(counts)
+	log.Println(err)
+
 	DelComment(ctx, newcomment2.ID, 1)
+	time.Sleep(time.Second)
 	counts, err = GetVideoCommentCounts(ctx, 1)
 	log.Println(counts)
 	log.Println(err)

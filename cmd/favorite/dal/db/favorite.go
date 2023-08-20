@@ -2,12 +2,16 @@ package db
 
 import (
 	"context"
+	"errors"
+	"strconv"
 	"time"
 
 	"gorm.io/gorm"
 )
 
 const FavoriteTableName = "favorite"
+const VideoFavoriteCountSuffix = ":Vfavorite"
+const UserFavoriteCountSuffix = ":Ufavorite"
 
 type Favorite struct {
 	ID        int64          `json:"id"`
@@ -30,7 +34,6 @@ func NewFavorite(ctx context.Context, user_id int64, video_id int64) (status int
 		UserId:  user_id,
 		VideoId: video_id}
 
-	//新建喜欢、新增喜欢为同一事务
 	err = DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		var count int64
 		if err := tx.WithContext(ctx).Model(&Favorite{}).Where(&favorite).Count(&count).Error; err != nil {
@@ -49,6 +52,20 @@ func NewFavorite(ctx context.Context, user_id int64, video_id int64) (status int
 	if err != nil {
 		return 1, err
 	}
+
+	go func() {
+		video_id_str := strconv.FormatInt(video_id, 10) + VideoFavoriteCountSuffix
+		if RDClient.Exists(video_id_str) {
+			RDClient.IncrBy(video_id_str, 1)
+		}
+	}()
+
+	go func() {
+		user_id_str := strconv.FormatInt(user_id, 10) + UserFavoriteCountSuffix
+		if RDClient.Exists(user_id_str) {
+			RDClient.IncrBy(user_id_str, 1)
+		}
+	}()
 
 	return 0, nil
 }
@@ -73,34 +90,68 @@ func CancelFavorite(ctx context.Context, user_id int64, video_id int64) (status 
 		return 1, err
 	}
 
+	go func() {
+		video_id_str := strconv.FormatInt(video_id, 10) + VideoFavoriteCountSuffix
+		if RDClient.Exists(video_id_str) {
+			RDClient.DecrBy(video_id_str, 1)
+		}
+	}()
+
+	go func() {
+		user_id_str := strconv.FormatInt(user_id, 10) + UserFavoriteCountSuffix
+		if RDClient.Exists(user_id_str) {
+			RDClient.DecrBy(user_id_str, 1)
+		}
+	}()
+
 	return 0, nil
 }
 
 func CheckFavorite(ctx context.Context, user_id int64, video_id int64) (status bool, err error) {
 
-	var count int64
-	err = DB.WithContext(ctx).Model(&Favorite{}).Where(&Favorite{UserId: user_id, VideoId: video_id}).Count(&count).Error
-	if err != nil {
-		return false, err
-	}
-	return count != 0, nil
+	favorite := Favorite{
+		UserId:  user_id,
+		VideoId: video_id}
+	res := DB.WithContext(ctx).Model(&Favorite{}).First(&favorite)
+	return !errors.Is(res.Error, gorm.ErrRecordNotFound), nil
 }
 
 func VideoFavoriteCount(ctx context.Context, video_id int64) (count int64, err error) {
+
+	video_id_str := strconv.FormatInt(video_id, 10) + VideoFavoriteCountSuffix
+	if RDClient.Exists(video_id_str) {
+
+		return RDClient.GetInt(video_id_str), nil
+	}
 
 	err = DB.WithContext(ctx).Model(&Favorite{}).Where(&Favorite{VideoId: video_id}).Count(&count).Error
 	if err != nil {
 		return 0, err
 	}
+
+	go func() {
+		RDClient.Set(video_id_str, count, time.Hour*24)
+	}()
+
 	return count, nil
 }
 
 func UserFavoriteCount(ctx context.Context, user_id int64) (count int64, err error) {
 
+	user_id_str := strconv.FormatInt(user_id, 10) + UserFavoriteCountSuffix
+	if RDClient.Exists(user_id_str) {
+		return RDClient.GetInt(user_id_str), nil
+	}
+
 	err = DB.WithContext(ctx).Model(&Favorite{}).Where(&Favorite{UserId: user_id}).Count(&count).Error
 	if err != nil {
 		return 0, err
 	}
+
+	go func() {
+		RDClient.Set(user_id_str, count, time.Hour*24)
+	}()
+
 	return count, nil
 }
 

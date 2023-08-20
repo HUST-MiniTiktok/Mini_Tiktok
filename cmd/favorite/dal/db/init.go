@@ -2,12 +2,16 @@ package db
 
 import (
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/redis"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	gormopentracing "gorm.io/plugin/opentracing"
 )
 
-var DB *gorm.DB
+var (
+	DB       *gorm.DB
+	RDClient *redis.RDClient
+)
 
 // Init Mysql DB
 func Init() {
@@ -27,4 +31,6 @@ func Init() {
 	}
 
 	DB.AutoMigrate(&Favorite{})
+
+	RDClient = redis.NewRDClient()
 }

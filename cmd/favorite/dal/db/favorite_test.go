@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"testing"
+	"time"
 )
 
 func TestInit(t *testing.T) {
@@ -56,19 +57,31 @@ func TestCheckFavorite(t *testing.T) {
 func TestVideoFavoriteCount(t *testing.T) {
 	ctx := context.Background()
 	Init()
-	NewFavorite(ctx, 1, 1)
-	NewFavorite(ctx, 1, 2)
-	NewFavorite(ctx, 2, 1)
-	NewFavorite(ctx, 2, 2)
+
 	count, err := VideoFavoriteCount(ctx, 1)
 	log.Println(count)
 	log.Println(err)
 	count, err = VideoFavoriteCount(ctx, 2)
 	log.Println(count)
 	log.Println(err)
+
+	NewFavorite(ctx, 1, 1)
+	NewFavorite(ctx, 1, 2)
+	NewFavorite(ctx, 2, 1)
+	NewFavorite(ctx, 2, 2)
+	time.Sleep(time.Second)
+	count, err = VideoFavoriteCount(ctx, 1)
+	log.Println(count)
+	log.Println(err)
+	count, err = VideoFavoriteCount(ctx, 2)
+	log.Println(count)
+	log.Println(err)
+
 	CancelFavorite(ctx, 1, 1)
+	CancelFavorite(ctx, 2, 1)
 	CancelFavorite(ctx, 1, 2)
 	CancelFavorite(ctx, 2, 2)
+	time.Sleep(time.Second)
 	count, err = VideoFavoriteCount(ctx, 1)
 	log.Println(count)
 	log.Println(err)

@@ -16,13 +16,13 @@ func (c *RDClient) Get(key string) string {
 	return val
 }
 
-func (c *RDClient) GetInt(key string) int {
+func (c *RDClient) GetInt(key string) int64 {
 	cmd := c.Client.Get(key)
 	val, err := cmd.Result()
 	if err != nil {
 		klog.Errorf("get key %s failed: %v", key, err)
 	}
-	v_int, err := strconv.Atoi(val)
+	v_int, err := strconv.ParseInt(val, 10, 64)
 	if err != nil {
 		klog.Errorf("get key %s failed: %v", key, err)
 	}
@@ -54,6 +54,24 @@ func (c *RDClient) Exists(key string) bool {
 		return false
 	}
 	return v > 0
+}
+
+func (c *RDClient) IncrBy(key string, num int64) bool {
+	err := c.Client.IncrBy(key, num).Err()
+	if err != nil {
+		klog.Errorf("incr key %s failed: %v", key, err)
+		return false
+	}
+	return true
+}
+
+func (c *RDClient) DecrBy(key string, num int64) bool {
+	err := c.Client.DecrBy(key, num).Err()
+	if err != nil {
+		klog.Errorf("decr key %s failed: %v", key, err)
+		return false
+	}
+	return true
 }
 
 func (c *RDClient) HGet(key string, field string) string {
@@ -104,7 +122,7 @@ func (c *RDClient) HExists(key string, field string) bool {
 }
 
 func (c *RDClient) HIncr(key string, field string, num int64) bool {
-	err := c.Client.HIncrBy("user_1", "count", num).Err()
+	err := c.Client.HIncrBy(key, field, num).Err()
 	if err != nil {
 		klog.Errorf("Hinc key %s field %s failed: %v", key, field, err)
 		return false
