@@ -71,12 +71,5 @@ func ToKitexUser(ctx context.Context, curr_user_token string, db_user *db.User) 
 		}
 	}
 
-	kitex_user = &common.User{
-		Id:              db_user.ID,
-		Name:            db_user.UserName,
-		Avatar:          &db_user.Avatar,
-		BackgroundImage: &db_user.BackgroundImage,
-		Signature:       &db_user.Signature,
-	}
 	return kitex_user, nil
 }

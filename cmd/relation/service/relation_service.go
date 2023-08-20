@@ -127,17 +127,19 @@ func (s *RelationService) RelationFriendList(request *relation.RelationFriendLis
 
 func (s *RelationService) GetFollowInfo(request *relation.GetFollowInfoRequest) (resp *relation.GetFollowInfoResponse, err error) {
 	claim, err := Jwt.ExtractClaims(request.Token)
-	curr_user_id := claim.ID
-	if err != nil || claim.ID == 0 {
-		return pack.NewGetFollowInfoResponse(errno.AuthorizationFailedErr), err
+	var curr_user_id int64
+	if err != nil {
+		curr_user_id = 0
+	} else {
+		curr_user_id = claim.ID
 	}
 
-	follow_count, err := db.GetFollowUserCount(s.ctx, curr_user_id)
+	follow_count, err := db.GetFollowUserCount(s.ctx, request.ToUserId)
 	if err != nil {
 		return pack.NewGetFollowInfoResponse(err), err
 	}
 
-	follower_count, err := db.GetFollowerUserCount(s.ctx, curr_user_id)
+	follower_count, err := db.GetFollowerUserCount(s.ctx, request.ToUserId)
 	if err != nil {
 		return pack.NewGetFollowInfoResponse(err), err
 	}

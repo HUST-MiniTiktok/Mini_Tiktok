@@ -3,10 +3,10 @@ package main
 import (
 	"net"
 
-	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/dal"
+	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/message/dal"
 	message "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/message/messageservice"
-	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/kitex"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/kitex"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"

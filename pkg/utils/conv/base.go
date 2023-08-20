@@ -50,7 +50,8 @@ func ToKitexBaseResponse(err error, src interface{}) interface{} {
 		v_statusCode = s.ErrCode
 		v_statusMsg = &s.ErrMsg
 	}
-	reflect.ValueOf(src).FieldByName("StatusCode").Set(reflect.ValueOf(v_statusCode))
-	reflect.ValueOf(src).FieldByName("StatusMsg").Set(reflect.ValueOf(v_statusMsg))
+	v_src := reflect.Indirect(reflect.ValueOf(src))
+	v_src.FieldByName("StatusCode").Set(reflect.ValueOf(v_statusCode))
+	v_src.FieldByName("StatusMsg").Set(reflect.ValueOf(v_statusMsg))
 	return src
 }

@@ -67,7 +67,7 @@ func (s *FeedService) GetFeed(request *feed.FeedRequest) (resp *feed.FeedRespons
 
 	for _, db_video := range db_videos {
 		go func(db_video *db.Video) {
-			author, err := client.UserRPC.User(s.ctx, &user.UserRequest{UserId: db_video.AuthorID})
+			author, err := client.UserRPC.User(s.ctx, &user.UserRequest{UserId: db_video.AuthorID, Token: request.GetToken()})
 			if err != nil {
 				err_chan <- err
 				return
