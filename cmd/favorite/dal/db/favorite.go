@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"errors"
 	"strconv"
 	"time"
 
@@ -108,12 +107,12 @@ func CancelFavorite(ctx context.Context, user_id int64, video_id int64) (status 
 }
 
 func CheckFavorite(ctx context.Context, user_id int64, video_id int64) (status bool, err error) {
-
-	favorite := Favorite{
-		UserId:  user_id,
-		VideoId: video_id}
-	res := DB.WithContext(ctx).Model(&Favorite{}).First(&favorite)
-	return !errors.Is(res.Error, gorm.ErrRecordNotFound), nil
+	var db_favorite Favorite
+	err = DB.WithContext(ctx).Model(&Favorite{}).Where("user_id = ? and video_id = ?", user_id, video_id).Limit(1).Find(&db_favorite).Error
+	if err != nil {
+		return false, err
+	}
+	return db_favorite != Favorite{}, nil
 }
 
 func VideoFavoriteCount(ctx context.Context, video_id int64) (count int64, err error) {

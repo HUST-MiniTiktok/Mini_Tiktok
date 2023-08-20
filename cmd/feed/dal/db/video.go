@@ -30,12 +30,12 @@ func CreateVideo(ctx context.Context, video *Video) (id int64, err error) {
 }
 
 func CheckVideoExistById(ctx context.Context, id int64) (exist bool, err error) {
-	var count int64
-	err = DB.WithContext(ctx).Model(&Video{}).Where("id = ?", id).Count(&count).Error
+	var db_video Video
+	err = DB.WithContext(ctx).Model(&Video{}).Where("id = ?", id).Limit(1).Find(&db_video).Error
 	if err != nil {
 		return false, err
 	}
-	return count != 0, nil
+	return db_video != Video{}, nil
 }
 
 func GetVideoById(ctx context.Context, id int64) (video *Video, err error) {
@@ -74,7 +74,7 @@ func GetVideosByIDs(ctx context.Context, ids []int64) (videos []*Video, err erro
 		}(id)
 	}
 	for i := 0; i < len(ids); i++ {
-		err = <- err_chan
+		err = <-err_chan
 		if err != nil {
 			return nil, err
 		}

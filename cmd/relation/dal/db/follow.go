@@ -51,10 +51,7 @@ func CheckFollow(ctx context.Context, user_id int64, follower_id int64) (ok bool
 	if err != nil {
 		return false, err
 	}
-	if db_follow == (Follow{}) {
-		return false, nil
-	}
-	return true, nil
+	return db_follow != Follow{}, nil
 }
 
 func GetFollowUserIdList(ctx context.Context, userId int64) (user_ids []int64, err error) {
