@@ -9,7 +9,7 @@ import (
 )
 
 const FavoriteTableName = "favorite"
-const VideoFavoriteCountSuffix = ":Vfavorite"
+const VFavoriteCount = "favoriteCount"
 const UserFavoriteCountSuffix = ":Ufavorite"
 
 type Favorite struct {
@@ -53,9 +53,9 @@ func NewFavorite(ctx context.Context, user_id int64, video_id int64) (status int
 	}
 
 	go func() {
-		video_id_str := strconv.FormatInt(video_id, 10) + VideoFavoriteCountSuffix
-		if RDClient.Exists(video_id_str) {
-			RDClient.IncrBy(video_id_str, 1)
+		video_id_str := strconv.FormatInt(video_id, 10)
+		if RDClient.HExists(video_id_str, VFavoriteCount) {
+			RDClient.HIncr(video_id_str, VFavoriteCount, 1)
 		}
 	}()
 
@@ -90,9 +90,9 @@ func CancelFavorite(ctx context.Context, user_id int64, video_id int64) (status 
 	}
 
 	go func() {
-		video_id_str := strconv.FormatInt(video_id, 10) + VideoFavoriteCountSuffix
-		if RDClient.Exists(video_id_str) {
-			RDClient.DecrBy(video_id_str, 1)
+		video_id_str := strconv.FormatInt(video_id, 10)
+		if RDClient.HExists(video_id_str, VFavoriteCount) {
+			RDClient.HIncr(video_id_str, VFavoriteCount, -1)
 		}
 	}()
 
@@ -117,10 +117,9 @@ func CheckFavorite(ctx context.Context, user_id int64, video_id int64) (status b
 
 func VideoFavoriteCount(ctx context.Context, video_id int64) (count int64, err error) {
 
-	video_id_str := strconv.FormatInt(video_id, 10) + VideoFavoriteCountSuffix
-	if RDClient.Exists(video_id_str) {
-
-		return RDClient.GetInt(video_id_str), nil
+	video_id_str := strconv.FormatInt(video_id, 10)
+	if RDClient.HExists(video_id_str, VFavoriteCount) {
+		return RDClient.HGetInt(video_id_str, VFavoriteCount), nil
 	}
 
 	err = DB.WithContext(ctx).Model(&Favorite{}).Where(&Favorite{VideoId: video_id}).Count(&count).Error
@@ -129,7 +128,8 @@ func VideoFavoriteCount(ctx context.Context, video_id int64) (count int64, err e
 	}
 
 	go func() {
-		RDClient.Set(video_id_str, count, time.Hour*24)
+		RDClient.HSet(video_id_str, VFavoriteCount, count)
+		RDClient.HExpire(video_id_str, time.Hour)
 	}()
 
 	return count, nil

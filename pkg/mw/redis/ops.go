@@ -82,12 +82,12 @@ func (c *RDClient) HGet(key string, field string) string {
 	return val
 }
 
-func (c *RDClient) HGetInt(key string, field string) int {
+func (c *RDClient) HGetInt(key string, field string) int64 {
 	val, err := c.Client.HGet(key, field).Result()
 	if err != nil {
 		klog.Errorf("Hget key %s field %s failed: %v", key, field, err)
 	}
-	count, err := strconv.Atoi(val)
+	count, err := strconv.ParseInt(val, 10, 64)
 	if err != nil {
 		klog.Errorf("Hget key %s field %s failed: %v", key, field, err)
 	}
@@ -125,6 +125,15 @@ func (c *RDClient) HIncr(key string, field string, num int64) bool {
 	err := c.Client.HIncrBy(key, field, num).Err()
 	if err != nil {
 		klog.Errorf("Hinc key %s field %s failed: %v", key, field, err)
+		return false
+	}
+	return true
+}
+
+func (c *RDClient) HExpire(key string, tm time.Duration) bool {
+	err := c.Client.Do("expire", key, tm.Seconds())
+	if err != nil {
+		klog.Errorf("HExpires key %s failed: %v", key, err)
 		return false
 	}
 	return true

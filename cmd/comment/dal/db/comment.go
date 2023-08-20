@@ -10,6 +10,7 @@ import (
 
 const CommentTableName = "comment"
 const CommentCountSuffix = ":comment"
+const VCommentCount = "commentCount"
 
 type Comment struct {
 	ID          int64          `json:"id"`
@@ -40,9 +41,9 @@ func NewComment(ctx context.Context, user_id int64, video_id int64, comment_text
 	})
 
 	go func() {
-		video_id_str := strconv.FormatInt(video_id, 10) + CommentCountSuffix
-		if RDClient.Exists(video_id_str) {
-			RDClient.IncrBy(video_id_str, 1)
+		video_id_str := strconv.FormatInt(video_id, 10)
+		if RDClient.HExists(video_id_str, VCommentCount) {
+			RDClient.HIncr(video_id_str, VCommentCount, 1)
 		}
 	}()
 
@@ -65,9 +66,9 @@ func DelComment(ctx context.Context, commentID int64, vid int64) error {
 	})
 
 	go func() {
-		video_id_str := strconv.FormatInt(vid, 10) + CommentCountSuffix
-		if RDClient.Exists(video_id_str) {
-			RDClient.DecrBy(video_id_str, 1)
+		video_id_str := strconv.FormatInt(vid, 10)
+		if RDClient.HExists(video_id_str, VCommentCount) {
+			RDClient.HIncr(video_id_str, VCommentCount, -1)
 		}
 	}()
 
@@ -87,9 +88,9 @@ func GetVideoComments(ctx context.Context, vid int64) ([]*Comment, error) {
 // GetVideoComments returns the number of comments of the inputed video.
 func GetVideoCommentCounts(ctx context.Context, vid int64) (count int64, err error) {
 
-	video_id_str := strconv.FormatInt(vid, 10) + CommentCountSuffix
-	if RDClient.Exists(video_id_str) {
-		return RDClient.GetInt(video_id_str), nil
+	video_id_str := strconv.FormatInt(vid, 10)
+	if RDClient.HExists(video_id_str, VCommentCount) {
+		return RDClient.HGetInt(video_id_str, VCommentCount), nil
 	}
 
 	err = DB.WithContext(ctx).Model(&Comment{}).Where(&Comment{VideoId: vid}).Count(&count).Error
@@ -98,7 +99,8 @@ func GetVideoCommentCounts(ctx context.Context, vid int64) (count int64, err err
 	}
 
 	go func() {
-		RDClient.Set(video_id_str, count, time.Hour*24)
+		RDClient.HSet(video_id_str, VCommentCount, count)
+		RDClient.HExpire(video_id_str, time.Hour)
 	}()
 
 	return count, nil

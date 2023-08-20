@@ -57,7 +57,6 @@ func TestCheckFavorite(t *testing.T) {
 func TestVideoFavoriteCount(t *testing.T) {
 	ctx := context.Background()
 	Init()
-
 	count, err := VideoFavoriteCount(ctx, 1)
 	log.Println(count)
 	log.Println(err)
