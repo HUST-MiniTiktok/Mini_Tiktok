@@ -2,12 +2,6 @@ namespace go relation
 
 include "common.thrift"
 
-struct FriendUser {
-    1: common.User user                        // 用户信息
-    2: optional string message         // 和该好友的最新聊天消息
-    3: optional i64 msgType            // message消息的类型，0 => 当前请求用户接收的消息， 1 => 当前请求用户发送的消息
-}
-
 struct RelationActionRequest {
     1: string token     // 用户token
     2: i64 to_user_id   // 对方用户id
@@ -49,7 +43,7 @@ struct RelationFriendListRequest {
 struct RelationFriendListResponse {
     1: i32 status_code (go.tag="json:\"status_code\"")  // 状态码，0-成功，其他值-失败
     2: optional string status_msg                       // 返回状态描述
-    3: list<FriendUser> user_list                             // 用户列表
+    3: list<common.FriendUser> user_list                             // 用户列表
 }
 
 struct GetFollowInfoRequest {

@@ -1484,7 +1484,7 @@ type GetFriendLatestMsgResponse struct {
 	StatusCode int32   `thrift:"status_code,1" json:"status_code" form:"status_code" query:"status_code"`
 	StatusMsg  *string `thrift:"status_msg,2,optional" form:"status_msg" json:"status_msg,omitempty" query:"status_msg"`
 	Message    *string `thrift:"message,3,optional" form:"message" json:"message,omitempty" query:"message"`
-	MsgType    *int64  `thrift:"msgType,4,optional" form:"msgType" json:"msgType,omitempty" query:"msgType"`
+	MsgType    int64   `thrift:"msgType,4" form:"msgType" json:"msgType" query:"msgType"`
 }
 
 func NewGetFriendLatestMsgResponse() *GetFriendLatestMsgResponse {
@@ -1513,13 +1513,8 @@ func (p *GetFriendLatestMsgResponse) GetMessage() (v string) {
 	return *p.Message
 }
 
-var GetFriendLatestMsgResponse_MsgType_DEFAULT int64
-
 func (p *GetFriendLatestMsgResponse) GetMsgType() (v int64) {
-	if !p.IsSetMsgType() {
-		return GetFriendLatestMsgResponse_MsgType_DEFAULT
-	}
-	return *p.MsgType
+	return p.MsgType
 }
 
 var fieldIDToName_GetFriendLatestMsgResponse = map[int16]string{
@@ -1535,10 +1530,6 @@ func (p *GetFriendLatestMsgResponse) IsSetStatusMsg() bool {
 
 func (p *GetFriendLatestMsgResponse) IsSetMessage() bool {
 	return p.Message != nil
-}
-
-func (p *GetFriendLatestMsgResponse) IsSetMsgType() bool {
-	return p.MsgType != nil
 }
 
 func (p *GetFriendLatestMsgResponse) Read(iprot thrift.TProtocol) (err error) {
@@ -1661,7 +1652,7 @@ func (p *GetFriendLatestMsgResponse) ReadField4(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadI64(); err != nil {
 		return err
 	} else {
-		p.MsgType = &v
+		p.MsgType = v
 	}
 	return nil
 }
@@ -1763,16 +1754,14 @@ WriteFieldEndError:
 }
 
 func (p *GetFriendLatestMsgResponse) writeField4(oprot thrift.TProtocol) (err error) {
-	if p.IsSetMsgType() {
-		if err = oprot.WriteFieldBegin("msgType", thrift.I64, 4); err != nil {
-			goto WriteFieldBeginError
-		}
-		if err := oprot.WriteI64(*p.MsgType); err != nil {
-			return err
-		}
-		if err = oprot.WriteFieldEnd(); err != nil {
-			goto WriteFieldEndError
-		}
+	if err = oprot.WriteFieldBegin("msgType", thrift.I64, 4); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI64(p.MsgType); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
 	}
 	return nil
 WriteFieldBeginError:

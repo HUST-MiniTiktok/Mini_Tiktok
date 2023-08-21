@@ -1619,7 +1619,8 @@ func (p *GetFriendLatestMsgResponse) FastReadField4(buf []byte) (int, error) {
 		return offset, err
 	} else {
 		offset += l
-		p.MsgType = &v
+
+		p.MsgType = v
 
 	}
 	return offset, nil
@@ -1691,12 +1692,10 @@ func (p *GetFriendLatestMsgResponse) fastWriteField3(buf []byte, binaryWriter bt
 
 func (p *GetFriendLatestMsgResponse) fastWriteField4(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	if p.IsSetMsgType() {
-		offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "msgType", thrift.I64, 4)
-		offset += bthrift.Binary.WriteI64(buf[offset:], *p.MsgType)
+	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "msgType", thrift.I64, 4)
+	offset += bthrift.Binary.WriteI64(buf[offset:], p.MsgType)
 
-		offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
-	}
+	offset += bthrift.Binary.WriteFieldEnd(buf[offset:])
 	return offset
 }
 
@@ -1733,12 +1732,10 @@ func (p *GetFriendLatestMsgResponse) field3Length() int {
 
 func (p *GetFriendLatestMsgResponse) field4Length() int {
 	l := 0
-	if p.IsSetMsgType() {
-		l += bthrift.Binary.FieldBeginLength("msgType", thrift.I64, 4)
-		l += bthrift.Binary.I64Length(*p.MsgType)
+	l += bthrift.Binary.FieldBeginLength("msgType", thrift.I64, 4)
+	l += bthrift.Binary.I64Length(p.MsgType)
 
-		l += bthrift.Binary.FieldEndLength()
-	}
+	l += bthrift.Binary.FieldEndLength()
 	return l
 }
 

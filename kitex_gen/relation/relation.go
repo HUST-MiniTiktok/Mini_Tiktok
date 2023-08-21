@@ -10,328 +10,6 @@ import (
 	"strings"
 )
 
-type FriendUser struct {
-	User    *common.User `thrift:"user,1" frugal:"1,default,common.User" json:"user"`
-	Message *string      `thrift:"message,2,optional" frugal:"2,optional,string" json:"message,omitempty"`
-	MsgType *int64       `thrift:"msgType,3,optional" frugal:"3,optional,i64" json:"msgType,omitempty"`
-}
-
-func NewFriendUser() *FriendUser {
-	return &FriendUser{}
-}
-
-func (p *FriendUser) InitDefault() {
-	*p = FriendUser{}
-}
-
-var FriendUser_User_DEFAULT *common.User
-
-func (p *FriendUser) GetUser() (v *common.User) {
-	if !p.IsSetUser() {
-		return FriendUser_User_DEFAULT
-	}
-	return p.User
-}
-
-var FriendUser_Message_DEFAULT string
-
-func (p *FriendUser) GetMessage() (v string) {
-	if !p.IsSetMessage() {
-		return FriendUser_Message_DEFAULT
-	}
-	return *p.Message
-}
-
-var FriendUser_MsgType_DEFAULT int64
-
-func (p *FriendUser) GetMsgType() (v int64) {
-	if !p.IsSetMsgType() {
-		return FriendUser_MsgType_DEFAULT
-	}
-	return *p.MsgType
-}
-func (p *FriendUser) SetUser(val *common.User) {
-	p.User = val
-}
-func (p *FriendUser) SetMessage(val *string) {
-	p.Message = val
-}
-func (p *FriendUser) SetMsgType(val *int64) {
-	p.MsgType = val
-}
-
-var fieldIDToName_FriendUser = map[int16]string{
-	1: "user",
-	2: "message",
-	3: "msgType",
-}
-
-func (p *FriendUser) IsSetUser() bool {
-	return p.User != nil
-}
-
-func (p *FriendUser) IsSetMessage() bool {
-	return p.Message != nil
-}
-
-func (p *FriendUser) IsSetMsgType() bool {
-	return p.MsgType != nil
-}
-
-func (p *FriendUser) Read(iprot thrift.TProtocol) (err error) {
-
-	var fieldTypeId thrift.TType
-	var fieldId int16
-
-	if _, err = iprot.ReadStructBegin(); err != nil {
-		goto ReadStructBeginError
-	}
-
-	for {
-		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
-		if err != nil {
-			goto ReadFieldBeginError
-		}
-		if fieldTypeId == thrift.STOP {
-			break
-		}
-
-		switch fieldId {
-		case 1:
-			if fieldTypeId == thrift.STRUCT {
-				if err = p.ReadField1(iprot); err != nil {
-					goto ReadFieldError
-				}
-			} else {
-				if err = iprot.Skip(fieldTypeId); err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 2:
-			if fieldTypeId == thrift.STRING {
-				if err = p.ReadField2(iprot); err != nil {
-					goto ReadFieldError
-				}
-			} else {
-				if err = iprot.Skip(fieldTypeId); err != nil {
-					goto SkipFieldError
-				}
-			}
-		case 3:
-			if fieldTypeId == thrift.I64 {
-				if err = p.ReadField3(iprot); err != nil {
-					goto ReadFieldError
-				}
-			} else {
-				if err = iprot.Skip(fieldTypeId); err != nil {
-					goto SkipFieldError
-				}
-			}
-		default:
-			if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		}
-
-		if err = iprot.ReadFieldEnd(); err != nil {
-			goto ReadFieldEndError
-		}
-	}
-	if err = iprot.ReadStructEnd(); err != nil {
-		goto ReadStructEndError
-	}
-
-	return nil
-ReadStructBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
-ReadFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
-ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_FriendUser[fieldId]), err)
-SkipFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
-
-ReadFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
-ReadStructEndError:
-	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
-}
-
-func (p *FriendUser) ReadField1(iprot thrift.TProtocol) error {
-	p.User = common.NewUser()
-	if err := p.User.Read(iprot); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (p *FriendUser) ReadField2(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadString(); err != nil {
-		return err
-	} else {
-		p.Message = &v
-	}
-	return nil
-}
-
-func (p *FriendUser) ReadField3(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadI64(); err != nil {
-		return err
-	} else {
-		p.MsgType = &v
-	}
-	return nil
-}
-
-func (p *FriendUser) Write(oprot thrift.TProtocol) (err error) {
-	var fieldId int16
-	if err = oprot.WriteStructBegin("FriendUser"); err != nil {
-		goto WriteStructBeginError
-	}
-	if p != nil {
-		if err = p.writeField1(oprot); err != nil {
-			fieldId = 1
-			goto WriteFieldError
-		}
-		if err = p.writeField2(oprot); err != nil {
-			fieldId = 2
-			goto WriteFieldError
-		}
-		if err = p.writeField3(oprot); err != nil {
-			fieldId = 3
-			goto WriteFieldError
-		}
-
-	}
-	if err = oprot.WriteFieldStop(); err != nil {
-		goto WriteFieldStopError
-	}
-	if err = oprot.WriteStructEnd(); err != nil {
-		goto WriteStructEndError
-	}
-	return nil
-WriteStructBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
-WriteFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
-WriteFieldStopError:
-	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
-WriteStructEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
-}
-
-func (p *FriendUser) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("user", thrift.STRUCT, 1); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := p.User.Write(oprot); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
-}
-
-func (p *FriendUser) writeField2(oprot thrift.TProtocol) (err error) {
-	if p.IsSetMessage() {
-		if err = oprot.WriteFieldBegin("message", thrift.STRING, 2); err != nil {
-			goto WriteFieldBeginError
-		}
-		if err := oprot.WriteString(*p.Message); err != nil {
-			return err
-		}
-		if err = oprot.WriteFieldEnd(); err != nil {
-			goto WriteFieldEndError
-		}
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
-}
-
-func (p *FriendUser) writeField3(oprot thrift.TProtocol) (err error) {
-	if p.IsSetMsgType() {
-		if err = oprot.WriteFieldBegin("msgType", thrift.I64, 3); err != nil {
-			goto WriteFieldBeginError
-		}
-		if err := oprot.WriteI64(*p.MsgType); err != nil {
-			return err
-		}
-		if err = oprot.WriteFieldEnd(); err != nil {
-			goto WriteFieldEndError
-		}
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
-}
-
-func (p *FriendUser) String() string {
-	if p == nil {
-		return "<nil>"
-	}
-	return fmt.Sprintf("FriendUser(%+v)", *p)
-}
-
-func (p *FriendUser) DeepEqual(ano *FriendUser) bool {
-	if p == ano {
-		return true
-	} else if p == nil || ano == nil {
-		return false
-	}
-	if !p.Field1DeepEqual(ano.User) {
-		return false
-	}
-	if !p.Field2DeepEqual(ano.Message) {
-		return false
-	}
-	if !p.Field3DeepEqual(ano.MsgType) {
-		return false
-	}
-	return true
-}
-
-func (p *FriendUser) Field1DeepEqual(src *common.User) bool {
-
-	if !p.User.DeepEqual(src) {
-		return false
-	}
-	return true
-}
-func (p *FriendUser) Field2DeepEqual(src *string) bool {
-
-	if p.Message == src {
-		return true
-	} else if p.Message == nil || src == nil {
-		return false
-	}
-	if strings.Compare(*p.Message, *src) != 0 {
-		return false
-	}
-	return true
-}
-func (p *FriendUser) Field3DeepEqual(src *int64) bool {
-
-	if p.MsgType == src {
-		return true
-	} else if p.MsgType == nil || src == nil {
-		return false
-	}
-	if *p.MsgType != *src {
-		return false
-	}
-	return true
-}
-
 type RelationActionRequest struct {
 	Token      string `thrift:"token,1" frugal:"1,default,string" json:"token"`
 	ToUserId   int64  `thrift:"to_user_id,2" frugal:"2,default,i64" json:"to_user_id"`
@@ -2169,9 +1847,9 @@ func (p *RelationFriendListRequest) Field2DeepEqual(src string) bool {
 }
 
 type RelationFriendListResponse struct {
-	StatusCode int32         `thrift:"status_code,1" frugal:"1,default,i32" json:"status_code"`
-	StatusMsg  *string       `thrift:"status_msg,2,optional" frugal:"2,optional,string" json:"status_msg,omitempty"`
-	UserList   []*FriendUser `thrift:"user_list,3" frugal:"3,default,list<FriendUser>" json:"user_list"`
+	StatusCode int32                `thrift:"status_code,1" frugal:"1,default,i32" json:"status_code"`
+	StatusMsg  *string              `thrift:"status_msg,2,optional" frugal:"2,optional,string" json:"status_msg,omitempty"`
+	UserList   []*common.FriendUser `thrift:"user_list,3" frugal:"3,default,list<common.FriendUser>" json:"user_list"`
 }
 
 func NewRelationFriendListResponse() *RelationFriendListResponse {
@@ -2195,7 +1873,7 @@ func (p *RelationFriendListResponse) GetStatusMsg() (v string) {
 	return *p.StatusMsg
 }
 
-func (p *RelationFriendListResponse) GetUserList() (v []*FriendUser) {
+func (p *RelationFriendListResponse) GetUserList() (v []*common.FriendUser) {
 	return p.UserList
 }
 func (p *RelationFriendListResponse) SetStatusCode(val int32) {
@@ -2204,7 +1882,7 @@ func (p *RelationFriendListResponse) SetStatusCode(val int32) {
 func (p *RelationFriendListResponse) SetStatusMsg(val *string) {
 	p.StatusMsg = val
 }
-func (p *RelationFriendListResponse) SetUserList(val []*FriendUser) {
+func (p *RelationFriendListResponse) SetUserList(val []*common.FriendUser) {
 	p.UserList = val
 }
 
@@ -2320,9 +1998,9 @@ func (p *RelationFriendListResponse) ReadField3(iprot thrift.TProtocol) error {
 	if err != nil {
 		return err
 	}
-	p.UserList = make([]*FriendUser, 0, size)
+	p.UserList = make([]*common.FriendUser, 0, size)
 	for i := 0; i < size; i++ {
-		_elem := NewFriendUser()
+		_elem := common.NewFriendUser()
 		if err := _elem.Read(iprot); err != nil {
 			return err
 		}
@@ -2477,7 +2155,7 @@ func (p *RelationFriendListResponse) Field2DeepEqual(src *string) bool {
 	}
 	return true
 }
-func (p *RelationFriendListResponse) Field3DeepEqual(src []*FriendUser) bool {
+func (p *RelationFriendListResponse) Field3DeepEqual(src []*common.FriendUser) bool {
 
 	if len(p.UserList) != len(src) {
 		return false

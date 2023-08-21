@@ -24,6 +24,9 @@ var (
 func (p *User) IsValid() error {
 	return nil
 }
+func (p *FriendUser) IsValid() error {
+	return nil
+}
 func (p *Video) IsValid() error {
 	if p.Author != nil {
 		if err := p.Author.IsValid(); err != nil {

@@ -1,20 +1,32 @@
 package conv
 
 import (
+	hertz_common "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/common"
 	hertz_relation "github.com/HUST-MiniTiktok/mini_tiktok/cmd/api/biz/model/relation"
+	kitex_common "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/common"
 	kitex_relation "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/relation"
 )
 
-func ToHertzFriendUser(user *kitex_relation.FriendUser) *hertz_relation.FriendUser {
-	return &hertz_relation.FriendUser{
-		User:    ToHertzUser(user.User),
-		Message: user.Message,
-		MsgType: user.MsgType,
+func ToHertzFriendUser(user *kitex_common.FriendUser) *hertz_common.FriendUser {
+	return &hertz_common.FriendUser{
+		ID:              user.Id,
+		Name:            user.Name,
+		FollowCount:     user.FollowCount,
+		FollowerCount:   user.FollowerCount,
+		IsFollow:        user.IsFollow,
+		Avatar:          user.Avatar,
+		BackgroundImage: user.BackgroundImage,
+		Signature:       user.Signature,
+		TotalFavorited:  user.TotalFavorited,
+		WorkCount:       user.WorkCount,
+		FavoriteCount:   user.FavoriteCount,
+		Message:         user.Message,
+		MsgType:         user.MsgType,
 	}
 }
 
-func ToHertzFriendUserList(user_list []*kitex_relation.FriendUser) []*hertz_relation.FriendUser {
-	hertz_user_list := make([]*hertz_relation.FriendUser, 0, len(user_list))
+func ToHertzFriendUserList(user_list []*kitex_common.FriendUser) []*hertz_common.FriendUser {
+	hertz_user_list := make([]*hertz_common.FriendUser, 0, len(user_list))
 	for _, user := range user_list {
 		hertz_user_list = append(hertz_user_list, ToHertzFriendUser(user))
 	}

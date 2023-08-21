@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"time"
 
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/message/client"
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/message/dal/db"
@@ -11,6 +12,7 @@ import (
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/errno"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/jwt"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/utils"
+	"github.com/cloudwego/kitex/pkg/klog"
 )
 
 var (
@@ -37,6 +39,7 @@ func (s *MessageService) MessageChat(request *message.MessageChatRequest) (resp 
 	}
 
 	var db_messages []*db.Message
+	klog.Infof("request.PreMsgTime: %v", utils.MillTimeStampToTime(request.PreMsgTime))
 	db_messages, err = db.GetMessageByUserIdPair(s.ctx, curr_user_id, request.ToUserId, utils.MillTimeStampToTime(request.PreMsgTime))
 	if err != nil {
 		return pack.NewMessageChatResponse(err), err
@@ -45,6 +48,7 @@ func (s *MessageService) MessageChat(request *message.MessageChatRequest) (resp 
 	kitex_messages := make([]*message.Message, 0, len(db_messages))
 	for _, db_message := range db_messages {
 		create_time := utils.TimeToMillTimeStamp(db_message.CreatedAt)
+		klog.Infof("db create_time: %v", db_message.CreatedAt)
 		kitex_messages = append(kitex_messages, &message.Message{
 			Id:         db_message.ID,
 			FromUserId: db_message.FromUserId,
@@ -77,7 +81,7 @@ func (s *MessageService) MessageAction(request *message.MessageActionRequest) (r
 		return pack.NewMessageActionResponse(errno.UserIsNotExistErr), errno.UserIsNotExistErr
 	}
 
-	db_message := db.Message{FromUserId: from_user_id, ToUserId: request.ToUserId, Content: request.Content}
+	db_message := db.Message{FromUserId: from_user_id, ToUserId: request.ToUserId, Content: request.Content, CreatedAt: time.Now().Add(-time.Second)}
 	_, err = db.CreateMessage(s.ctx, &db_message)
 	if err != nil {
 		return pack.NewMessageActionResponse(err), err
@@ -104,17 +108,17 @@ func (s *MessageService) GetFriendLatestMsg(request *message.GetFriendLatestMsgR
 		msgType = 2 // 2 means no message
 		resp = pack.NewGetFriendLatestMsgResponse(errno.Success)
 		msg := &db.Message{}
-		resp.MsgType = &msgType
+		resp.MsgType = msgType
 		resp.Message = &msg.Content
 	} else if db_message.ToUserId == curr_user_id {
 		msgType = 0 // 0 means friend user send message to curr user
 		resp = pack.NewGetFriendLatestMsgResponse(errno.Success)
-		resp.MsgType = &msgType
+		resp.MsgType = msgType
 		resp.Message = &db_message.Content
 	} else { // db_message.FromUserId == curr_user_id
 		msgType = 1 // 1 means curr user send message to friend user
 		resp = pack.NewGetFriendLatestMsgResponse(errno.Success)
-		resp.MsgType = &msgType
+		resp.MsgType = msgType
 		resp.Message = &db_message.Content
 	}
 

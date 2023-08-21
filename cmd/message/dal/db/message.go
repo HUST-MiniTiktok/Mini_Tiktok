@@ -37,7 +37,7 @@ func GetMessageById(ctx context.Context, id int64) (message *Message, err error)
 }
 
 func GetMessageByUserIdPair(ctx context.Context, toUserId, fromUserId int64, preMsgTime time.Time) (messages []*Message, err error) {
-	err = DB.WithContext(ctx).Where("to_user_id = ? AND from_user_id = ? AND created_at > ?", toUserId, fromUserId, preMsgTime).Or("to_user_id = ? AND from_user_id = ? AND created_at > ?", fromUserId, toUserId, preMsgTime).Order("created_at desc").Find(&messages).Error
+	err = DB.WithContext(ctx).Where("to_user_id = ? AND from_user_id = ? AND created_at > ?", toUserId, fromUserId, preMsgTime).Or("to_user_id = ? AND from_user_id = ? AND created_at > ?", fromUserId, toUserId, preMsgTime).Order("created_at asc").Find(&messages).Error
 	if err != nil {
 		return nil, err
 	}
@@ -45,9 +45,13 @@ func GetMessageByUserIdPair(ctx context.Context, toUserId, fromUserId int64, pre
 }
 
 func GetLastestMsgByUserIdPair(ctx context.Context, toUserId, fromUserId int64) (message *Message, err error) {
-	err = DB.WithContext(ctx).Where("to_user_id = ? AND from_user_id = ?", toUserId, fromUserId).Or("to_user_id = ? AND from_user_id = ?", fromUserId, toUserId).Order("created_at desc").Limit(1).Find(&message).Error
+	var db_message Message
+	err = DB.WithContext(ctx).Where("to_user_id = ? AND from_user_id = ?", toUserId, fromUserId).Or("to_user_id = ? AND from_user_id = ?", fromUserId, toUserId).Order("created_at desc").Limit(1).Find(&db_message).Error
 	if err != nil {
 		return nil, err
 	}
-	return
+	if (db_message == Message{}) {
+		return nil, nil
+	}
+	return &db_message, nil
 }
