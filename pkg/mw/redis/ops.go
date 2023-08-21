@@ -131,7 +131,7 @@ func (c *RDClient) HIncr(key string, field string, num int64) bool {
 }
 
 func (c *RDClient) HExpire(key string, tm time.Duration) bool {
-	err := c.Client.Do("expire", key, tm.Seconds())
+	err := c.Client.Expire(key, tm)
 	if err != nil {
 		klog.Errorf("HExpires key %s failed: %v", key, err)
 		return false
