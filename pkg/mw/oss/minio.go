@@ -31,4 +31,5 @@ func init() {
 
 	CreateBucket(ctx, conf.GetConf().GetString("oss.videobucket"))
 	CreateBucket(ctx, conf.GetConf().GetString("oss.imagebucket"))
+	LoadDefaultImageData(ctx, conf.GetConf().GetString("oss.imagebucket"))
 }

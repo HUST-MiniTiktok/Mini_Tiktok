@@ -9,11 +9,14 @@ import (
 
 func ToHertzVideo(video *kitex_common.Video) *hertz_common.Video {
 	return &hertz_common.Video{
-		ID:       video.Id,
-		Author:   ToHertzUser(video.Author),
-		PlayURL:  video.PlayUrl,
-		CoverURL: video.CoverUrl,
-		Title:    video.Title,
+		ID:            video.Id,
+		Author:        ToHertzUser(video.Author),
+		PlayURL:       video.PlayUrl,
+		CoverURL:      video.CoverUrl,
+		FavoriteCount: video.FavoriteCount,
+		CommentCount:  video.CommentCount,
+		IsFavorite:    video.IsFavorite,
+		Title:         video.Title,
 	}
 }
 

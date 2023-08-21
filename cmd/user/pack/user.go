@@ -9,16 +9,20 @@ import (
 	favorite "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/favorite"
 	publish "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/publish"
 	relation "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/relation"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/oss"
 )
 
 func ToKitexUser(ctx context.Context, curr_user_token string, db_user *db.User) (kitex_user *common.User, err error) {
 	// 复制用户信息
+	default_avatar := oss.ToRealURL(ctx, "image/Avatar.png")
+	default_background_image := oss.ToRealURL(ctx, "image/Background.png")
+	default_signature := "This is my signature."
 	kitex_user = &common.User{
 		Id:              db_user.ID,
 		Name:            db_user.UserName,
-		Avatar:          &db_user.Avatar,
-		BackgroundImage: &db_user.BackgroundImage,
-		Signature:       &db_user.Signature,
+		Avatar:          &default_avatar,
+		BackgroundImage: &default_background_image,
+		Signature:       &default_signature,
 	}
 
 	// 协程补全

@@ -29,7 +29,7 @@ func NewFeedClient() (feedClient *FeedClient) {
 		client.WithMiddleware(kitex.CommonMiddleware),
 		client.WithInstanceMW(kitex.ClientMiddleware),
 		client.WithMuxConnection(1),
-		client.WithRPCTimeout(3*time.Second),
+		client.WithRPCTimeout(5*time.Second),
 		client.WithConnectTimeout(50*time.Millisecond),
 		client.WithFailureRetry(retry.NewFailurePolicy()),
 	)

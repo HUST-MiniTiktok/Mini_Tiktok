@@ -63,8 +63,8 @@ func (s *UserService) Register(ctx context.Context, request *user.UserRegisterRe
 	}
 
 	db_user_new := db.User{
-		UserName: request.Username,
-		Password: encrypted_password,
+		UserName:        request.Username,
+		Password:        encrypted_password,
 	}
 
 	user_id, err := db.CreateUser(ctx, &db_user_new)

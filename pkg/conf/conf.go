@@ -33,8 +33,8 @@ func InitConfig() (*viper.Viper, error) {
 	}
 	v.SetConfigType("yaml")
 	_, filename, _, _ := runtime.Caller(0)
-	root := path.Dir(path.Dir(filename))
-	v.AddConfigPath(root + "/conf")
+	root := path.Dir(filename)
+	v.AddConfigPath(root)
 	if err := v.ReadInConfig(); err == nil {
 		klog.Info("Using config: ", v.ConfigFileUsed())
 	} else {

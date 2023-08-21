@@ -3,8 +3,11 @@ package oss
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"mime/multipart"
 	"net/url"
+	"path"
+	"runtime"
 	"strings"
 	"time"
 
@@ -47,6 +50,11 @@ func PutToBucketWithBuf(ctx context.Context, bucketName, filename string, buf *b
 	return
 }
 
+func PutToBucketWithFilePath(ctx context.Context, bucketName, filename, filePath string) (info minio.UploadInfo, err error) {
+	info, err = OSSClient.FPutObject(ctx, bucketName, filename, filePath, minio.PutObjectOptions{})
+	return
+}
+
 func ToRealURL(ctx context.Context, db_url string) (real_url string) {
 	if RDClient.Exists(db_url) {
 		return RDClient.Get(db_url)
@@ -56,7 +64,7 @@ func ToRealURL(ctx context.Context, db_url string) (real_url string) {
 	file_name := names[1]
 	real_url_, err := GetObjectURL(ctx, bucket_name, file_name)
 	go func() {
-		RDClient.Set(db_url, real_url_, time.Hour * 24)
+		RDClient.Set(db_url, real_url_, time.Hour*24)
 	}()
 	if err != nil {
 		klog.Errorf("get object url failed: %v", err)
@@ -69,5 +77,25 @@ func ToRealURL(ctx context.Context, db_url string) (real_url string) {
 
 func ToDbURL(bucket_name string, file_name string) (db_url string) {
 	db_url = bucket_name + "/" + file_name
+	return
+}
+
+func LoadDefaultImageData(ctx context.Context, image_bucket string) (err error) {
+	_, filename, _, _ := runtime.Caller(0)
+	default_image_dir := fmt.Sprintf("%s/default_data/%s/", path.Dir(filename), image_bucket)
+	// 上传默认头像
+	_, err = PutToBucketWithFilePath(ctx, "image", "Avatar.png", default_image_dir+"Avatar.png")
+	if err != nil {
+		klog.Fatalf("upload default avatar failed: %v", err)
+		return
+	}
+	klog.Infof("upload default avatar success: %v")
+	// 上传默认背景图
+	_, err = PutToBucketWithFilePath(ctx, "image", "Background.png", image_bucket+"Background.png")
+	if err != nil {
+		klog.Fatalf("upload default background image failed: %v", err)
+		return
+	}
+	klog.Infof("upload default background image success: %v")
 	return
 }

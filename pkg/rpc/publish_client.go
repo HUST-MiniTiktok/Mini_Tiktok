@@ -11,7 +11,6 @@ import (
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/kitex"
 	"github.com/cloudwego/kitex/client"
 	"github.com/cloudwego/kitex/pkg/klog"
-	"github.com/cloudwego/kitex/pkg/retry"
 	etcd "github.com/kitex-contrib/registry-etcd"
 )
 
@@ -29,9 +28,7 @@ func NewPublishClient() (publishClient *PublishClient) {
 		client.WithMiddleware(kitex.CommonMiddleware),
 		client.WithInstanceMW(kitex.ClientMiddleware),
 		client.WithMuxConnection(1),
-		client.WithRPCTimeout(3*time.Second),
-		client.WithConnectTimeout(50*time.Millisecond),
-		client.WithFailureRetry(retry.NewFailurePolicy()),
+		client.WithConnectTimeout(500*time.Millisecond),
 	)
 	if err != nil {
 		klog.Fatalf("new publish client failed: %v", err)

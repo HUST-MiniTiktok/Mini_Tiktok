@@ -36,8 +36,8 @@ func (s *RelationService) RelationAction(request *relation.RelationActionRequest
 	if request.ActionType == 1 {
 		// Action 1: follow
 		db_follow := db.Follow{
-			UserId:     curr_user_id,
-			FollowerId: request.ToUserId,
+			UserId:     request.ToUserId,
+			FollowerId: curr_user_id,
 		}
 		_, err := db.CreateFollow(s.ctx, &db_follow)
 		if err != nil {
@@ -46,8 +46,8 @@ func (s *RelationService) RelationAction(request *relation.RelationActionRequest
 	} else if request.ActionType == 2 {
 		// Action 2: unfollow
 		db_follow := db.Follow{
-			UserId:     curr_user_id,
-			FollowerId: request.ToUserId,
+			UserId:     request.ToUserId,
+			FollowerId: curr_user_id,
 		}
 		_, err := db.DeleteFollow(s.ctx, &db_follow)
 		if err != nil {

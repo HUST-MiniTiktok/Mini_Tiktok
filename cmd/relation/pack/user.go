@@ -44,12 +44,12 @@ func ToKitexFriendUserList(ctx context.Context, curr_user_token string, friend_u
 	userChan := make(chan *relation.FriendUser)
 	for _, user_id := range friend_user_ids {
 		go func(user_id int64) {
-			userResp, err := client.UserRPC.User(ctx, &user.UserRequest{UserId: user_id})
+			userResp, err := client.UserRPC.User(ctx, &user.UserRequest{UserId: user_id, Token: curr_user_token})
 			if err != nil {
 				errChan <- err
 				return
 			}
-			friendMsgResp, err := client.MessageRPC.GetFriendLatestMsg(ctx, &message.GetFriendLatestMsgRequest{Token: curr_user_token, FriendUserId: user_id})
+			friendMsgResp, err := client.MessageRPC.GetFriendLatestMsg(ctx, &message.GetFriendLatestMsgRequest{FriendUserId: user_id, Token: curr_user_token})
 			if err != nil {
 				errChan <- err
 			} else {

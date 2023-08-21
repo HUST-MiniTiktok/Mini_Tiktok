@@ -98,19 +98,21 @@ func (s *MessageService) GetFriendLatestMsg(request *message.GetFriendLatestMsgR
 	if err != nil {
 		return pack.NewGetFriendLatestMsgResponse(err), err
 	}
-	// db_message == nil means no message between friend users
-	if db_message == nil {
-		return pack.NewGetFriendLatestMsgResponse(errno.Success), nil
-	}
 
 	var msgType int64
-	if db_message.ToUserId == curr_user_id {
-		msgType = 0
+	if db_message == nil { // db_message == nil means no message between friend users
+		msgType = 2 // 2 means no message
+		resp = pack.NewGetFriendLatestMsgResponse(errno.Success)
+		msg := &db.Message{}
+		resp.MsgType = &msgType
+		resp.Message = &msg.Content
+	} else if db_message.ToUserId == curr_user_id {
+		msgType = 0 // 0 means friend user send message to curr user
 		resp = pack.NewGetFriendLatestMsgResponse(errno.Success)
 		resp.MsgType = &msgType
 		resp.Message = &db_message.Content
-	} else {
-		msgType = 1
+	} else { // db_message.FromUserId == curr_user_id
+		msgType = 1 // 1 means curr user send message to friend user
 		resp = pack.NewGetFriendLatestMsgResponse(errno.Success)
 		resp.MsgType = &msgType
 		resp.Message = &db_message.Content
