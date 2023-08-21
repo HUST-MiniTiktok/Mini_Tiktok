@@ -8,7 +8,11 @@ db:
   redis:
     address: "127.0.0.1:12003"
     password: "mini_tiktok_pass"
-    db: 0
+    id: 
+      url: 0
+      favorite: 1
+      relation: 2
+      comment: 3
 
 oss:
     endpoint: "127.0.0.1:12001"

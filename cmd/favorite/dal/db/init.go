@@ -32,5 +32,5 @@ func Init() {
 
 	DB.AutoMigrate(&Favorite{})
 
-	RDClient = redis.NewRDClient()
+	RDClient = redis.NewRDClient(conf.GetConf().GetInt("db.redis.id.favorite"))
 }

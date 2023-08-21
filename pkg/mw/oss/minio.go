@@ -19,7 +19,7 @@ var (
 
 func init() {
 	ctx := context.Background()
-	RDClient = redis.NewRDClient()
+	RDClient = redis.NewRDClient(conf.GetConf().GetInt("db.redis.id.url"))
 	MinioHost = conf.GetConf().GetString("oss.endpoint")
 	OSSClient, err = minio.New(MinioHost, &minio.Options{
 		Creds: credentials.NewStaticV4(conf.GetConf().GetString("oss.accesskey"), conf.GetConf().GetString("oss.secretkey"), ""),

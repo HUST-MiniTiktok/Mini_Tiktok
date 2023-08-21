@@ -9,11 +9,11 @@ type RDClient struct {
 	Client *redis.Client
 }
 
-func NewRDClient() *RDClient {
+func NewRDClient(db_id int) *RDClient {
 	return &RDClient{
 		Client: redis.NewClient(&redis.Options{
 			Addr:     conf.GetConf().GetString("db.redis.address"),
 			Password: conf.GetConf().GetString("db.redis.password"),
-			DB:       conf.Conf.GetInt("db.redis.db"),
+			DB:       db_id,
 		})}
 }

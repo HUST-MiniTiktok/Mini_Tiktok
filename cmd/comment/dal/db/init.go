@@ -32,5 +32,5 @@ func Init() {
 
 	DB.AutoMigrate(&Comment{})
 
-	RDClient = redis.NewRDClient()
+	RDClient = redis.NewRDClient(conf.GetConf().GetInt("db.redis.id.comment"))
 }
