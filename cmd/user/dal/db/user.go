@@ -58,7 +58,7 @@ func UpdateUser(ctx context.Context, user *User) (err error) {
 
 func CheckUserById(ctx context.Context, userId int64) (exist bool, err error) {
 	var user User
-	err = DB.Where("id = ?", userId).Find(&user).Error
+	err = DB.Where("id = ?", userId).Limit(1).Find(&user).Error
 	if err != nil {
 		return false, err
 	}

@@ -34,11 +34,11 @@ func NewFavorite(ctx context.Context, user_id int64, video_id int64) (status int
 		VideoId: video_id}
 
 	err = DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		var count int64
-		if err := tx.WithContext(ctx).Model(&Favorite{}).Where(&favorite).Count(&count).Error; err != nil {
+		status, err := CheckFavorite(ctx, user_id, video_id)
+		if err != nil {
 			return err
 		}
-		if count != 0 { // 重复点赞
+		if status { // 重复点赞
 			return nil
 		}
 
