@@ -71,7 +71,7 @@ func (s *RelationService) RelationFollowList(request *relation.RelationFollowLis
 		return pack.NewRelationFollowListResponse(err), err
 	}
 
-	kitex_users, err := pack.ToKitexUserList(s.ctx, user_ids)
+	kitex_users, err := pack.ToKitexUserList(s.ctx, request.Token, user_ids)
 	if err != nil {
 		return pack.NewRelationFollowListResponse(err), err
 	}
@@ -93,7 +93,7 @@ func (s *RelationService) RelationFollowerList(request *relation.RelationFollowe
 		return pack.NewRelationFollowerListResponse(err), err
 	}
 
-	kitex_users, err := pack.ToKitexUserList(s.ctx, user_ids)
+	kitex_users, err := pack.ToKitexUserList(s.ctx, request.Token, user_ids)
 	if err != nil {
 		return pack.NewRelationFollowerListResponse(err), err
 	}

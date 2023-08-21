@@ -9,14 +9,14 @@ import (
 	user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user"
 )
 
-func ToKitexUserList(ctx context.Context, user_ids []int64) ([]*common.User, error) {
+func ToKitexUserList(ctx context.Context, curr_user_token string, user_ids []int64) ([]*common.User, error) {
 	// 协程补全
 	kitex_users := make([]*common.User, 0, len(user_ids))
 	errChan := make(chan error)
 	userChan := make(chan *common.User)
 	for _, user_id := range user_ids {
 		go func(user_id int64) {
-			userResp, err := client.UserRPC.User(ctx, &user.UserRequest{UserId: user_id})
+			userResp, err := client.UserRPC.User(ctx, &user.UserRequest{UserId: user_id, Token: curr_user_token})
 			if err != nil {
 				errChan <- err
 			} else {
