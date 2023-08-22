@@ -9,7 +9,7 @@ db:
     address: "127.0.0.1:12003"
     password: "mini_tiktok_pass"
     id: 
-      url: 0
+      oss: 0
       favorite: 1
       relation: 2
       comment: 3

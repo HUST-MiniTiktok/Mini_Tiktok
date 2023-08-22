@@ -11,17 +11,17 @@ import (
 )
 
 var (
-	OSSClient *minio.Client
-	RDClient  *redis.RDClient
-	MinioHost string
-	err       error
+	OSSClient   *minio.Client
+	RDClient    *redis.RDClient
+	OSSEndpoint string
+	err         error
 )
 
 func init() {
 	ctx := context.Background()
-	RDClient = redis.NewRDClient(conf.GetConf().GetInt("db.redis.id.url"))
-	MinioHost = conf.GetConf().GetString("oss.endpoint")
-	OSSClient, err = minio.New(MinioHost, &minio.Options{
+
+	OSSEndpoint = conf.GetConf().GetString("oss.endpoint")
+	OSSClient, err = minio.New(OSSEndpoint, &minio.Options{
 		Creds: credentials.NewStaticV4(conf.GetConf().GetString("oss.accesskey"), conf.GetConf().GetString("oss.secretkey"), ""),
 	})
 
@@ -32,4 +32,6 @@ func init() {
 	CreateBucket(ctx, conf.GetConf().GetString("oss.videobucket"))
 	CreateBucket(ctx, conf.GetConf().GetString("oss.imagebucket"))
 	LoadDefaultImageData(ctx, conf.GetConf().GetString("oss.imagebucket"))
+
+	RDClient = redis.NewRDClient(conf.GetConf().GetInt("db.redis.id.oss"))
 }

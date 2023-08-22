@@ -74,6 +74,15 @@ func (c *RDClient) DecrBy(key string, num int64) bool {
 	return true
 }
 
+func (c *RDClient) Expire(key string, tm time.Duration) bool {
+	err := c.Client.Expire(key, tm).Err()
+	if err != nil {
+		klog.Errorf("expire key %s failed: %v", key, err)
+		return false
+	}
+	return true
+}
+
 func (c *RDClient) HGet(key string, field string) string {
 	val, err := c.Client.HGet(key, field).Result()
 	if err != nil {

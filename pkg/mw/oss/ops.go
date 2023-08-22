@@ -15,6 +15,10 @@ import (
 	"github.com/minio/minio-go/v7"
 )
 
+const (
+	PresignedURLExpire = time.Hour * 24
+)
+
 func CreateBucket(ctx context.Context, bucketName string) {
 	exists, err := OSSClient.BucketExists(ctx, bucketName)
 	if err != nil {
@@ -39,9 +43,8 @@ func PutToBucket(ctx context.Context, bucketName string, file *multipart.FileHea
 }
 
 func GetObjectURL(ctx context.Context, bucketName, filename string) (obj_url *url.URL, err error) {
-	exp := time.Hour * 24
 	reqParams := make(url.Values)
-	obj_url, err = OSSClient.PresignedGetObject(ctx, bucketName, filename, exp, reqParams)
+	obj_url, err = OSSClient.PresignedGetObject(ctx, bucketName, filename, PresignedURLExpire, reqParams)
 	return
 }
 
@@ -56,22 +59,23 @@ func PutToBucketWithFilePath(ctx context.Context, bucketName, filename, filePath
 }
 
 func ToRealURL(ctx context.Context, db_url string) (real_url string) {
-	if RDClient.Exists(db_url) {
+	// 从redis中获取
+	if RDExistURLMaping(db_url) {
 		return RDClient.Get(db_url)
 	}
 	names := strings.Split(db_url, "/")
 	bucket_name := names[0]
 	file_name := names[1]
 	real_url_, err := GetObjectURL(ctx, bucket_name, file_name)
-	go func() {
-		RDClient.Set(db_url, real_url_, time.Hour*24)
-	}()
+
 	if err != nil {
 		klog.Errorf("get object url failed: %v", err)
 	} else {
-		real_url_.Host = MinioHost
+		real_url_.Host = OSSEndpoint
 		real_url = real_url_.String()
 	}
+	// 保存到redis
+	go RDSetURLMaping(db_url, real_url)
 	return
 }
 

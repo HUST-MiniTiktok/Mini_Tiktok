@@ -2,15 +2,12 @@ package db
 
 import (
 	"context"
-	"strconv"
 	"time"
 
 	"gorm.io/gorm"
 )
 
 const CommentTableName = "comment"
-const CommentCountSuffix = ":comment"
-const VCommentCount = "commentCount"
 
 type Comment struct {
 	ID          int64          `json:"id"`
@@ -40,45 +37,26 @@ func NewComment(ctx context.Context, user_id int64, video_id int64, comment_text
 		return nil
 	})
 
-	go func() {
-		video_id_str := strconv.FormatInt(video_id, 10)
-		if RDClient.HExists(video_id_str, VCommentCount) {
-			RDClient.HIncr(video_id_str, VCommentCount, 1)
-		}
-	}()
+	go RDIncrCommentCount(video_id, 1)
 
 	return comment, err
 }
 
 // DelComment deletes a comment from the database.
-func DelComment(ctx context.Context, commentID int64, vid int64) error {
-	err := DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		comment := new(Comment)
-		if err := tx.WithContext(ctx).First(&comment, commentID).Error; err != nil { //主键查找
-			return err
-		}
-		// tx.Unscoped().Delete()将永久删除记录
-		err := tx.WithContext(ctx).Unscoped().Delete(&comment).Error
-		if err != nil {
-			return err
-		}
-		return nil
-	})
+func DelComment(ctx context.Context, comment_id int64, video_id int64) error {
+	if err := DB.WithContext(ctx).Model(&Comment{}).Where(&Comment{ID: comment_id}).Delete(&Comment{}).Error; err != nil {
+		return err
+	}
 
-	go func() {
-		video_id_str := strconv.FormatInt(vid, 10)
-		if RDClient.HExists(video_id_str, VCommentCount) {
-			RDClient.HIncr(video_id_str, VCommentCount, -1)
-		}
-	}()
+	go RDIncrCommentCount(video_id, -1)
 
-	return err
+	return nil
 }
 
 // GetVideoComments returns a list of video comments.
-func GetVideoComments(ctx context.Context, vid int64) ([]*Comment, error) {
+func GetVideoComments(ctx context.Context, video_id int64) ([]*Comment, error) {
 	var comments []*Comment
-	err := DB.WithContext(ctx).Model(&Comment{}).Where(&Comment{VideoId: vid}).Find(&comments).Error
+	err := DB.WithContext(ctx).Model(&Comment{}).Where(&Comment{VideoId: video_id}).Find(&comments).Error
 	if err != nil {
 		return nil, err
 	}
@@ -86,22 +64,18 @@ func GetVideoComments(ctx context.Context, vid int64) ([]*Comment, error) {
 }
 
 // GetVideoComments returns the number of comments of the inputed video.
-func GetVideoCommentCounts(ctx context.Context, vid int64) (count int64, err error) {
+func GetVideoCommentCounts(ctx context.Context, video_id int64) (count int64, err error) {
 
-	video_id_str := strconv.FormatInt(vid, 10)
-	if RDClient.HExists(video_id_str, VCommentCount) {
-		return RDClient.HGetInt(video_id_str, VCommentCount), nil
+	if RDExistCommentCount(video_id) {
+		return RDGetCommentCount(video_id), nil
 	}
 
-	err = DB.WithContext(ctx).Model(&Comment{}).Where(&Comment{VideoId: vid}).Count(&count).Error
+	err = DB.WithContext(ctx).Model(&Comment{}).Where(&Comment{VideoId: video_id}).Count(&count).Error
 	if err != nil {
 		return 0, err
 	}
 
-	go func() {
-		RDClient.HSet(video_id_str, VCommentCount, count)
-		RDClient.HExpire(video_id_str, time.Hour)
-	}()
+	go RDSetCommentCount(video_id, count)
 
 	return count, nil
 }

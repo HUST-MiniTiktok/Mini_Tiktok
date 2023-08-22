@@ -2,15 +2,12 @@ package db
 
 import (
 	"context"
-	"strconv"
 	"time"
 
 	"gorm.io/gorm"
 )
 
 const FavoriteTableName = "favorite"
-const VFavoriteCount = "favoriteCount"
-const UserFavoriteCountSuffix = ":Ufavorite"
 
 type Favorite struct {
 	ID        int64          `json:"id"`
@@ -52,19 +49,8 @@ func NewFavorite(ctx context.Context, user_id int64, video_id int64) (status int
 		return 1, err
 	}
 
-	go func() {
-		video_id_str := strconv.FormatInt(video_id, 10)
-		if RDClient.HExists(video_id_str, VFavoriteCount) {
-			RDClient.HIncr(video_id_str, VFavoriteCount, 1)
-		}
-	}()
-
-	go func() {
-		user_id_str := strconv.FormatInt(user_id, 10) + UserFavoriteCountSuffix
-		if RDClient.Exists(user_id_str) {
-			RDClient.IncrBy(user_id_str, 1)
-		}
-	}()
+	go RDIncrVideoFavoriteCount(video_id, 1)
+	go RDIncrUserFavoriteCount(user_id, 1)
 
 	return 0, nil
 }
@@ -89,19 +75,8 @@ func CancelFavorite(ctx context.Context, user_id int64, video_id int64) (status 
 		return 1, err
 	}
 
-	go func() {
-		video_id_str := strconv.FormatInt(video_id, 10)
-		if RDClient.HExists(video_id_str, VFavoriteCount) {
-			RDClient.HIncr(video_id_str, VFavoriteCount, -1)
-		}
-	}()
-
-	go func() {
-		user_id_str := strconv.FormatInt(user_id, 10) + UserFavoriteCountSuffix
-		if RDClient.Exists(user_id_str) {
-			RDClient.DecrBy(user_id_str, 1)
-		}
-	}()
+	go RDIncrVideoFavoriteCount(video_id, -1)
+	go RDIncrUserFavoriteCount(user_id, -1)
 
 	return 0, nil
 }
@@ -117,9 +92,8 @@ func CheckFavorite(ctx context.Context, user_id int64, video_id int64) (status b
 
 func VideoFavoriteCount(ctx context.Context, video_id int64) (count int64, err error) {
 
-	video_id_str := strconv.FormatInt(video_id, 10)
-	if RDClient.HExists(video_id_str, VFavoriteCount) {
-		return RDClient.HGetInt(video_id_str, VFavoriteCount), nil
+	if RDExistVideoFavoriteCount(video_id) {
+		return RDGetVideoFavoriteCount(video_id), nil
 	}
 
 	err = DB.WithContext(ctx).Model(&Favorite{}).Where(&Favorite{VideoId: video_id}).Count(&count).Error
@@ -127,19 +101,15 @@ func VideoFavoriteCount(ctx context.Context, video_id int64) (count int64, err e
 		return 0, err
 	}
 
-	go func() {
-		RDClient.HSet(video_id_str, VFavoriteCount, count)
-		RDClient.HExpire(video_id_str, time.Hour)
-	}()
+	go RDSetVideoFavoriteCount(video_id, count)
 
 	return count, nil
 }
 
 func UserFavoriteCount(ctx context.Context, user_id int64) (count int64, err error) {
 
-	user_id_str := strconv.FormatInt(user_id, 10) + UserFavoriteCountSuffix
-	if RDClient.Exists(user_id_str) {
-		return RDClient.GetInt(user_id_str), nil
+	if RDExistUserFavoriteCount(user_id) {
+		return RDGetUserFavoriteCount(user_id), nil
 	}
 
 	err = DB.WithContext(ctx).Model(&Favorite{}).Where(&Favorite{UserId: user_id}).Count(&count).Error
@@ -147,9 +117,7 @@ func UserFavoriteCount(ctx context.Context, user_id int64) (count int64, err err
 		return 0, err
 	}
 
-	go func() {
-		RDClient.Set(user_id_str, count, time.Hour*24)
-	}()
+	go RDSetUserFavoriteCount(user_id, count)
 
 	return count, nil
 }
