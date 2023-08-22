@@ -29,8 +29,7 @@ func RDIncrCommentCount(video_id int64, val int64) {
 
 func RDSetCommentCount(video_id int64, val int64) {
 	video_id_str := strconv.FormatInt(video_id, 10)
-	RDClient.HSet(video_id_str, VCommentCount, val)
-	RDClient.HExpire(video_id_str, RDCacheExpire)
+	RDClient.HSet(video_id_str, VCommentCount, val, RDCacheExpire)
 }
 
 func RDGetCommentCount(video_id int64) int64 {

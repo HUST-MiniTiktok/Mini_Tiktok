@@ -55,8 +55,7 @@ func RDGetUserFavoriteCount(user_id int64) int64 {
 
 func RDSetVideoFavoriteCount(video_id int64, val int64) {
 	video_id_str := strconv.FormatInt(video_id, 10)
-	RDClient.HSet(video_id_str, VFavoriteCount, val)
-	RDClient.HExpire(video_id_str, RDCacheExpire)
+	RDClient.HSet(video_id_str, VFavoriteCount, val, RDCacheExpire)
 }
 
 func RDSetUserFavoriteCount(user_id int64, val int64) {
