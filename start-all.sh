@@ -25,10 +25,10 @@ done
 # step 2. start docker compose
 echo "Starting docker compose ..."
 docker compose up -d
-sleep 10
 
 # step 3. start all services and API gateway
 echo "Starting all services and API gateway ..."
+sleep 10
 for file in `ls cmd`
 do
     if [ -d "cmd/$file" ]
@@ -42,3 +42,6 @@ done
 # step 4. show all services and API gateway
 echo "Showing all services and API gateway ..."
 screen -ls
+echo ""
+echo "Hint: You can use 'screen -r <service>' to attach to a screen and use Ctrl+A+D to detach from a screen"
+echo "If you want to stop all services and API gateway, please run stop-all.sh"
