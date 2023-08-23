@@ -21,6 +21,7 @@ func (Follow) TableName() string {
 	return FollowTableName
 }
 
+// CreateFollow: create a new follow record
 func CreateFollow(ctx context.Context, follow *Follow) (id int64, err error) {
 	// 如果关注关系已经存在，那么就不需要再次创建
 	ok, err := CheckFollow(ctx, follow.UserId, follow.FollowerId)
@@ -41,6 +42,7 @@ func CreateFollow(ctx context.Context, follow *Follow) (id int64, err error) {
 	return follow.ID, nil
 }
 
+// DeleteFollow: delete a follow record
 func DeleteFollow(ctx context.Context, follow *Follow) (ok bool, err error) {
 	err = DB.WithContext(ctx).Where("user_id = ? and follower_id = ?", follow.UserId, follow.FollowerId).Delete(follow).Error
 	if err != nil {
@@ -53,6 +55,7 @@ func DeleteFollow(ctx context.Context, follow *Follow) (ok bool, err error) {
 	return true, nil
 }
 
+// CheckFollow: check if a follow record exists
 func CheckFollow(ctx context.Context, user_id int64, follower_id int64) (ok bool, err error) {
 	if RDExistFollowKey(follower_id) {
 		return RDExistFollowValue(user_id, follower_id), nil
@@ -79,6 +82,7 @@ func CheckFollow(ctx context.Context, user_id int64, follower_id int64) (ok bool
 	return result, nil
 }
 
+// GetFollowById: get a follow user id list by current user id
 func GetFollowUserIdList(ctx context.Context, userId int64) (user_ids []int64, err error) {
 	if RDExistFollowKey(userId) {
 		return RDGetFollowList(userId), nil
@@ -95,6 +99,7 @@ func GetFollowUserIdList(ctx context.Context, userId int64) (user_ids []int64, e
 	return user_ids, nil
 }
 
+// GetFollowerUserIdList: get a follower user id list by current user id
 func GetFollowerUserIdList(ctx context.Context, userId int64) (user_ids []int64, err error) {
 	if RDExistFollowerKey(userId) {
 		return RDGetFollowerList(userId), nil
@@ -111,6 +116,7 @@ func GetFollowerUserIdList(ctx context.Context, userId int64) (user_ids []int64,
 	return user_ids, nil
 }
 
+// GetFriendUserIdList: get a friend user id list by current user id
 func GetFriendUserIdList(ctx context.Context, userId int64) (user_ids []int64, err error) {
 	// Friend 要求 A关注B 且 B关注A
 	// user_id 表示被关注者A, follower_id 表示关注者B
@@ -129,6 +135,7 @@ func GetFriendUserIdList(ctx context.Context, userId int64) (user_ids []int64, e
 	return user_ids, nil
 }
 
+// GetFollowUserList: get a follow user list by current user id
 func GetFollowUserCount(ctx context.Context, userId int64) (count int64, err error) {
 	if RDExistFollowKey(userId) {
 		return RDCountFollow(userId), nil
@@ -140,6 +147,7 @@ func GetFollowUserCount(ctx context.Context, userId int64) (count int64, err err
 	return count, nil
 }
 
+// GetFollowerUserList: get a follower user list by current user id
 func GetFollowerUserCount(ctx context.Context, userId int64) (count int64, err error) {
 	if RDExistFollowerKey(userId) {
 		return RDCountFollower(userId), nil
@@ -151,6 +159,7 @@ func GetFollowerUserCount(ctx context.Context, userId int64) (count int64, err e
 	return count, nil
 }
 
+// GetFriendUserList: get a friend user list by current user id
 func GetFriendUserCount(ctx context.Context, userId int64) (count int64, err error) {
 	// Friend 要求 A关注B 且 B关注A
 	// user_id 表示被关注者A, follower_id 表示关注者B

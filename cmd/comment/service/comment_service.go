@@ -3,11 +3,9 @@ package service
 import (
 	"context"
 
-	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/comment/client"
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/comment/dal/db"
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/comment/pack"
 	comment "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/comment"
-	user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/errno"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/jwt"
 )
@@ -28,34 +26,26 @@ func NewCommentService(ctx context.Context) *CommentService {
 	return &CommentService{ctx: ctx}
 }
 
-// CommentAction implements the CommentServiceImpl interface.
+// CommentAction: publish a comment or delete a comment
 func (s *CommentService) CommentAction(ctx context.Context, request *comment.CommentActionRequest) (resp *comment.CommentActionResponse, err error) {
 	claim, err := Jwt.ExtractClaims(request.Token)
 	if err != nil || claim.ID == 0 {
 		return pack.NewCommentActionResponse(errno.AuthorizationFailedErr), err
 	}
-
-	if request.ActionType == 1 { // 1-发布评论，2-删除评论
+	// 1-发布评论，2-删除评论
+	if request.ActionType == 1 {
 		newcomment, err := db.NewComment(s.ctx, claim.ID, request.VideoId, *request.CommentText)
 		if err != nil {
 			return pack.NewCommentActionResponse(err), err
 		}
 
-		// 创建成功需要返回 comment类型的newcomment
-		author, err := client.UserRPC.User(s.ctx, &user.UserRequest{UserId: newcomment.UserId})
+		kitex_comment, err := pack.ToKitexComment(s.ctx, newcomment, request.Token)
 		if err != nil {
 			return pack.NewCommentActionResponse(err), err
 		}
 
-		comComment := &comment.Comment{
-			Id:         newcomment.ID,
-			User:       author.User,
-			Content:    newcomment.CommentText,
-			CreateDate: newcomment.CreatedAt.Format("01-02"),
-		}
-
 		resp = pack.NewCommentActionResponse(errno.Success)
-		resp.Comment = comComment
+		resp.Comment = kitex_comment
 		return resp, nil
 
 	} else if request.ActionType == 2 {
@@ -71,7 +61,7 @@ func (s *CommentService) CommentAction(ctx context.Context, request *comment.Com
 	}
 }
 
-// CommentList implements the CommentServiceImpl interface.
+// CommentList: get comments of a video
 func (s *CommentService) CommentList(ctx context.Context, request *comment.CommentListRequest) (resp *comment.CommentListResponse, err error) {
 
 	claim, err := Jwt.ExtractClaims(request.Token)
@@ -84,33 +74,9 @@ func (s *CommentService) CommentList(ctx context.Context, request *comment.Comme
 		return pack.NewCommentListResponse(err), err
 	}
 
-	kitex_comments := make([]*comment.Comment, 0, len(db_comments))
-	err_chan := make(chan error)
-	comment_chan := make(chan *comment.Comment)
-
-	for _, db_comment := range db_comments {
-		go func(db_comment *db.Comment) {
-			author, err := client.UserRPC.User(s.ctx, &user.UserRequest{UserId: db_comment.UserId})
-			if err != nil {
-				err_chan <- err
-			} else {
-				comment_chan <- &comment.Comment{
-					Id:         db_comment.ID,
-					User:       author.User,
-					Content:    db_comment.CommentText,
-					CreateDate: db_comment.CreatedAt.Format("01-02"),
-				}
-			}
-		}(db_comment)
-	}
-
-	for i := 0; i < len(db_comments); i++ {
-		select {
-		case err := <-err_chan:
-			return pack.NewCommentListResponse(err), err
-		case comComment := <-comment_chan:
-			kitex_comments = append(kitex_comments, comComment)
-		}
+	kitex_comments, err := pack.ToKitexCommentList(ctx, db_comments, request.Token)
+	if err != nil {
+		return pack.NewCommentListResponse(err), err
 	}
 
 	resp = pack.NewCommentListResponse(errno.Success)
@@ -118,6 +84,7 @@ func (s *CommentService) CommentList(ctx context.Context, request *comment.Comme
 	return resp, nil
 }
 
+// GetVideoCommentCount implements the CommentServiceImpl interface.
 func (s *CommentService) GetVideoCommentCount(ctx context.Context, request *comment.GetVideoCommentCountRequest) (resp *comment.GetVideoCommentCountResponse, er error) {
 	count, err := db.GetVideoCommentCounts(s.ctx, request.VideoId)
 	if err != nil {

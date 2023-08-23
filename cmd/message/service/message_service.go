@@ -31,6 +31,7 @@ func NewMessageService(ctx context.Context) *MessageService {
 	return &MessageService{ctx: ctx}
 }
 
+// MessageChat: get message list between friend users
 func (s *MessageService) MessageChat(request *message.MessageChatRequest) (resp *message.MessageChatResponse, err error) {
 	user_claims, err := Jwt.ExtractClaims(request.Token)
 	curr_user_id := user_claims.ID
@@ -45,23 +46,12 @@ func (s *MessageService) MessageChat(request *message.MessageChatRequest) (resp 
 		return pack.NewMessageChatResponse(err), err
 	}
 
-	kitex_messages := make([]*message.Message, 0, len(db_messages))
-	for _, db_message := range db_messages {
-		create_time := utils.TimeToMillTimeStamp(db_message.CreatedAt)
-		klog.Infof("db create_time: %v", db_message.CreatedAt)
-		kitex_messages = append(kitex_messages, &message.Message{
-			Id:         db_message.ID,
-			FromUserId: db_message.FromUserId,
-			ToUserId:   db_message.ToUserId,
-			Content:    db_message.Content,
-			CreateTime: &create_time,
-		})
-	}
 	resp = pack.NewMessageChatResponse(errno.Success)
-	resp.MessageList = kitex_messages
+	resp.MessageList = pack.ToKitexMessageList(s.ctx, db_messages)
 	return resp, nil
 }
 
+// MessageAction: send message to friend user
 func (s *MessageService) MessageAction(request *message.MessageActionRequest) (resp *message.MessageActionResponse, err error) {
 	user_claims, err := Jwt.ExtractClaims(request.Token)
 	from_user_id := user_claims.ID
@@ -90,6 +80,7 @@ func (s *MessageService) MessageAction(request *message.MessageActionRequest) (r
 	return pack.NewMessageActionResponse(errno.Success), nil
 }
 
+// GetFriendLatestMsg: get latest message between friend users
 func (s *MessageService) GetFriendLatestMsg(request *message.GetFriendLatestMsgRequest) (resp *message.GetFriendLatestMsgResponse, err error) {
 	user_claims, err := Jwt.ExtractClaims(request.Token)
 	curr_user_id := user_claims.ID

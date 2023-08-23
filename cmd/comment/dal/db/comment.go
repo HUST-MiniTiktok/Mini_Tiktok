@@ -23,14 +23,14 @@ func (Comment) TableName() string {
 }
 
 // NewComment creates a new Comment
-func NewComment(ctx context.Context, user_id int64, video_id int64, comment_text string) (comment Comment, err error) {
-	comment = Comment{
+func NewComment(ctx context.Context, user_id int64, video_id int64, comment_text string) (comment *Comment, err error) {
+	comment = &Comment{
 		UserId:      user_id,
 		VideoId:     video_id,
 		CommentText: comment_text,
 	}
 	err = DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		err := tx.WithContext(ctx).Model(&Comment{}).Create(&comment).Error
+		err := tx.WithContext(ctx).Model(&Comment{}).Create(comment).Error
 		if err != nil {
 			return err
 		}

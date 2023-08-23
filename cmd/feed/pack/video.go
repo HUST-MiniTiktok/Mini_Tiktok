@@ -3,8 +3,8 @@ package pack
 import (
 	"context"
 
-	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/client"
-	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/dal/db"
+	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/client"
+	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/dal/db"
 	comment "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/comment"
 	common "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/common"
 	favorite "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/favorite"
@@ -71,6 +71,7 @@ func ToKitexVideo(ctx context.Context, curr_user_id int64, curr_user_token strin
 	return kitex_video, nil
 }
 
+// ToKitexVideoList: convert []*db.Video to []*common.Video
 func ToKitexVideoList(ctx context.Context, curr_user_id int64, curr_user_token string, db_video []*db.Video) ([]*common.Video, error) {
 	kitex_videos := make([]*common.Video, 0, len(db_video))
 	for _, video := range db_video {

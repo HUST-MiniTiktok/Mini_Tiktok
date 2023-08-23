@@ -12,8 +12,9 @@ import (
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/oss"
 )
 
+// ToKitexUser: convert db.User to common.User
 func ToKitexUser(ctx context.Context, curr_user_token string, db_user *db.User) (kitex_user *common.User, err error) {
-	// 复制用户信息
+	// 设置默认信息
 	default_avatar := oss.ToRealURL(ctx, "image/Avatar.png")
 	default_background_image := oss.ToRealURL(ctx, "image/Background.png")
 	default_signature := "This is my signature."
@@ -25,12 +26,11 @@ func ToKitexUser(ctx context.Context, curr_user_token string, db_user *db.User) 
 		Signature:       &default_signature,
 	}
 
-	// 协程补全
 	errChan := make(chan error)
 	publishInfoChan := make(chan *publish.GetPublishInfoByUserIdResponse)
 	followInfoChan := make(chan *relation.GetFollowInfoResponse)
 	favoriteInfoChan := make(chan *favorite.GetUserFavoriteInfoResponse)
-
+	// create goroutines to get publish info, follow info and favorite info
 	go func() {
 		publish_info, err := client.PublishRPC.GetPublishInfoByUserId(ctx, &publish.GetPublishInfoByUserIdRequest{UserId: db_user.ID})
 		if err != nil {
@@ -58,7 +58,7 @@ func ToKitexUser(ctx context.Context, curr_user_token string, db_user *db.User) 
 		}
 	}()
 
-	// 等待协程结束
+	// wait for goroutines to finish
 	for i := 0; i < 3; i++ {
 		select {
 		case err = <-errChan:

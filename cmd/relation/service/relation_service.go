@@ -26,6 +26,7 @@ func NewRelationService(ctx context.Context) *RelationService {
 	return &RelationService{ctx: ctx}
 }
 
+// RelationAction: follow or unfollow a user
 func (s *RelationService) RelationAction(request *relation.RelationActionRequest) (resp *relation.RelationActionResponse, err error) {
 	claim, err := Jwt.ExtractClaims(request.Token)
 	curr_user_id := claim.ID
@@ -59,6 +60,7 @@ func (s *RelationService) RelationAction(request *relation.RelationActionRequest
 	return pack.NewRelationActionResponse(errno.Success), nil
 }
 
+// RelationFollowList: get follow user list
 func (s *RelationService) RelationFollowList(request *relation.RelationFollowListRequest) (resp *relation.RelationFollowListResponse, err error) {
 	claim, err := Jwt.ExtractClaims(request.Token)
 	curr_user_id := claim.ID
@@ -81,6 +83,7 @@ func (s *RelationService) RelationFollowList(request *relation.RelationFollowLis
 	return resp, nil
 }
 
+// RelationFollowerList: get follower user list
 func (s *RelationService) RelationFollowerList(request *relation.RelationFollowerListRequest) (resp *relation.RelationFollowerListResponse, err error) {
 	claim, err := Jwt.ExtractClaims(request.Token)
 	curr_user_id := claim.ID
@@ -103,6 +106,7 @@ func (s *RelationService) RelationFollowerList(request *relation.RelationFollowe
 	return resp, nil
 }
 
+// RelationFriendList: get friend user list
 func (s *RelationService) RelationFriendList(request *relation.RelationFriendListRequest) (resp *relation.RelationFriendListResponse, err error) {
 	claim, err := Jwt.ExtractClaims(request.Token)
 	curr_user_id := claim.ID
@@ -125,6 +129,7 @@ func (s *RelationService) RelationFriendList(request *relation.RelationFriendLis
 	return resp, nil
 }
 
+// GetFollowInfo: get follow count, follower count and is_follow of a user
 func (s *RelationService) GetFollowInfo(request *relation.GetFollowInfoRequest) (resp *relation.GetFollowInfoResponse, err error) {
 	claim, err := Jwt.ExtractClaims(request.Token)
 	var curr_user_id int64

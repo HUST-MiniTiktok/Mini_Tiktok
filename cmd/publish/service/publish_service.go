@@ -10,7 +10,6 @@ import (
 
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/dal/db"
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/pack"
-	common "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/common"
 	publish "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/publish"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/errno"
@@ -42,6 +41,7 @@ func NewPublishService(ctx context.Context) *PublishService {
 	}
 }
 
+// PublishAction: publish a video
 func (s *PublishService) PublishAction(request *publish.PublishActionRequest) (resp *publish.PublishActionResponse, err error) {
 	claim, err := Jwt.ExtractClaims(request.Token)
 	author_id := claim.ID
@@ -49,19 +49,21 @@ func (s *PublishService) PublishAction(request *publish.PublishActionRequest) (r
 	if err != nil || claim.ID == 0 {
 		return pack.NewPublishActionResponse(errno.AuthorizationFailedErr), err
 	}
-
+	// generate filenames for video and cover
 	cover_filename := uuid.NewString() + ".png"
 	video_filename := uuid.NewString() + ".mp4"
+	// concurrent upload video and cover
 	err_chan := make(chan error)
 	ok := make(chan bool)
 	go func() {
+		// get cover data
 		cover_data, err := ffmpeg.GetVideoCover(request.Data)
 		if err != nil {
 			err_chan <- err
 			return
 		}
 		klog.Infof("cover_size=%v", strconv.FormatInt(int64(len(cover_data)), 10))
-
+		// upload cover
 		cover_buf := bytes.NewBuffer(cover_data)
 		cover_info, err := oss.PutToBucketWithBuf(s.ctx, ImageBucketName, cover_filename, cover_buf)
 		if err != nil {
@@ -72,6 +74,7 @@ func (s *PublishService) PublishAction(request *publish.PublishActionRequest) (r
 		ok <- true
 	}()
 	go func() {
+		// upload video
 		video_buf := bytes.NewBuffer(request.Data)
 		video_info, err := oss.PutToBucketWithBuf(s.ctx, VideoBucketName, video_filename, video_buf)
 		if err != nil {
@@ -104,6 +107,7 @@ func (s *PublishService) PublishAction(request *publish.PublishActionRequest) (r
 	return pack.NewPublishActionResponse(errno.Success), nil
 }
 
+// PublishList: get a list of videos published by a user
 func (s *PublishService) PublishList(request *publish.PublishListRequest) (resp *publish.PublishListResponse, err error) {
 	user_claims, err := Jwt.ExtractClaims(request.Token)
 	query_user_id := request.UserId
@@ -119,28 +123,9 @@ func (s *PublishService) PublishList(request *publish.PublishListRequest) (resp 
 		return pack.NewPublishListResponse(err), err
 	}
 
-	err_chan := make(chan error)
-	video_chan := make(chan *common.Video)
-	kitex_videos := make([]*common.Video, 0, len(db_videos))
-
-	for _, db_video := range db_videos {
-		go func(db_video *db.Video) {
-			kitex_video, err := pack.ToKitexVideo(s.ctx, db_video, curr_user_id)
-			if err != nil {
-				err_chan <- err
-			} else {
-				video_chan <- kitex_video
-			}
-		}(db_video)
-	}
-
-	for i := 0; i < len(db_videos); i++ {
-		select {
-		case err := <-err_chan:
-			return pack.NewPublishListResponse(err), err
-		case video := <-video_chan:
-			kitex_videos = append(kitex_videos, video)
-		}
+	kitex_videos, err := pack.ToKitexVideoList(s.ctx, curr_user_id, request.Token, db_videos)
+	if err != nil {
+		return pack.NewPublishListResponse(err), err
 	}
 
 	resp = pack.NewPublishListResponse(errno.Success)
@@ -162,7 +147,7 @@ func (s *PublishService) GetVideoById(request *publish.GetVideoByIdRequest) (res
 		return pack.NewGetVideoByIdResponse(err), err
 	}
 
-	kitex_video, err := pack.ToKitexVideo(s.ctx, db_video, curr_user_id)
+	kitex_video, err := pack.ToKitexVideo(s.ctx, curr_user_id, request.Token, db_video)
 	if err != nil {
 		return pack.NewGetVideoByIdResponse(err), err
 	}
@@ -186,28 +171,9 @@ func (s *PublishService) GetVideoByIdList(request *publish.GetVideoByIdListReque
 		return pack.NewGetVideoByIdListResponse(err), err
 	}
 
-	err_chan := make(chan error)
-	video_chan := make(chan *common.Video)
-	kitex_videos := make([]*common.Video, 0, len(db_videos))
-
-	for _, db_video := range db_videos {
-		go func(db_video *db.Video) {
-			kitex_video, err := pack.ToKitexVideo(s.ctx, db_video, curr_user_id)
-			if err != nil {
-				err_chan <- err
-			} else {
-				video_chan <- kitex_video
-			}
-		}(db_video)
-	}
-
-	for i := 0; i < len(db_videos); i++ {
-		select {
-		case err := <-err_chan:
-			return pack.NewGetVideoByIdListResponse(err), err
-		case video := <-video_chan:
-			kitex_videos = append(kitex_videos, video)
-		}
+	kitex_videos, err := pack.ToKitexVideoList(s.ctx, curr_user_id, request.Token, db_videos)
+	if err != nil {
+		return pack.NewGetVideoByIdListResponse(err), err
 	}
 
 	resp = pack.NewGetVideoByIdListResponse(errno.Success)
@@ -215,6 +181,7 @@ func (s *PublishService) GetVideoByIdList(request *publish.GetVideoByIdListReque
 	return resp, nil
 }
 
+// GetPublishInfoByUserId: get user work count and video id list
 func (s *PublishService) GetPublishInfoByUserId(request *publish.GetPublishInfoByUserIdRequest) (resp *publish.GetPublishInfoByUserIdResponse, err error) {
 	video_ids, err := db.GetVideoIdListByAuthorId(s.ctx, request.UserId)
 	if err != nil {

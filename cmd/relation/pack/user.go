@@ -9,11 +9,12 @@ import (
 	user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user"
 )
 
+// ToKitexUserList: get []*common.User from []user_ids
 func ToKitexUserList(ctx context.Context, curr_user_token string, user_ids []int64) ([]*common.User, error) {
-	// 协程补全
 	kitex_users := make([]*common.User, 0, len(user_ids))
 	errChan := make(chan error)
 	userChan := make(chan *common.User)
+	// create goroutines to get user info
 	for _, user_id := range user_ids {
 		go func(user_id int64) {
 			userResp, err := client.UserRPC.User(ctx, &user.UserRequest{UserId: user_id, Token: curr_user_token})
@@ -24,7 +25,7 @@ func ToKitexUserList(ctx context.Context, curr_user_token string, user_ids []int
 			}
 		}(user_id)
 	}
-	// 等待协程结束
+	// wait for goroutines to finish
 	for i := 0; i < len(user_ids); i++ {
 		select {
 		case err := <-errChan:
@@ -36,11 +37,12 @@ func ToKitexUserList(ctx context.Context, curr_user_token string, user_ids []int
 	return kitex_users, nil
 }
 
+// ToKitexFriendUserList: get []*common.FriendUser from []friend_user_ids
 func ToKitexFriendUserList(ctx context.Context, curr_user_token string, friend_user_ids []int64) ([]*common.FriendUser, error) {
-	// 协程补全
 	kitex_friend_users := make([]*common.FriendUser, 0, len(friend_user_ids))
 	errChan := make(chan error)
 	userChan := make(chan *common.FriendUser)
+	// create goroutines to get user info
 	for _, user_id := range friend_user_ids {
 		go func(user_id int64) {
 			userResp, err := client.UserRPC.User(ctx, &user.UserRequest{UserId: user_id, Token: curr_user_token})
@@ -71,7 +73,7 @@ func ToKitexFriendUserList(ctx context.Context, curr_user_token string, friend_u
 			}
 		}(user_id)
 	}
-	// 等待协程结束
+	// wait for goroutines to finish
 	for i := 0; i < len(friend_user_ids); i++ {
 		select {
 		case err := <-errChan:

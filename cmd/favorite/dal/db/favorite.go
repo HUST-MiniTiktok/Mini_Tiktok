@@ -21,11 +21,11 @@ func (Favorite) TableName() string {
 	return FavoriteTableName
 }
 
+// NewFavorite Create a new favorite record
 // status 返回0——成功，返回1——失败
 // err 返回nil——成功，返回其他——失败原因
 func NewFavorite(ctx context.Context, user_id int64, video_id int64) (status int32, err error) {
 
-	// 创建一条favorite数据
 	favorite := Favorite{
 		UserId:  user_id,
 		VideoId: video_id}
@@ -55,22 +55,10 @@ func NewFavorite(ctx context.Context, user_id int64, video_id int64) (status int
 	return 0, nil
 }
 
+// Cancel a favorite record
 func CancelFavorite(ctx context.Context, user_id int64, video_id int64) (status int32, err error) {
-	//先根据user_id和video_id寻找到id，再根据id软删除
-	var favorite Favorite
 
-	err = DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		//通过user_id和video_id找到要删除的favorite记录
-		if err := tx.WithContext(ctx).Model(&Favorite{}).Where(&Favorite{UserId: user_id, VideoId: video_id}).Scan(&favorite).Error; err != nil {
-			return err
-		}
-
-		if err := tx.WithContext(ctx).Model(&Favorite{}).Delete(&favorite).Error; err != nil { //删除这条favorite记录
-			return err
-		}
-		return nil
-	})
-
+	err = DB.WithContext(ctx).Model(&Favorite{}).Where("user_id = ? and video_id = ?", user_id, video_id).Delete(&Favorite{}).Error
 	if err != nil {
 		return 1, err
 	}
@@ -81,6 +69,7 @@ func CancelFavorite(ctx context.Context, user_id int64, video_id int64) (status 
 	return 0, nil
 }
 
+// CheckFavorite check if a user has favorited a video
 func CheckFavorite(ctx context.Context, user_id int64, video_id int64) (status bool, err error) {
 	var db_favorite Favorite
 	err = DB.WithContext(ctx).Model(&Favorite{}).Where("user_id = ? and video_id = ?", user_id, video_id).Limit(1).Find(&db_favorite).Error
@@ -90,6 +79,7 @@ func CheckFavorite(ctx context.Context, user_id int64, video_id int64) (status b
 	return db_favorite != Favorite{}, nil
 }
 
+// VideoFavoriteCount get the favorite count of a video
 func VideoFavoriteCount(ctx context.Context, video_id int64) (count int64, err error) {
 
 	if RDExistVideoFavoriteCount(video_id) {
@@ -106,6 +96,7 @@ func VideoFavoriteCount(ctx context.Context, video_id int64) (count int64, err e
 	return count, nil
 }
 
+// UserFavoriteCount get the favorite count of a user
 func UserFavoriteCount(ctx context.Context, user_id int64) (count int64, err error) {
 
 	if RDExistUserFavoriteCount(user_id) {
@@ -122,6 +113,7 @@ func UserFavoriteCount(ctx context.Context, user_id int64) (count int64, err err
 	return count, nil
 }
 
+// GetFavoriteList get the favorite list of a user
 func GetFavoriteList(ctx context.Context, user_id int64) (status int32, videoIDList []int64, err error) { //仅返回videoID
 
 	var favoriteList []Favorite
