@@ -13,10 +13,7 @@ services:
       - MYSQL_USER=mini_tiktok_user
       - MYSQL_PASSWORD=mini_tiktok_pass
       - MYSQL_RANDOM_ROOT_PASSWORD="yes"
-    restart: always
-    profiles:
-      - dev
-      - release
+    restart: unless-stopped
 
   minio:
     image: minio/minio
@@ -32,10 +29,7 @@ services:
       - ./docker/minio/config/:/root/.minio
     command: server --console-address ':9001' /data
     privileged: true
-    restart: always
-    profiles:
-      - dev
-      - release
+    restart: unless-stopped
 
   redis:
     image: redis:alpine
@@ -47,9 +41,6 @@ services:
       - ./docker/redis/data/:/data
     command: redis-server /usr/local/etc/redis/redis.conf
     restart: always
-    profiles:
-      - dev
-      - release
 
   etcd:
     image: bitnami/etcd:latest
@@ -57,7 +48,7 @@ services:
     ports:
       - "12004:2379"
       - "12005:2380"
-    restart: always
+    restart: unless-stopped
     environment:
       - TZ=Asia/Shanghai
       - ALLOW_NONE_AUTHENTICATION=yes
@@ -66,6 +57,3 @@ services:
       - ETCD_LISTEN_PEER_URLS=http://0.0.0.0:2380
       - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
       - ETCD_ADVERTISE_CLIENT_URLS=http://etcd1:2379
-    profiles:
-      - dev
-      - release
