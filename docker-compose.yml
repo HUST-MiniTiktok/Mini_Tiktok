@@ -5,7 +5,9 @@ services:
     image: 'mysql:latest'
     container_name: tiktok_mysql
     volumes:
-      - ./docker/mysql/sql:/docker-entrypoint-initdb.d
+      - ./docker/mysql/data:/var/lib/mysql
+      - /etc/localtime:/etc/localtime:ro
+
     ports:
       - "12000:3306"
     environment:

@@ -16,11 +16,12 @@ do
 done
 
 # step 2. start docker compose
-echo "Starting docker compose..."
+echo "Starting docker compose ..."
 docker compose up -d
+sleep 10
 
 # step 3. start all services and API gateway
-echo "Starting all services and API gateway..."
+echo "Starting all services and API gateway ..."
 for file in `ls cmd`
 do
     if [ -d "cmd/$file" ]
@@ -32,4 +33,5 @@ do
 done
 
 # step 4. show all services and API gateway
+echo "Showing all services and API gateway ..."
 screen -ls

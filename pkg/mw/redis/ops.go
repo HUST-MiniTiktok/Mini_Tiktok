@@ -254,7 +254,7 @@ func (c *RDClient) HDecr(key string, field string, num int64) bool {
 }
 
 func (c *RDClient) HExpire(key string, exp time.Duration) bool {
-	err := c.Client.Expire(key, exp)
+	err := c.Client.Expire(key, exp).Err()
 	if err != nil {
 		klog.Errorf("HExpire key %s failed: %v", key, err)
 		return false
