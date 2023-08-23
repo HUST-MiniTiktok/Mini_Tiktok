@@ -2,6 +2,13 @@
 
 # This script is used to build and start all services and API gateway
 
+# Step 0. check and install screen
+echo "Checking and installing screen ..."
+if [ ! -x "$(command -v screen)" ]; then
+    echo "Installing screen ..."
+    sudo apt-get install screen -y
+fi
+
 # Step 1. build all services and API gateway
 echo "Building all services and API gateway ..."
 for file in `ls cmd`
