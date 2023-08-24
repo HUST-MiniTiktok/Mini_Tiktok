@@ -13,6 +13,7 @@ import (
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/retry"
 	etcd "github.com/kitex-contrib/registry-etcd"
+	opentracing "github.com/kitex-contrib/tracer-opentracing"
 )
 
 type MessageClient struct {
@@ -26,6 +27,7 @@ func NewMessageClient() (messageClient *MessageClient) {
 	}
 	c, err := messageservice.NewClient("message",
 		client.WithResolver(r),
+		client.WithSuite(opentracing.NewDefaultClientSuite()),
 		client.WithMiddleware(kitex.CommonMiddleware),
 		client.WithInstanceMW(kitex.ClientMiddleware),
 		client.WithMuxConnection(1),

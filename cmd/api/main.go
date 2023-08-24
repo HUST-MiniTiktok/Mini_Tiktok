@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/errno"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/tracer"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/middlewares/server/recovery"
 	"github.com/cloudwego/hertz/pkg/app/server"
@@ -15,6 +16,7 @@ import (
 )
 
 func main() {
+	tracer.InitJaeger("api")
 	h := server.Default(
 		server.WithStreamBody(true),
 	)

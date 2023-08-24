@@ -7,13 +7,16 @@ import (
 	message "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/message/messageservice"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/kitex"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/tracer"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
 	etcd "github.com/kitex-contrib/registry-etcd"
+	opentracing "github.com/kitex-contrib/tracer-opentracing"
 )
 
 func main() {
+	tracer.InitJaeger("message")
 	dal.Init()
 
 	addr, err := net.ResolveTCPAddr("tcp", "127.0.0.1:8886")
@@ -32,6 +35,7 @@ func main() {
 		server.WithMiddleware(kitex.CommonMiddleware),
 		server.WithMiddleware(kitex.ServerMiddleware),
 		server.WithMuxTransport(),
+		server.WithSuite(opentracing.NewDefaultServerSuite()),
 		server.WithRegistry(r),
 	)
 

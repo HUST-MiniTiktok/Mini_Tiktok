@@ -13,6 +13,7 @@ import (
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/retry"
 	etcd "github.com/kitex-contrib/registry-etcd"
+	opentracing "github.com/kitex-contrib/tracer-opentracing"
 )
 
 type FavoriteClient struct {
@@ -26,6 +27,7 @@ func NewFavoriteClient() (favoriteClient *FavoriteClient) {
 	}
 	c, err := favoriteservice.NewClient("favorite",
 		client.WithResolver(r),
+		client.WithSuite(opentracing.NewDefaultClientSuite()),
 		client.WithMiddleware(kitex.CommonMiddleware),
 		client.WithInstanceMW(kitex.ClientMiddleware),
 		client.WithMuxConnection(1),

@@ -3,7 +3,7 @@ version: '3'
 services:
   mysql:
     image: 'mysql:latest'
-    container_name: tiktok_mysql
+    container_name: mini_tiktok_mysql
     volumes:
       - ./docker/mysql/data:/var/lib/mysql
       - /etc/localtime:/etc/localtime:ro
@@ -19,7 +19,7 @@ services:
 
   minio:
     image: minio/minio
-    container_name: tiktok_minio
+    container_name: mini_tiktok_minio
     ports:
       - "12001:9000"
       - "12002:9001"
@@ -35,7 +35,7 @@ services:
 
   redis:
     image: redis:alpine
-    container_name: tiktok_redis
+    container_name: mini_tiktok_redis
     ports:
       - "12003:6379"
     volumes:
@@ -46,7 +46,7 @@ services:
 
   etcd:
     image: bitnami/etcd:latest
-    container_name: tiktok_etcd
+    container_name: mini_tiktok_etcd
     ports:
       - "12004:2379"
       - "12005:2380"
@@ -59,3 +59,10 @@ services:
       - ETCD_LISTEN_PEER_URLS=http://0.0.0.0:2380
       - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
       - ETCD_ADVERTISE_CLIENT_URLS=http://etcd1:2379
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: mini_tiktok_jaeger
+    ports:
+      - "12006:6831/udp"
+      - "12007:16686"

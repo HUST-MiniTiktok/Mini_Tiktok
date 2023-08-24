@@ -14,7 +14,6 @@ db:
       relation: 2
       comment: 3
 
-
 oss:
     endpoint: "ti.geektip.cc:12001"
     accesskey: "mini_tiktok_user"
@@ -30,3 +29,8 @@ registry:
 
 jwt:
   signingkey: "mini_tiktok"
+
+tracer:
+  jaeger:
+    host: "127.0.0.1"
+    port: "12006"

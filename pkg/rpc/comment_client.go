@@ -13,6 +13,7 @@ import (
 	"github.com/cloudwego/kitex/pkg/klog"
 	"github.com/cloudwego/kitex/pkg/retry"
 	etcd "github.com/kitex-contrib/registry-etcd"
+	opentracing "github.com/kitex-contrib/tracer-opentracing"
 )
 
 type CommentClient struct {
@@ -26,6 +27,7 @@ func NewCommentClient() (commentClient *CommentClient) {
 	}
 	c, err := commentservice.NewClient("comment",
 		client.WithResolver(r),
+		client.WithSuite(opentracing.NewDefaultClientSuite()),
 		client.WithMiddleware(kitex.CommonMiddleware),
 		client.WithInstanceMW(kitex.ClientMiddleware),
 		client.WithMuxConnection(1),

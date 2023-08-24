@@ -12,6 +12,7 @@ import (
 	"github.com/cloudwego/kitex/client"
 	"github.com/cloudwego/kitex/pkg/klog"
 	etcd "github.com/kitex-contrib/registry-etcd"
+	opentracing "github.com/kitex-contrib/tracer-opentracing"
 )
 
 type PublishClient struct {
@@ -25,6 +26,7 @@ func NewPublishClient() (publishClient *PublishClient) {
 	}
 	c, err := publishservice.NewClient("publish",
 		client.WithResolver(r),
+		client.WithSuite(opentracing.NewDefaultClientSuite()),
 		client.WithMiddleware(kitex.CommonMiddleware),
 		client.WithInstanceMW(kitex.ClientMiddleware),
 		client.WithMuxConnection(1),

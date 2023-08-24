@@ -8,6 +8,8 @@ require (
 	github.com/apache/thrift v0.13.0
 	github.com/cloudwego/kitex v0.6.2
 	github.com/google/uuid v1.3.0
+	github.com/opentracing/opentracing-go v1.2.0
+	github.com/uber/jaeger-client-go v2.29.1+incompatible
 	gorm.io/gorm v1.25.3
 )
 
@@ -32,8 +34,8 @@ require (
 	github.com/minio/sha256-simd v1.0.1 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/nyaruka/phonenumbers v1.0.55 // indirect
-	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rs/xid v1.5.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/spf13/afero v1.9.5 // indirect
@@ -42,6 +44,7 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.4.2 // indirect
 	github.com/u2takey/go-utils v0.3.1 // indirect
+	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
 	go.etcd.io/etcd/api/v3 v3.5.9 // indirect
 	go.etcd.io/etcd/client/pkg/v3 v3.5.9 // indirect
 	go.etcd.io/etcd/client/v3 v3.5.9 // indirect
@@ -71,6 +74,7 @@ require (
 	github.com/jhump/protoreflect v1.8.2 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kitex-contrib/registry-etcd v0.1.0
+	github.com/kitex-contrib/tracer-opentracing v0.0.3
 	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
 	github.com/minio/minio-go/v7 v7.0.61
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
