@@ -7,10 +7,10 @@ services:
     volumes:
       - ./docker/mysql/data:/var/lib/mysql
       - /etc/localtime:/etc/localtime:ro
-
     ports:
       - "12000:3306"
     environment:
+      - TZ=Asia/Shanghai
       - MYSQL_DATABASE=mini_tiktok
       - MYSQL_USER=mini_tiktok_user
       - MYSQL_PASSWORD=mini_tiktok_pass
