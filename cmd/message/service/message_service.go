@@ -53,6 +53,7 @@ func (s *MessageService) MessageChat(request *message.MessageChatRequest) (resp 
 
 // MessageAction: send message to friend user
 func (s *MessageService) MessageAction(request *message.MessageActionRequest) (resp *message.MessageActionResponse, err error) {
+	curr_time := time.Now()
 	user_claims, err := Jwt.ExtractClaims(request.Token)
 	from_user_id := user_claims.ID
 	if err != nil {
@@ -71,7 +72,7 @@ func (s *MessageService) MessageAction(request *message.MessageActionRequest) (r
 		return pack.NewMessageActionResponse(errno.UserIsNotExistErr), errno.UserIsNotExistErr
 	}
 
-	db_message := db.Message{FromUserId: from_user_id, ToUserId: request.ToUserId, Content: request.Content, CreatedAt: time.Now().Add(-time.Second)}
+	db_message := db.Message{FromUserId: from_user_id, ToUserId: request.ToUserId, Content: request.Content, CreatedAt: curr_time.Add(-time.Second)}
 	_, err = db.CreateMessage(s.ctx, &db_message)
 	if err != nil {
 		return pack.NewMessageActionResponse(err), err
