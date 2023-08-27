@@ -56,6 +56,7 @@ require (
 )
 
 require (
+	bou.ke/monkey v1.0.2
 	github.com/bytedance/gopkg v0.0.0-20230531144706-a12972768317 // indirect
 	github.com/bytedance/sonic v1.8.8 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
