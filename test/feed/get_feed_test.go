@@ -24,7 +24,7 @@ func TestFeed(t *testing.T) {
 	})
 	defer monkey.Unpatch(pack.ToKitexVideo)
 
-	resp, err := FeedService.GetFeed(&feed.FeedRequest{})
+	resp, err := FeedService.GetFeed(&feed.FeedRequest{Token: &DemoUser.Token})
 	if err != nil {
 		t.Fatal(err)
 	}

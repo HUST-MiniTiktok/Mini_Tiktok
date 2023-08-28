@@ -8,9 +8,7 @@ import (
 	publish_dal "github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/dal"
 	publish_service "github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/service"
 
-	user_dal "github.com/HUST-MiniTiktok/mini_tiktok/cmd/user/dal"
-	user_service "github.com/HUST-MiniTiktok/mini_tiktok/cmd/user/service"
-	user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user"
+	jwt "github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/jwt"
 )
 
 type DemoUserType struct {
@@ -29,9 +27,11 @@ type DemoVideoType struct {
 
 var (
 	ctx            = context.Background()
+	Jwt            = jwt.NewJWT()
 	PublishService *publish_service.PublishService
-	UserService    *user_service.UserService
-	DemoUser       = DemoUserType{
+
+	DemoUser = DemoUserType{
+		Id:       101,
 		UserName: "demo@mail.com",
 		Password: "demopassword",
 	}
@@ -44,9 +44,8 @@ var (
 func TestMain(m *testing.M) {
 	os.Setenv("GO_ENV", "test")
 	publish_dal.Init()
-	user_dal.Init()
+
 	PublishService = publish_service.NewPublishService(ctx)
-	UserService = user_service.NewUserService(ctx)
 
 	DoLogin()
 	DoLoadVideo()
@@ -63,15 +62,11 @@ func TestMainOrder(t *testing.T) {
 }
 
 func DoLogin() {
-	resp, err := UserService.Login(&user.UserLoginRequest{
-		Username: DemoUser.UserName,
-		Password: DemoUser.Password,
-	})
+	token, err := Jwt.CreateToken(jwt.UserClaims{ID: DemoUser.Id})
 	if err != nil {
 		panic(err)
 	}
-	DemoUser.Token = resp.GetToken()
-	DemoUser.Id = resp.GetUserId()
+	DemoUser.Token = token
 }
 
 func DoLoadVideo() {

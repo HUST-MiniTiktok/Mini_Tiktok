@@ -5,12 +5,10 @@ import (
 	"os"
 	"testing"
 
-	relation_dal "github.com/HUST-MiniTiktok/mini_tiktok/cmd/relation/dal"
-	relation_service "github.com/HUST-MiniTiktok/mini_tiktok/cmd/relation/service"
+	dal "github.com/HUST-MiniTiktok/mini_tiktok/cmd/relation/dal"
+	service "github.com/HUST-MiniTiktok/mini_tiktok/cmd/relation/service"
 
-	user_dal "github.com/HUST-MiniTiktok/mini_tiktok/cmd/user/dal"
-	user_service "github.com/HUST-MiniTiktok/mini_tiktok/cmd/user/service"
-	user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user"
+	jwt "github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/jwt"
 )
 
 type DemoUserType struct {
@@ -22,41 +20,32 @@ type DemoUserType struct {
 
 var (
 	ctx             = context.Background()
-	RelationService *relation_service.RelationService
-	UserService     *user_service.UserService
+	Jwt             = jwt.NewJWT()
+	RelationService *service.RelationService
 	DemoUserList    = []DemoUserType{
-		{UserName: "demo1@mail.com", Password: "demopass1"},
-		{UserName: "demo2@mail.com", Password: "demopass2"},
-		{UserName: "demo3@mail.com", Password: "demopass3"},
+		{Id: 11, UserName: "demo1@mail.com", Password: "demopass1"},
+		{Id: 12, UserName: "demo2@mail.com", Password: "demopass2"},
+		{Id: 13, UserName: "demo3@mail.com", Password: "demopass3"},
 	}
 )
 
 func TestMain(m *testing.M) {
 	os.Setenv("GO_ENV", "test")
-	relation_dal.Init()
-	user_dal.Init()
-	RelationService = relation_service.NewRelationService(ctx)
-	UserService = user_service.NewUserService(ctx)
+	dal.Init()
+	RelationService = service.NewRelationService(ctx)
 
-	DoRegister()
+	DoLogin()
 
 	code := m.Run()
 	os.Exit(code)
 }
 
-func DoRegister() {
-	for _, u := range DemoUserList {
-		resp, err := UserService.Register(&user.UserRegisterRequest{
-			Username: u.UserName,
-			Password: u.Password,
-		})
+func DoLogin() {
+	for _, user := range DemoUserList {
+		token, err := Jwt.CreateToken(jwt.UserClaims{ID: user.Id})
 		if err != nil {
 			panic(err)
 		}
-		if resp == nil {
-			panic("resp is nil")
-		}
-		u.Token = resp.GetToken()
-		u.Id = resp.GetUserId()
+		user.Token = token
 	}
 }
