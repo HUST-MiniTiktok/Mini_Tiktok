@@ -6,7 +6,7 @@ import (
 	publish "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/publish"
 )
 
-func TestGetInfoByUser(t *testing.T) {
+func TestGetPublishInfoByUser(t *testing.T) {
 	resp, err := PublishService.GetPublishInfoByUserId(&publish.GetPublishInfoByUserIdRequest{UserId: DemoUser.Id})
 	if err != nil {
 		t.Fatal(err)

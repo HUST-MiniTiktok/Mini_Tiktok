@@ -58,7 +58,7 @@ func TestMainOrder(t *testing.T) {
 	t.Run("publish_action", TestPublishAction)
 	t.Run("publish_list", TestPublishList)
 	t.Run("get_video_by_id", TestGetVideoById)
-	t.Run("get_info_by_user", TestGetInfoByUser)
+	t.Run("get_publish_info_by_user", TestGetPublishInfoByUser)
 }
 
 func DoLogin() {
