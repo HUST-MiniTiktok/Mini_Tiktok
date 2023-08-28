@@ -7,7 +7,7 @@ import (
 )
 
 func TestLogin(t *testing.T) {
-	resp, err := UserService.Login(ctx, &user.UserLoginRequest{
+	resp, err := UserService.Login(&user.UserLoginRequest{
 		Username: DemoUserName,
 		Password: DemoPassword,
 	})

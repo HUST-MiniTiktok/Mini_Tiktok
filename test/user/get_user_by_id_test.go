@@ -21,7 +21,7 @@ func TestGetUser(t *testing.T) {
 	})
 	defer monkey.Unpatch(pack.ToKitexUser)
 
-	resp, err := UserService.GetUserById(ctx, &user.UserRequest{
+	resp, err := UserService.GetUserById(&user.UserRequest{
 		UserId: id,
 		Token:  token,
 	})

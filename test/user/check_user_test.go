@@ -7,7 +7,7 @@ import (
 )
 
 func TestCheckUser(t *testing.T) {
-	resp, err := UserService.CheckUserIsExist(ctx, &user.CheckUserIsExistRequest{
+	resp, err := UserService.CheckUserIsExist(&user.CheckUserIsExistRequest{
 		UserId: id,
 	})
 	if err != nil {

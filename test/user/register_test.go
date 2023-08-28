@@ -7,7 +7,7 @@ import (
 )
 
 func TestRegister(t *testing.T) {
-	resp, err := UserService.Register(ctx, &user.UserRegisterRequest{
+	resp, err := UserService.Register(&user.UserRegisterRequest{
 		Username: DemoUserName,
 		Password: DemoPassword,
 	})
