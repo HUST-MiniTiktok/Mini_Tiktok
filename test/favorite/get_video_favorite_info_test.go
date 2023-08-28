@@ -19,7 +19,7 @@ import (
 // }
 
 func TestGetVideoFavoriteInfo(t *testing.T) {
-	resp, err := FavoriteService.GetVideoFavoriteInfo(&favorite.GetVideoFavoriteInfoRequest{UserId: id, VideoId: video_id})
+	resp, err := FavoriteService.GetVideoFavoriteInfo(&favorite.GetVideoFavoriteInfoRequest{UserId: DemoUser.Id, VideoId: DemoVideo.Id})
 	if err != nil {
 		t.Fatal(err)
 	}

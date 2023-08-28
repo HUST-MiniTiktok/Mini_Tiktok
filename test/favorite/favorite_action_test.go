@@ -15,8 +15,8 @@ import (
 // Action type: 1: 点赞 2: 取消点赞
 func TestFavoriteAction1(t *testing.T) {
 	resp, err := FavoriteService.FavoriteAction(&favorite.FavoriteActionRequest{
-		Token:      token,
-		VideoId:    video_id,
+		Token:      DemoUser.Token,
+		VideoId:    DemoVideo.Id,
 		ActionType: 1,
 	})
 	if err != nil {
@@ -30,8 +30,8 @@ func TestFavoriteAction1(t *testing.T) {
 
 func TestFavoriteAction2(t *testing.T) {
 	resp, err := FavoriteService.FavoriteAction(&favorite.FavoriteActionRequest{
-		Token:      token,
-		VideoId:    video_id,
+		Token:      DemoUser.Token,
+		VideoId:    DemoVideo.Id,
 		ActionType: 2,
 	})
 	if err != nil {

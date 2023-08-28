@@ -5,35 +5,26 @@ import (
 	"testing"
 
 	"bou.ke/monkey"
-	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/dal/db"
-	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/feed/pack"
+	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/favorite/pack"
 	"github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/common"
 	favorite "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/favorite"
-	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/oss"
 )
 
-// type FavoriteListRequest struct {
-// 	UserId int64  `thrift:"user_id,1" frugal:"1,default,i64" json:"user_id"`
-// 	Token  string `thrift:"token,2" frugal:"2,default,string" json:"token"`
-// }
-// type FavoriteListResponse struct {
-// 	StatusCode int32           `thrift:"status_code,1" frugal:"1,default,i32" json:"status_code"`
-// 	StatusMsg  *string         `thrift:"status_msg,2,optional" frugal:"2,optional,string" json:"status_msg,omitempty"`
-// 	VideoList  []*common.Video `thrift:"video_list,3" frugal:"3,default,list<common.Video>" json:"video_list"`
-// }
-
 func TestFavoriteList(t *testing.T) {
-	monkey.Patch(pack.ToKitexVideo, func(ctx context.Context, curr_user_id int64, curr_user_token string, db_video *db.Video) (*common.Video, error) {
-		return &common.Video{
-			Id:       db_video.ID,
-			PlayUrl:  oss.ToRealURL(ctx, db_video.PlayURL),
-			CoverUrl: oss.ToRealURL(ctx, db_video.CoverURL),
-			Title:    db_video.Title,
-		}, nil
+	monkey.Patch(pack.GetVideoByIdList, func(ctx context.Context, videoIDList []int64, token string) (VideoList []*common.Video, err error) {
+		vlist := make([]*common.Video, 0, 1)
+		v := &common.Video{
+			Id: DemoVideo.Id,
+			// PlayUrl:  DemoVideo.PlayUrl,
+			// CoverUrl: DemoVideo.CoverUrl,
+			// Title:    DemoVideo.Title,
+		}
+		vlist = append(vlist, v)
+		return vlist, nil
 	})
-	defer monkey.Unpatch(pack.ToKitexVideo)
+	defer monkey.Unpatch(pack.GetVideoByIdList)
 
-	resp, err := FavoriteService.FavoriteList(&favorite.FavoriteListRequest{UserId: id, Token: token})
+	resp, err := FavoriteService.FavoriteList(&favorite.FavoriteListRequest{UserId: DemoUser.Id, Token: DemoUser.Token})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -44,5 +35,4 @@ func TestFavoriteList(t *testing.T) {
 		t.Fatal("video_list is empty")
 	}
 	t.Logf("Favorite_list response: %v", resp)
-	// video_id = resp.GetVideoList()[0].GetId()
 }

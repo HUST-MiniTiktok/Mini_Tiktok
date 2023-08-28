@@ -3,11 +3,9 @@ package service
 import (
 	"context"
 
-	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/favorite/client"
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/favorite/dal/db"
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/favorite/pack"
 	favorite "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/favorite"
-	publish "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/publish"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/errno"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/jwt"
 )
@@ -63,12 +61,12 @@ func (s *FavoriteService) FavoriteList(req *favorite.FavoriteListRequest) (resp 
 		return pack.NewFavoriteListResponse(err), err
 	}
 
-	videosResponse, err := client.PublishRPC.GetVideoByIdList(s.ctx, &publish.GetVideoByIdListRequest{Id: videoIDList, Token: req.Token})
+	videolist, err := pack.GetVideoByIdList(s.ctx, videoIDList, req.Token)
 	if err != nil {
 		return pack.NewFavoriteListResponse(err), err
 	} else {
 		resp = pack.NewFavoriteListResponse(errno.Success)
-		resp.VideoList = videosResponse.VideoList
+		resp.VideoList = videolist
 		return resp, nil
 	}
 }
@@ -93,11 +91,11 @@ func (s *FavoriteService) GetVideoFavoriteInfo(req *favorite.GetVideoFavoriteInf
 
 // GetUserFavoriteInfo: get totalFavorited and favoriteCount of a user
 func (s *FavoriteService) GetUserFavoriteInfo(req *favorite.GetUserFavoriteInfoRequest) (resp *favorite.GetUserFavoriteInfoResponse, err error) {
-	publishInfoResp, err := client.PublishRPC.GetPublishInfoByUserId(s.ctx, &publish.GetPublishInfoByUserIdRequest{UserId: req.UserId})
+	user_work_ids, err := pack.GetPublishInfoByUserId(s.ctx, req.UserId)
 	if err != nil {
 		return pack.NewGetUserFavoriteInfoResponse(err), err
 	}
-	user_work_ids := publishInfoResp.VideoIds
+
 	var favorite_count int64 = 0
 	var favorited_count int64 = 0
 	// Get favorited count, concurrently call db.VideoFavoriteCount
