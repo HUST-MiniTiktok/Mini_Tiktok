@@ -9,13 +9,20 @@ import (
 	service "github.com/HUST-MiniTiktok/mini_tiktok/cmd/user/service"
 )
 
+type DemoUserType struct {
+	Id       int64
+	UserName string
+	Password string
+	Token    string
+}
+
 var (
-	ctx          = context.Background()
-	UserService  *service.UserService
-	DemoUserName = "demo@gmail.com"
-	DemoPassword = "demo!Password"
-	token        string
-	id           int64
+	ctx         = context.Background()
+	UserService *service.UserService
+	DemoUser    = DemoUserType{
+		UserName: "demo@mail.com",
+		Password: "demopassword",
+	}
 )
 
 func TestMain(m *testing.M) {

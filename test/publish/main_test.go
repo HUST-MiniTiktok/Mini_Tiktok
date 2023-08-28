@@ -7,23 +7,38 @@ import (
 
 	publish_dal "github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/dal"
 	publish_service "github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/service"
+
 	user_dal "github.com/HUST-MiniTiktok/mini_tiktok/cmd/user/dal"
 	user_service "github.com/HUST-MiniTiktok/mini_tiktok/cmd/user/service"
 	user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user"
 )
 
+type DemoUserType struct {
+	Id       int64
+	UserName string
+	Password string
+	Token    string
+}
+
+type DemoVideoType struct {
+	Id    int64
+	Title string
+	Data  []byte
+	Path  string
+}
+
 var (
 	ctx            = context.Background()
 	PublishService *publish_service.PublishService
 	UserService    *user_service.UserService
-	DemoUserName   = "demo@gmail.com"
-	DemoPassword   = "demo!Password"
-	DemoVideoData  []byte
-	DemoVideoFile  = "bear.mp4"
-	DemoVideoTitle = "bear"
-	token          string
-	id             int64
-	video_id       int64
+	DemoUser       = DemoUserType{
+		UserName: "demo@mail.com",
+		Password: "demopassword",
+	}
+	DemoVideo = DemoVideoType{
+		Title: "bear",
+		Path:  "bear.mp4",
+	}
 )
 
 func TestMain(m *testing.M) {
@@ -32,6 +47,7 @@ func TestMain(m *testing.M) {
 	user_dal.Init()
 	PublishService = publish_service.NewPublishService(ctx)
 	UserService = user_service.NewUserService(ctx)
+
 	DoLogin()
 	DoLoadVideo()
 
@@ -48,20 +64,21 @@ func TestMainOrder(t *testing.T) {
 
 func DoLogin() {
 	resp, err := UserService.Login(&user.UserLoginRequest{
-		Username: DemoUserName,
-		Password: DemoPassword,
+		Username: DemoUser.UserName,
+		Password: DemoUser.Password,
 	})
 	if err != nil {
 		panic(err)
 	}
-	token = resp.GetToken()
-	id = resp.GetUserId()
+	DemoUser.Token = resp.GetToken()
+	DemoUser.Id = resp.GetUserId()
 }
 
 func DoLoadVideo() {
 	var err error
-	DemoVideoData, err = os.ReadFile(DemoVideoFile)
+	data, err := os.ReadFile(DemoVideo.Path)
 	if err != nil {
 		panic(err)
 	}
+	DemoVideo.Data = data
 }

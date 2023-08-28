@@ -24,7 +24,7 @@ func TestGetVideoById(t *testing.T) {
 	})
 	defer monkey.Unpatch(pack.ToKitexVideo)
 
-	resp, err := PublishService.GetVideoById(&publish.GetVideoByIdRequest{Token: token, Id: video_id})
+	resp, err := PublishService.GetVideoById(&publish.GetVideoByIdRequest{Token: DemoUser.Token, Id: DemoVideo.Id})
 	if err != nil {
 		t.Fatal(err)
 	}

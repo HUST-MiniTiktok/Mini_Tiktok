@@ -8,8 +8,8 @@ import (
 
 func TestLogin(t *testing.T) {
 	resp, err := UserService.Login(&user.UserLoginRequest{
-		Username: DemoUserName,
-		Password: DemoPassword,
+		Username: DemoUser.UserName,
+		Password: DemoUser.Password,
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -18,6 +18,6 @@ func TestLogin(t *testing.T) {
 		t.Fatal("resp is nil")
 	}
 	t.Logf("login response: %v", resp)
-	token = resp.Token
-	id = resp.UserId
+	DemoUser.Token = resp.Token
+	DemoUser.Id = resp.UserId
 }

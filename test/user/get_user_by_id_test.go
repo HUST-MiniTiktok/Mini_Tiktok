@@ -22,8 +22,8 @@ func TestGetUser(t *testing.T) {
 	defer monkey.Unpatch(pack.ToKitexUser)
 
 	resp, err := UserService.GetUserById(&user.UserRequest{
-		UserId: id,
-		Token:  token,
+		UserId: DemoUser.Id,
+		Token:  DemoUser.Token,
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -35,7 +35,7 @@ func TestGetUser(t *testing.T) {
 	if resp.User == nil {
 		t.Fatal("user is nil")
 	}
-	if resp.User.GetId() != id || resp.User.GetName() != DemoUserName {
+	if resp.User.GetId() != DemoUser.Id || resp.User.GetName() != DemoUser.UserName {
 		t.Fatal("get user info not match")
 	}
 }

@@ -24,7 +24,7 @@ func TestPublishList(t *testing.T) {
 	})
 	defer monkey.Unpatch(pack.ToKitexVideo)
 
-	resp, err := PublishService.PublishList(&publish.PublishListRequest{Token: token, UserId: id})
+	resp, err := PublishService.PublishList(&publish.PublishListRequest{Token: DemoUser.Token, UserId: DemoUser.Id})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -35,5 +35,5 @@ func TestPublishList(t *testing.T) {
 		t.Fatal("video_list is empty")
 	}
 	t.Logf("publish_list response: %v", resp)
-	video_id = resp.GetVideoList()[0].GetId()
+	DemoVideo.Id = resp.GetVideoList()[0].GetId()
 }

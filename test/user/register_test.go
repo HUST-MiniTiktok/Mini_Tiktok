@@ -8,8 +8,8 @@ import (
 
 func TestRegister(t *testing.T) {
 	resp, err := UserService.Register(&user.UserRegisterRequest{
-		Username: DemoUserName,
-		Password: DemoPassword,
+		Username: DemoUser.UserName,
+		Password: DemoUser.Password,
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -18,6 +18,6 @@ func TestRegister(t *testing.T) {
 		t.Fatal("resp is nil")
 	}
 	t.Logf("register response: %v", resp)
-	token = resp.Token
-	id = resp.UserId
+	DemoUser.Token = resp.Token
+	DemoUser.Id = resp.UserId
 }

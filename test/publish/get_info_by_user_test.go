@@ -7,7 +7,7 @@ import (
 )
 
 func TestGetInfoByUser(t *testing.T) {
-	resp, err := PublishService.GetPublishInfoByUserId(&publish.GetPublishInfoByUserIdRequest{UserId: id})
+	resp, err := PublishService.GetPublishInfoByUserId(&publish.GetPublishInfoByUserIdRequest{UserId: DemoUser.Id})
 	if err != nil {
 		t.Fatal(err)
 	}

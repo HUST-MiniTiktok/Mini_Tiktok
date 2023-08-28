@@ -8,9 +8,9 @@ import (
 
 func TestPublishAction(t *testing.T) {
 	resp, err := PublishService.PublishAction(&publish.PublishActionRequest{
-		Token: token,
-		Data:  DemoVideoData,
-		Title: DemoVideoTitle,
+		Token: DemoUser.Token,
+		Data:  DemoVideo.Data,
+		Title: DemoVideo.Title,
 	})
 	if err != nil {
 		t.Fatal(err)
