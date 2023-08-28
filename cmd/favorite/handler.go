@@ -13,27 +13,27 @@ type FavoriteServiceImpl struct{}
 // FavoriteAction implements the FavoriteServiceImpl interface.
 func (s *FavoriteServiceImpl) FavoriteAction(ctx context.Context, request *favorite.FavoriteActionRequest) (resp *favorite.FavoriteActionResponse, err error) {
 	favorite_service := service.NewFavoriteService(ctx)
-	resp, err = favorite_service.FavoriteAction(ctx, request)
+	resp, err = favorite_service.FavoriteAction(request)
 	return
 }
 
 // FavoriteList implements the FavoriteServiceImpl interface.
 func (s *FavoriteServiceImpl) FavoriteList(ctx context.Context, request *favorite.FavoriteListRequest) (resp *favorite.FavoriteListResponse, err error) {
 	favorite_service := service.NewFavoriteService(ctx)
-	resp, err = favorite_service.FavoriteList(ctx, request)
+	resp, err = favorite_service.FavoriteList(request)
 	return
 }
 
 // GetFavoriteInfo implements the FavoriteServiceImpl interface.
 func (s *FavoriteServiceImpl) GetVideoFavoriteInfo(ctx context.Context, request *favorite.GetVideoFavoriteInfoRequest) (resp *favorite.GetVideoFavoriteInfoResponse, err error) {
 	favorite_service := service.NewFavoriteService(ctx)
-	resp, err = favorite_service.GetVideoFavoriteInfo(ctx, request)
+	resp, err = favorite_service.GetVideoFavoriteInfo(request)
 	return
 }
 
 // GetUserFavoriteInfo implements the FavoriteServiceImpl interface.
 func (s *FavoriteServiceImpl) GetUserFavoriteInfo(ctx context.Context, request *favorite.GetUserFavoriteInfoRequest) (resp *favorite.GetUserFavoriteInfoResponse, err error) {
 	favorite_service := service.NewFavoriteService(ctx)
-	resp, err = favorite_service.GetUserFavoriteInfo(ctx, request)
+	resp, err = favorite_service.GetUserFavoriteInfo(request)
 	return
 }

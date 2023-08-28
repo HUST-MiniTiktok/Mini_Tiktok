@@ -13,20 +13,20 @@ type CommentServiceImpl struct{}
 // CommentAction implements the CommentServiceImpl interface.
 func (s *CommentServiceImpl) CommentAction(ctx context.Context, request *comment.CommentActionRequest) (resp *comment.CommentActionResponse, err error) {
 	comment_service := service.NewCommentService(ctx)
-	resp, err = comment_service.CommentAction(ctx, request)
+	resp, err = comment_service.CommentAction(request)
 	return
 }
 
 // CommentList implements the CommentServiceImpl interface.
 func (s *CommentServiceImpl) CommentList(ctx context.Context, request *comment.CommentListRequest) (resp *comment.CommentListResponse, err error) {
 	comment_service := service.NewCommentService(ctx)
-	resp, err = comment_service.CommentList(ctx, request)
+	resp, err = comment_service.CommentList(request)
 	return
 }
 
 // GetVideoCommentCount implements the CommentServiceImpl interface.
 func (s *CommentServiceImpl) GetVideoCommentCount(ctx context.Context, request *comment.GetVideoCommentCountRequest) (resp *comment.GetVideoCommentCountResponse, err error) {
 	comment_service := service.NewCommentService(ctx)
-	resp, err = comment_service.GetVideoCommentCount(ctx, request)
+	resp, err = comment_service.GetVideoCommentCount(request)
 	return
 }

@@ -27,7 +27,7 @@ func NewCommentService(ctx context.Context) *CommentService {
 }
 
 // CommentAction: publish a comment or delete a comment
-func (s *CommentService) CommentAction(ctx context.Context, request *comment.CommentActionRequest) (resp *comment.CommentActionResponse, err error) {
+func (s *CommentService) CommentAction(request *comment.CommentActionRequest) (resp *comment.CommentActionResponse, err error) {
 	claim, err := Jwt.ExtractClaims(request.Token)
 	if err != nil || claim.ID == 0 {
 		return pack.NewCommentActionResponse(errno.AuthorizationFailedErr), err
@@ -62,19 +62,19 @@ func (s *CommentService) CommentAction(ctx context.Context, request *comment.Com
 }
 
 // CommentList: get comments of a video
-func (s *CommentService) CommentList(ctx context.Context, request *comment.CommentListRequest) (resp *comment.CommentListResponse, err error) {
+func (s *CommentService) CommentList(request *comment.CommentListRequest) (resp *comment.CommentListResponse, err error) {
 
 	claim, err := Jwt.ExtractClaims(request.Token)
 	if err != nil || claim.ID == 0 {
 		return pack.NewCommentListResponse(errno.AuthorizationFailedErr), err
 	}
 
-	db_comments, err := db.GetVideoComments(ctx, request.VideoId)
+	db_comments, err := db.GetVideoComments(s.ctx, request.VideoId)
 	if err != nil {
 		return pack.NewCommentListResponse(err), err
 	}
 
-	kitex_comments, err := pack.ToKitexCommentList(ctx, db_comments, request.Token)
+	kitex_comments, err := pack.ToKitexCommentList(s.ctx, db_comments, request.Token)
 	if err != nil {
 		return pack.NewCommentListResponse(err), err
 	}
@@ -85,7 +85,7 @@ func (s *CommentService) CommentList(ctx context.Context, request *comment.Comme
 }
 
 // GetVideoCommentCount implements the CommentServiceImpl interface.
-func (s *CommentService) GetVideoCommentCount(ctx context.Context, request *comment.GetVideoCommentCountRequest) (resp *comment.GetVideoCommentCountResponse, er error) {
+func (s *CommentService) GetVideoCommentCount(request *comment.GetVideoCommentCountRequest) (resp *comment.GetVideoCommentCountResponse, er error) {
 	count, err := db.GetVideoCommentCounts(s.ctx, request.VideoId)
 	if err != nil {
 		return pack.NewGetVideoCommentCountResponse(err), err

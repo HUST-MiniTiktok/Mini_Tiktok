@@ -28,9 +28,9 @@ func NewUserService(ctx context.Context) *UserService {
 }
 
 // GetUserById: get a user by user id
-func (s *UserService) GetUserById(ctx context.Context, request *user.UserRequest) (resp *user.UserResponse, err error) {
+func (s *UserService) GetUserById(request *user.UserRequest) (resp *user.UserResponse, err error) {
 	var db_user *db.User
-	db_user, err = db.GetUserById(ctx, request.UserId)
+	db_user, err = db.GetUserById(s.ctx, request.UserId)
 	if err != nil {
 		return pack.NewUserResponse(err), err
 	}
@@ -38,7 +38,7 @@ func (s *UserService) GetUserById(ctx context.Context, request *user.UserRequest
 		return pack.NewUserResponse(errno.UserIsNotExistErr), errno.UserIsNotExistErr
 	}
 
-	resp_user, err := pack.ToKitexUser(ctx, request.Token, db_user)
+	resp_user, err := pack.ToKitexUser(s.ctx, request.Token, db_user)
 	if err != nil {
 		return pack.NewUserResponse(err), err
 	}
@@ -49,9 +49,9 @@ func (s *UserService) GetUserById(ctx context.Context, request *user.UserRequest
 }
 
 // Register: register a new user
-func (s *UserService) Register(ctx context.Context, request *user.UserRegisterRequest) (resp *user.UserRegisterResponse, err error) {
+func (s *UserService) Register(request *user.UserRegisterRequest) (resp *user.UserRegisterResponse, err error) {
 	// check user name is already exist
-	db_user_ck, err := db.GetUserByUserName(ctx, request.Username)
+	db_user_ck, err := db.GetUserByUserName(s.ctx, request.Username)
 	if err != nil {
 		return pack.NewUserRegisterResponse(err), err
 	}
@@ -70,7 +70,7 @@ func (s *UserService) Register(ctx context.Context, request *user.UserRegisterRe
 		Password: encrypted_password,
 	}
 
-	user_id, err := db.CreateUser(ctx, &db_user_new)
+	user_id, err := db.CreateUser(s.ctx, &db_user_new)
 	if err != nil {
 		return pack.NewUserRegisterResponse(err), err
 	}
@@ -87,8 +87,8 @@ func (s *UserService) Register(ctx context.Context, request *user.UserRegisterRe
 }
 
 // Login: login a user
-func (s *UserService) Login(ctx context.Context, request *user.UserLoginRequest) (resp *user.UserLoginResponse, err error) {
-	db_user_ck, err := db.GetUserByUserName(ctx, request.Username)
+func (s *UserService) Login(request *user.UserLoginRequest) (resp *user.UserLoginResponse, err error) {
+	db_user_ck, err := db.GetUserByUserName(s.ctx, request.Username)
 	if err != nil {
 		return pack.NewUserLoginResponse(err), err
 	}
@@ -114,8 +114,8 @@ func (s *UserService) Login(ctx context.Context, request *user.UserLoginRequest)
 }
 
 // CheckUserIsExist: check if a user exists by user id
-func (s *UserService) CheckUserIsExist(ctx context.Context, request *user.CheckUserIsExistRequest) (resp *user.CheckUserIsExistResponse, err error) {
-	is_exist, err := db.CheckUserById(ctx, request.UserId)
+func (s *UserService) CheckUserIsExist(request *user.CheckUserIsExistRequest) (resp *user.CheckUserIsExistResponse, err error) {
+	is_exist, err := db.CheckUserById(s.ctx, request.UserId)
 
 	if err != nil {
 		return pack.NewCheckUserIsExistResponse(err), err

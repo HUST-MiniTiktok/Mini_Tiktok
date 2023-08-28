@@ -29,7 +29,7 @@ func NewFavoriteService(ctx context.Context) *FavoriteService {
 }
 
 // FavoriteAction: favorite a video or cancel favorite
-func (s *FavoriteService) FavoriteAction(ctx context.Context, req *favorite.FavoriteActionRequest) (resp *favorite.FavoriteActionResponse, err error) {
+func (s *FavoriteService) FavoriteAction(req *favorite.FavoriteActionRequest) (resp *favorite.FavoriteActionResponse, err error) {
 	claim, err := Jwt.ExtractClaims(req.Token)
 	if err != nil {
 		return pack.NewFavoriteActionResponse(errno.AuthorizationFailedErr), err
@@ -37,11 +37,11 @@ func (s *FavoriteService) FavoriteAction(ctx context.Context, req *favorite.Favo
 
 	// Action type: 1: 点赞 2: 取消点赞
 	if req.ActionType == 1 {
-		if _, err = db.NewFavorite(ctx, claim.ID, req.VideoId); err != nil {
+		if _, err = db.NewFavorite(s.ctx, claim.ID, req.VideoId); err != nil {
 			return pack.NewFavoriteActionResponse(err), err
 		}
 	} else if req.ActionType == 2 {
-		if _, err = db.CancelFavorite(ctx, claim.ID, req.VideoId); err != nil {
+		if _, err = db.CancelFavorite(s.ctx, claim.ID, req.VideoId); err != nil {
 			return pack.NewFavoriteActionResponse(err), err
 		}
 	} else {
@@ -52,18 +52,18 @@ func (s *FavoriteService) FavoriteAction(ctx context.Context, req *favorite.Favo
 }
 
 // FavoriteList: get favorite list
-func (s *FavoriteService) FavoriteList(ctx context.Context, req *favorite.FavoriteListRequest) (resp *favorite.FavoriteListResponse, err error) {
+func (s *FavoriteService) FavoriteList(req *favorite.FavoriteListRequest) (resp *favorite.FavoriteListResponse, err error) {
 	_, err = Jwt.ExtractClaims(req.Token)
 	if err != nil {
 		return pack.NewFavoriteListResponse(errno.AuthorizationFailedErr), err
 	}
 
-	_, videoIDList, err := db.GetFavoriteList(ctx, req.UserId)
+	_, videoIDList, err := db.GetFavoriteList(s.ctx, req.UserId)
 	if err != nil {
 		return pack.NewFavoriteListResponse(err), err
 	}
 
-	videosResponse, err := client.PublishRPC.GetVideoByIdList(ctx, &publish.GetVideoByIdListRequest{Id: videoIDList, Token: req.Token})
+	videosResponse, err := client.PublishRPC.GetVideoByIdList(s.ctx, &publish.GetVideoByIdListRequest{Id: videoIDList, Token: req.Token})
 	if err != nil {
 		return pack.NewFavoriteListResponse(err), err
 	} else {
@@ -74,13 +74,13 @@ func (s *FavoriteService) FavoriteList(ctx context.Context, req *favorite.Favori
 }
 
 // GetVideoFavoriteInfo: get favoriteCount and isFavorite of a video
-func (s *FavoriteService) GetVideoFavoriteInfo(ctx context.Context, req *favorite.GetVideoFavoriteInfoRequest) (resp *favorite.GetVideoFavoriteInfoResponse, err error) {
-	count, err := db.VideoFavoriteCount(ctx, req.VideoId)
+func (s *FavoriteService) GetVideoFavoriteInfo(req *favorite.GetVideoFavoriteInfoRequest) (resp *favorite.GetVideoFavoriteInfoResponse, err error) {
+	count, err := db.VideoFavoriteCount(s.ctx, req.VideoId)
 	if err != nil {
 		return pack.NewGetVideoFavoriteInfoResponse(err), err
 	}
 
-	is_favorite, err := db.CheckFavorite(ctx, req.UserId, req.VideoId)
+	is_favorite, err := db.CheckFavorite(s.ctx, req.UserId, req.VideoId)
 	if err != nil {
 		return pack.NewGetVideoFavoriteInfoResponse(err), err
 	}
@@ -92,8 +92,8 @@ func (s *FavoriteService) GetVideoFavoriteInfo(ctx context.Context, req *favorit
 }
 
 // GetUserFavoriteInfo: get totalFavorited and favoriteCount of a user
-func (s *FavoriteService) GetUserFavoriteInfo(ctx context.Context, req *favorite.GetUserFavoriteInfoRequest) (resp *favorite.GetUserFavoriteInfoResponse, err error) {
-	publishInfoResp, err := client.PublishRPC.GetPublishInfoByUserId(ctx, &publish.GetPublishInfoByUserIdRequest{UserId: req.UserId})
+func (s *FavoriteService) GetUserFavoriteInfo(req *favorite.GetUserFavoriteInfoRequest) (resp *favorite.GetUserFavoriteInfoResponse, err error) {
+	publishInfoResp, err := client.PublishRPC.GetPublishInfoByUserId(s.ctx, &publish.GetPublishInfoByUserIdRequest{UserId: req.UserId})
 	if err != nil {
 		return pack.NewGetUserFavoriteInfoResponse(err), err
 	}
@@ -105,7 +105,7 @@ func (s *FavoriteService) GetUserFavoriteInfo(ctx context.Context, req *favorite
 	countChan := make(chan int64)
 	for _, video_id := range user_work_ids {
 		go func(video_id int64) {
-			count, err := db.VideoFavoriteCount(ctx, video_id)
+			count, err := db.VideoFavoriteCount(s.ctx, video_id)
 			if err != nil {
 				errChan <- err
 			} else {
@@ -122,7 +122,7 @@ func (s *FavoriteService) GetUserFavoriteInfo(ctx context.Context, req *favorite
 		}
 	}
 	// get favorite count
-	favorite_count, err = db.UserFavoriteCount(ctx, req.UserId)
+	favorite_count, err = db.UserFavoriteCount(s.ctx, req.UserId)
 	if err != nil {
 		return pack.NewGetUserFavoriteInfoResponse(err), err
 	}

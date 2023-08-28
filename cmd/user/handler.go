@@ -13,27 +13,27 @@ type UserServiceImpl struct{}
 // User implements the UserServiceImpl interface.
 func (s *UserServiceImpl) User(ctx context.Context, request *user.UserRequest) (resp *user.UserResponse, err error) {
 	user_service := service.NewUserService(ctx)
-	resp, err = user_service.GetUserById(ctx, request)
+	resp, err = user_service.GetUserById(request)
 	return
 }
 
 // Register implements the UserServiceImpl interface.
 func (s *UserServiceImpl) Register(ctx context.Context, request *user.UserRegisterRequest) (resp *user.UserRegisterResponse, err error) {
 	user_service := service.NewUserService(ctx)
-	resp, err = user_service.Register(ctx, request)
+	resp, err = user_service.Register(request)
 	return
 }
 
 // Login implements the UserServiceImpl interface.
 func (s *UserServiceImpl) Login(ctx context.Context, request *user.UserLoginRequest) (resp *user.UserLoginResponse, err error) {
 	user_service := service.NewUserService(ctx)
-	resp, err = user_service.Login(ctx, request)
+	resp, err = user_service.Login(request)
 	return
 }
 
 // CheckUserIsExist implements the UserServiceImpl interface.
 func (s *UserServiceImpl) CheckUserIsExist(ctx context.Context, request *user.CheckUserIsExistRequest) (resp *user.CheckUserIsExistResponse, err error) {
 	user_service := service.NewUserService(ctx)
-	resp, err = user_service.CheckUserIsExist(ctx, request)
+	resp, err = user_service.CheckUserIsExist(request)
 	return
 }
