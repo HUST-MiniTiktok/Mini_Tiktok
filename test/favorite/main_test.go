@@ -59,6 +59,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestMainOrder(t *testing.T) {
+	t.Run("favorite_client", TestFavoriteClient)
 	t.Run("favorite_action", TestFavoriteAction)
 	t.Run("favorite_list_after_do_favorite", TestFavoriteList)
 	t.Run("get_video_favorite_info", TestGetVideoFavoriteInfo)

@@ -54,6 +54,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestMainOrder(t *testing.T) {
+	t.Run("publish_client", TestPublishClient)
 	t.Run("publish_action", TestPublishAction)
 	t.Run("publish_list", TestPublishList)
 	t.Run("get_video_by_id", TestGetVideoById)

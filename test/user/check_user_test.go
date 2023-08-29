@@ -6,7 +6,7 @@ import (
 	user "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user"
 )
 
-func TestCheckUser(t *testing.T) {
+func TestCheck(t *testing.T) {
 	resp, err := UserService.CheckUserIsExist(&user.CheckUserIsExistRequest{
 		UserId: DemoUser.Id,
 	})

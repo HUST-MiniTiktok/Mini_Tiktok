@@ -42,6 +42,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestMainOrder(t *testing.T) {
+	t.Run("message_client", TestMessageClient)
 	t.Run("message_action", TestMessageAction)
 	t.Run("message_chat", TestMessageChat)
 	t.Run("get_friend_latest_msg", TestGetFriendLatestMsg)

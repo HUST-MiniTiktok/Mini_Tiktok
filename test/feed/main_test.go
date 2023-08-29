@@ -39,6 +39,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestMainOrder(t *testing.T) {
+	t.Run("feed_client", TestFeedClient)
 	t.Run("feed", TestFeed)
 }
 

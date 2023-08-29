@@ -35,8 +35,9 @@ func TestMain(m *testing.M) {
 }
 
 func TestMainOrder(t *testing.T) {
+	t.Run("user_client", TestUserClient)
 	t.Run("register", TestRegister)
 	t.Run("login", TestLogin)
-	t.Run("check", TestCheckUser)
-	t.Run("get", TestGetUser)
+	t.Run("check", TestCheck)
+	t.Run("get_user_by_id", TestGetUser)
 }

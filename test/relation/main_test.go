@@ -41,6 +41,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestMainOrder(t *testing.T) {
+	t.Run("relation_client", TestRelationClient)
 	t.Run("relation_follow_action", TestRelationFollowAction)
 	t.Run("relation_follow_list_after_follow", TestRelationFollowList)
 	t.Run("relation_follower_list_after_follow", TestRelationFollowerList)

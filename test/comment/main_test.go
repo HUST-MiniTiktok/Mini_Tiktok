@@ -62,11 +62,12 @@ func TestMain(m *testing.M) {
 }
 
 func TestMainOrder(t *testing.T) {
-	t.Run("test_omment_action", TestCommentAction)
-	t.Run("test_get_video_comment_count", TestGetVideoCommentCount)
-	t.Run("test_comment_list", TestCommentList)
-	t.Run("test_comment_action_delete", TestDeleteCommentAction)
-	t.Run("test_get_video_comment_count_after_delete", TestGetVideoCommentCount)
+	t.Run("comment_client", TestCommentClient)
+	t.Run("comment_action", TestCommentAction)
+	t.Run("get_video_comment_count", TestGetVideoCommentCount)
+	t.Run("comment_list", TestCommentList)
+	t.Run("comment_action_delete", TestDeleteCommentAction)
+	t.Run("get_video_comment_count_after_delete", TestGetVideoCommentCount)
 }
 
 func DoLogin() {
