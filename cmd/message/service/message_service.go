@@ -4,11 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/message/client"
 	db "github.com/HUST-MiniTiktok/mini_tiktok/cmd/message/dal/db"
 	"github.com/HUST-MiniTiktok/mini_tiktok/cmd/message/pack"
 	message "github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/message"
-	"github.com/HUST-MiniTiktok/mini_tiktok/kitex_gen/user"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/errno"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/jwt"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/utils"
@@ -64,11 +62,11 @@ func (s *MessageService) MessageAction(request *message.MessageActionRequest) (r
 		return pack.NewMessageActionResponse(errno.ParamErr), errno.ParamErr
 	}
 
-	to_user_ck, err := client.UserRPC.CheckUserIsExist(s.ctx, &user.CheckUserIsExistRequest{UserId: request.ToUserId})
+	to_user_exist, err := pack.IsExistUser(s.ctx, request.ToUserId)
 	if err != nil {
 		return pack.NewMessageActionResponse(err), err
 	}
-	if !to_user_ck.IsExist {
+	if !to_user_exist {
 		return pack.NewMessageActionResponse(errno.UserIsNotExistErr), errno.UserIsNotExistErr
 	}
 

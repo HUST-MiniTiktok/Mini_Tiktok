@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
-	publish_dal "github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/dal"
-	publish_service "github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/service"
+	dal "github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/dal"
+	service "github.com/HUST-MiniTiktok/mini_tiktok/cmd/publish/service"
 
 	jwt "github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/jwt"
 )
@@ -28,7 +28,7 @@ type DemoVideoType struct {
 var (
 	ctx            = context.Background()
 	Jwt            = jwt.NewJWT()
-	PublishService *publish_service.PublishService
+	PublishService *service.PublishService
 
 	DemoUser = DemoUserType{
 		Id:       101,
@@ -43,9 +43,8 @@ var (
 
 func TestMain(m *testing.M) {
 	os.Setenv("GO_ENV", "test")
-	publish_dal.Init()
-
-	PublishService = publish_service.NewPublishService(ctx)
+	dal.Init()
+	PublishService = service.NewPublishService(ctx)
 
 	DoLogin()
 	DoLoadVideo()
