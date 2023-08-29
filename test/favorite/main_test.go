@@ -18,13 +18,13 @@ type DemoUserType struct {
 }
 
 type DemoVideoType struct {
-	Id       int64
-	Title    string
-	Author   string
-	PlayUrl  string
-	CoverUrl string
-	Data     []byte
-	Path     string
+	Id int64
+	// Title    string
+	// Author   string
+	// PlayUrl  string
+	// CoverUrl string
+	// Data     []byte
+	// Path     string
 }
 
 var (
@@ -38,11 +38,11 @@ var (
 		Password: "demopassword",
 	}
 	DemoVideo = DemoVideoType{
-		Id:       11,
-		PlayUrl:  "play",
-		CoverUrl: "cober",
-		Title:    "bear",
-		Path:     "bear.mp4",
+		Id: 11,
+		// PlayUrl:  "play",
+		// CoverUrl: "cober",
+		// Title:    "bear",
+		// Path:     "bear.mp4",
 	}
 )
 
@@ -52,7 +52,6 @@ func TestMain(m *testing.M) {
 
 	FavoriteService = favorite_service.NewFavoriteService(ctx)
 
-	// DoRegister()
 	DoLogin()
 
 	code := m.Run()
@@ -60,12 +59,13 @@ func TestMain(m *testing.M) {
 }
 
 func TestMainOrder(t *testing.T) {
-	t.Run("favorite_action_1", TestFavoriteAction1)
-	t.Run("favorite_list_1", TestFavoriteList)
+	t.Run("favorite_action", TestFavoriteAction)
+	t.Run("favorite_list_after_do_favorite", TestFavoriteList)
 	t.Run("get_video_favorite_info", TestGetVideoFavoriteInfo)
 	t.Run("get_user_favorite_info", TestGetUserFavoriteInfo)
-	t.Run("favorite_action_2", TestFavoriteAction2)
-	t.Run("favorite_list_2", TestFavoriteList)
+	t.Run("cancel_favorite_action", TestCancelFavoriteAction)
+	t.Run("favorite_list_after_cancel_favorite", TestFavoriteList)
+	t.Run("get_user_favorite_info_after_cancel_favorite", TestGetUserFavoriteInfo)
 }
 
 func DoLogin() {

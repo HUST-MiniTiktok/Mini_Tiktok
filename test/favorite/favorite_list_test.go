@@ -15,9 +15,6 @@ func TestFavoriteList(t *testing.T) {
 		vlist := make([]*common.Video, 0, 1)
 		v := &common.Video{
 			Id: DemoVideo.Id,
-			// PlayUrl:  DemoVideo.PlayUrl,
-			// CoverUrl: DemoVideo.CoverUrl,
-			// Title:    DemoVideo.Title,
 		}
 		vlist = append(vlist, v)
 		return vlist, nil
