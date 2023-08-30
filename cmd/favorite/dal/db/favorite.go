@@ -10,9 +10,9 @@ import (
 const FavoriteTableName = "favorite"
 
 type Favorite struct {
-	ID        int64          `json:"id"`
-	UserId    int64          `json:"user_id"`
-	VideoId   int64          `json:"video_id"`
+	ID        int64          `json:"id" gorm:"primaryKey;autoincrement"`
+	UserId    int64          `json:"user_id" gorm:"index:favorite_idx;index:favorite_user_idx"`
+	VideoId   int64          `json:"video_id" gorm:"index:favorite_idx;index:favorite_video_idx"`
 	CreatedAt time.Time      `json:"create_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"delete_at"`
 }

@@ -10,9 +10,9 @@ import (
 const CommentTableName = "comment"
 
 type Comment struct {
-	ID          int64          `json:"id"`
+	ID          int64          `json:"id" gorm:"primaryKey;autoincrement"`
 	UserId      int64          `json:"user_id"`
-	VideoId     int64          `json:"video_id"`
+	VideoId     int64          `json:"video_id" gorm:"index:comment_video_idx"`
 	CommentText string         `json:"comment_text"`
 	CreatedAt   time.Time      `json:"created_at"`
 	DeletedAt   gorm.DeletedAt `gorm:"index" json:"deleted_at"`

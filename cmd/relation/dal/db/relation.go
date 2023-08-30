@@ -10,9 +10,9 @@ import (
 const FollowTableName = "follow"
 
 type Follow struct {
-	ID         int64          `json:"id"`
-	UserId     int64          `json:"user_id"`
-	FollowerId int64          `json:"follower_id"`
+	ID         int64          `json:"id" gorm:"primaryKey;autoincrement"`
+	UserId     int64          `json:"user_id" gorm:"index:follow_idx;index:follow_user_idx"`
+	FollowerId int64          `json:"follower_id" gorm:"index:follow_idx;index:follow_follower_idx"`
 	CreatedAt  time.Time      `json:"create_at"`
 	DeletedAt  gorm.DeletedAt `gorm:"index" json:"delete_at"`
 }

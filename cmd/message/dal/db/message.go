@@ -8,9 +8,9 @@ import (
 const MessageTableName = "message"
 
 type Message struct {
-	ID         int64     `json:"id"`
-	ToUserId   int64     `json:"to_user_id"`
-	FromUserId int64     `json:"from_user_id"`
+	ID         int64     `json:"id" gorm:"primaryKey;autoincrement"`
+	ToUserId   int64     `json:"to_user_id" gorm:"index:message_idx"`
+	FromUserId int64     `json:"from_user_id" gorm:"index:message_idx"`
 	Content    string    `json:"content"`
 	CreatedAt  time.Time `json:"created_at"`
 }

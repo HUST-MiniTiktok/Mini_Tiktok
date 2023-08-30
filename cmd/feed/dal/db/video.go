@@ -8,8 +8,8 @@ import (
 const VideoTableName = "video"
 
 type Video struct {
-	ID          int64     `json:"id"`
-	AuthorID    int64     `json:"author_id"`
+	ID          int64     `json:"id" gorm:"primaryKey;autoincrement"`
+	AuthorID    int64     `json:"author_id" gorm:"index:author_id_idx"`
 	PlayURL     string    `json:"play_url"`
 	CoverURL    string    `json:"cover_url"`
 	PublishTime time.Time `json:"publish_time"`
