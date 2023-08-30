@@ -63,12 +63,11 @@ func (s *RelationService) RelationAction(request *relation.RelationActionRequest
 // RelationFollowList: get follow user list
 func (s *RelationService) RelationFollowList(request *relation.RelationFollowListRequest) (resp *relation.RelationFollowListResponse, err error) {
 	claim, err := Jwt.ExtractClaims(request.Token)
-	curr_user_id := claim.ID
 	if err != nil || claim.ID == 0 {
 		return pack.NewRelationFollowListResponse(errno.AuthorizationFailedErr), err
 	}
 
-	user_ids, err := db.GetFollowUserIdList(s.ctx, curr_user_id)
+	user_ids, err := db.GetFollowUserIdList(s.ctx, request.UserId)
 	if err != nil {
 		return pack.NewRelationFollowListResponse(err), err
 	}
@@ -86,12 +85,11 @@ func (s *RelationService) RelationFollowList(request *relation.RelationFollowLis
 // RelationFollowerList: get follower user list
 func (s *RelationService) RelationFollowerList(request *relation.RelationFollowerListRequest) (resp *relation.RelationFollowerListResponse, err error) {
 	claim, err := Jwt.ExtractClaims(request.Token)
-	curr_user_id := claim.ID
 	if err != nil || claim.ID == 0 {
 		return pack.NewRelationFollowerListResponse(errno.AuthorizationFailedErr), err
 	}
 
-	user_ids, err := db.GetFollowerUserIdList(s.ctx, curr_user_id)
+	user_ids, err := db.GetFollowerUserIdList(s.ctx, request.UserId)
 	if err != nil {
 		return pack.NewRelationFollowerListResponse(err), err
 	}
@@ -109,12 +107,11 @@ func (s *RelationService) RelationFollowerList(request *relation.RelationFollowe
 // RelationFriendList: get friend user list
 func (s *RelationService) RelationFriendList(request *relation.RelationFriendListRequest) (resp *relation.RelationFriendListResponse, err error) {
 	claim, err := Jwt.ExtractClaims(request.Token)
-	curr_user_id := claim.ID
 	if err != nil || claim.ID == 0 {
 		return pack.NewRelationFriendListResponse(errno.AuthorizationFailedErr), err
 	}
 
-	friend_user_ids, err := db.GetFriendUserIdList(s.ctx, curr_user_id)
+	friend_user_ids, err := db.GetFriendUserIdList(s.ctx, request.UserId)
 	if err != nil {
 		return pack.NewRelationFriendListResponse(err), err
 	}
