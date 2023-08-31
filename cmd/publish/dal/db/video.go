@@ -13,7 +13,7 @@ type Video struct {
 	PlayURL     string    `json:"play_url"`
 	CoverURL    string    `json:"cover_url"`
 	PublishTime time.Time `json:"publish_time"`
-	Title       string    `json:"title"`
+	Title       string    `json:"title" gorm:"type:varchar(255)"`
 }
 
 func (Video) TableName() string {
