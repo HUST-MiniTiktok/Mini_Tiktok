@@ -2,11 +2,17 @@
 
 # This script is used to build and start all services and API gateway
 
-# Step 0. check and install screen
+# Step 0. check and install screen & ffmpeg
 echo "Checking and installing screen ..."
 if [ ! -x "$(command -v screen)" ]; then
     echo "Installing screen ..."
     sudo apt-get install screen -y
+fi
+
+echo "Checking and installing ffmpeg ..."
+if [ ! -x "$(command -v ffmpeg)" ]; then
+    echo "Installing ffmpeg ..."
+    sudo apt-get install ffmpeg -y
 fi
 
 # Step 1. build all services and API gateway
