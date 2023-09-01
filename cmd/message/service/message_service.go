@@ -32,13 +32,13 @@ func NewMessageService(ctx context.Context) *MessageService {
 // MessageChat: get message list between friend users
 func (s *MessageService) MessageChat(request *message.MessageChatRequest) (resp *message.MessageChatResponse, err error) {
 	user_claims, err := Jwt.ExtractClaims(request.Token)
-	curr_user_id := user_claims.ID
 	if err != nil {
 		return pack.NewMessageChatResponse(errno.AuthorizationFailedErr), err
 	}
+	curr_user_id := user_claims.ID
 
 	var db_messages []*db.Message
-	klog.Infof("request.PreMsgTime: %v", utils.MillTimeStampToTime(request.PreMsgTime))
+	klog.Infof("request.PreMsgTime: %v", request.PreMsgTime)
 	db_messages, err = db.GetMessageByUserIdPair(s.ctx, curr_user_id, request.ToUserId, utils.MillTimeStampToTime(request.PreMsgTime))
 	if err != nil {
 		return pack.NewMessageChatResponse(err), err
@@ -53,10 +53,10 @@ func (s *MessageService) MessageChat(request *message.MessageChatRequest) (resp 
 func (s *MessageService) MessageAction(request *message.MessageActionRequest) (resp *message.MessageActionResponse, err error) {
 	curr_time := time.Now()
 	user_claims, err := Jwt.ExtractClaims(request.Token)
-	from_user_id := user_claims.ID
 	if err != nil {
 		return pack.NewMessageActionResponse(errno.AuthorizationFailedErr), err
 	}
+	from_user_id := user_claims.ID
 
 	if request.ActionType != 1 {
 		return pack.NewMessageActionResponse(errno.ParamErr), errno.ParamErr
@@ -82,10 +82,10 @@ func (s *MessageService) MessageAction(request *message.MessageActionRequest) (r
 // GetFriendLatestMsg: get latest message between friend users
 func (s *MessageService) GetFriendLatestMsg(request *message.GetFriendLatestMsgRequest) (resp *message.GetFriendLatestMsgResponse, err error) {
 	user_claims, err := Jwt.ExtractClaims(request.Token)
-	curr_user_id := user_claims.ID
 	if err != nil {
 		return pack.NewGetFriendLatestMsgResponse(errno.AuthorizationFailedErr), err
 	}
+	curr_user_id := user_claims.ID
 
 	var db_message *db.Message
 	db_message, err = db.GetLastestMsgByUserIdPair(s.ctx, curr_user_id, request.FriendUserId)
