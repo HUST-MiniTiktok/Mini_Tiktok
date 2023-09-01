@@ -9,6 +9,7 @@ import (
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/kitex"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/tracer"
 	"github.com/cloudwego/kitex/pkg/klog"
+	limit "github.com/cloudwego/kitex/pkg/limit"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
 	etcd "github.com/kitex-contrib/registry-etcd"
@@ -35,6 +36,7 @@ func main() {
 		server.WithMiddleware(kitex.CommonMiddleware),
 		server.WithMiddleware(kitex.ServerMiddleware),
 		server.WithMuxTransport(),
+		server.WithLimit(&limit.Option{MaxConnections: 1000, MaxQPS: 10000}),
 		server.WithSuite(opentracing.NewDefaultServerSuite()),
 		server.WithRegistry(r),
 	)
