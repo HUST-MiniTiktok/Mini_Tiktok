@@ -18,6 +18,7 @@ import (
 func main() {
 	tracer.InitJaeger("api")
 	h := server.Default(
+		server.WithHostPorts("0.0.0.0:20088"),
 		server.WithStreamBody(true),
 	)
 
