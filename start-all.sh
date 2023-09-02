@@ -2,7 +2,27 @@
 
 # This script is used to build and start all services and API gateway
 
-# Step 0. check and install screen & ffmpeg
+# Step 0. check and install docker & screen & ffmpeg
+echo "Checking and installing docker ..."
+if [ ! -x "$(command -v docker)" ]; then
+    echo "Installing docker ..."
+    sudo apt-get update
+    sudo apt-get install \
+        apt-transport-https \
+        ca-certificates \
+        curl \
+        gnupg \
+        lsb-release -y
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+    echo \
+        "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+        $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    sudo apt-get update
+    sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    sudo usermod -aG docker $USER
+    newgrp docker
+fi
+
 echo "Checking and installing screen ..."
 if [ ! -x "$(command -v screen)" ]; then
     echo "Installing screen ..."
