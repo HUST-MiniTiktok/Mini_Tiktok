@@ -36,7 +36,7 @@ func main() {
 		server.WithMiddleware(kitex.CommonMiddleware),
 		server.WithMiddleware(kitex.ServerMiddleware),
 		server.WithMuxTransport(),
-		server.WithLimit(&limit.Option{MaxConnections: 1000, MaxQPS: 10000}),
+		server.WithLimit(&limit.Option{MaxConnections: 10000, MaxQPS: 100000}),
 		server.WithSuite(opentracing.NewDefaultServerSuite()),
 		server.WithRegistry(r),
 	)
