@@ -16,7 +16,7 @@ import (
 func ToKitexUser(ctx context.Context, curr_user_token string, db_user *db.User) (kitex_user *common.User, err error) {
 	// 设置默认信息
 	default_avatar := oss.ToRealURL(ctx, "image/Avatar.png")
-	default_background_image := oss.ToRealURL(ctx, "image/Background.png")
+	default_background_image := oss.ToRealURL(ctx, "image/Background.jpg")
 	default_signature := "This is my signature."
 	kitex_user = &common.User{
 		Id:              db_user.ID,

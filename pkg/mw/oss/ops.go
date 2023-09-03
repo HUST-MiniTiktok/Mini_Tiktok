@@ -95,7 +95,7 @@ func LoadDefaultImageData(ctx context.Context, image_bucket string) (err error) 
 	}
 	klog.Infof("upload default avatar success")
 	// 上传默认背景图
-	_, err = PutToBucketWithFilePath(ctx, "image", "Background.png", default_image_dir+"Background.png")
+	_, err = PutToBucketWithFilePath(ctx, "image", "Background.jpg", default_image_dir+"Background.jpg")
 	if err != nil {
 		klog.Fatalf("upload default background image failed: %v", err)
 		return
