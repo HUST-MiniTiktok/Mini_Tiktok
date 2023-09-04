@@ -11,6 +11,7 @@ import (
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/kitex"
 	"github.com/cloudwego/kitex/client"
 	"github.com/cloudwego/kitex/pkg/klog"
+	"github.com/cloudwego/kitex/pkg/retry"
 	etcd "github.com/kitex-contrib/registry-etcd"
 	opentracing "github.com/kitex-contrib/tracer-opentracing"
 )
@@ -24,14 +25,21 @@ func NewPublishClient() (publishClient *PublishClient) {
 	if err != nil {
 		klog.Fatalf("new resolver failed: %v", err)
 	}
-	c, err := publishservice.NewClient("publish",
+
+	opts := []client.Option{
 		client.WithResolver(r),
-		client.WithSuite(opentracing.NewDefaultClientSuite()),
 		client.WithMiddleware(kitex.CommonMiddleware),
 		client.WithInstanceMW(kitex.ClientMiddleware),
 		client.WithMuxConnection(1),
-		client.WithConnectTimeout(500*time.Millisecond),
-	)
+		client.WithConnectTimeout(100 * time.Millisecond),
+		client.WithFailureRetry(retry.NewFailurePolicy()),
+	}
+	if conf.GetConf().GetBool("tracer.enabled") {
+		opts = append(opts, client.WithSuite(opentracing.NewDefaultClientSuite()))
+	}
+
+	c, err := publishservice.NewClient("publish", opts...)
+
 	if err != nil {
 		klog.Fatalf("new publish client failed: %v", err)
 	}

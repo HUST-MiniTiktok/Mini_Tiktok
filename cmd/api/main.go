@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/errno"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/tracer"
 	"github.com/cloudwego/hertz/pkg/app"
@@ -16,7 +17,10 @@ import (
 )
 
 func main() {
-	tracer.InitJaeger("api")
+	if conf.GetConf().GetBool("tracer.enabled") {
+		tracer.InitJaeger("api")
+	}
+
 	h := server.Default(
 		server.WithHostPorts("0.0.0.0:20088"),
 		server.WithStreamBody(true),

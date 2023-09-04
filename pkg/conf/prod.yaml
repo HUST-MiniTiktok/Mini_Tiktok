@@ -31,6 +31,7 @@ jwt:
   signingkey: "mini_tiktok"
 
 tracer:
+  enabled: false
   jaeger:
     host: "127.0.0.1"
     port: "12006"

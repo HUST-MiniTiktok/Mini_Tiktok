@@ -17,7 +17,10 @@ import (
 )
 
 func main() {
-	tracer.InitJaeger("favorite")
+	if conf.GetConf().GetBool("tracer.enabled") {
+		tracer.InitJaeger("favorite")
+	}
+
 	dal.Init()
 
 	addr, err := net.ResolveTCPAddr("tcp", "127.0.0.1:8884")
@@ -30,16 +33,20 @@ func main() {
 		klog.Fatalf("new registry failed: %v", err)
 	}
 
-	svr := favorite.NewServer(new(FavoriteServiceImpl),
+	opts := []server.Option{
 		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: "favorite"}),
 		server.WithServiceAddr(addr),
 		server.WithMiddleware(kitex.CommonMiddleware),
 		server.WithMiddleware(kitex.ServerMiddleware),
 		server.WithMuxTransport(),
 		server.WithLimit(&limit.Option{MaxConnections: 10000, MaxQPS: 100000}),
-		server.WithSuite(opentracing.NewDefaultServerSuite()),
 		server.WithRegistry(r),
-	)
+	}
+	if conf.GetConf().GetBool("tracer.enabled") {
+		opts = append(opts, server.WithSuite(opentracing.NewDefaultServerSuite()))
+	}
+
+	svr := favorite.NewServer(new(FavoriteServiceImpl), opts...)
 
 	if err := svr.Run(); err != nil {
 		klog.Errorf("favorite server stopped with error:", err)

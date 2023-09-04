@@ -17,7 +17,10 @@ import (
 )
 
 func main() {
-	tracer.InitJaeger("message")
+	if conf.GetConf().GetBool("tracer.enabled") {
+		tracer.InitJaeger("message")
+	}
+
 	dal.Init()
 
 	addr, err := net.ResolveTCPAddr("tcp", "127.0.0.1:8886")
@@ -30,16 +33,20 @@ func main() {
 		klog.Fatalf("new registry failed: %v", err)
 	}
 
-	svr := message.NewServer(new(MessageServiceImpl),
+	opts := []server.Option{
 		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: "message"}),
 		server.WithServiceAddr(addr),
 		server.WithMiddleware(kitex.CommonMiddleware),
 		server.WithMiddleware(kitex.ServerMiddleware),
 		server.WithMuxTransport(),
 		server.WithLimit(&limit.Option{MaxConnections: 10000, MaxQPS: 100000}),
-		server.WithSuite(opentracing.NewDefaultServerSuite()),
 		server.WithRegistry(r),
-	)
+	}
+	if conf.GetConf().GetBool("tracer.enabled") {
+		opts = append(opts, server.WithSuite(opentracing.NewDefaultServerSuite()))
+	}
+
+	svr := message.NewServer(new(MessageServiceImpl), opts...)
 
 	if err := svr.Run(); err != nil {
 		klog.Errorf("message server stopped with error:", err)

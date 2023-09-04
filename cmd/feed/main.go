@@ -17,7 +17,10 @@ import (
 )
 
 func main() {
-	tracer.InitJaeger("feed")
+	if conf.GetConf().GetBool("tracer.enabled") {
+		tracer.InitJaeger("feed")
+	}
+
 	dal.Init()
 
 	addr, err := net.ResolveTCPAddr("tcp", "127.0.0.1:8882")
@@ -30,16 +33,20 @@ func main() {
 		klog.Fatalf("new registry failed: %v", err)
 	}
 
-	svr := feed.NewServer(new(FeedServiceImpl),
+	opts := []server.Option{
 		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: "feed"}),
 		server.WithServiceAddr(addr),
 		server.WithMiddleware(kitex.CommonMiddleware),
 		server.WithMiddleware(kitex.ServerMiddleware),
 		server.WithMuxTransport(),
 		server.WithLimit(&limit.Option{MaxConnections: 10000, MaxQPS: 100000}),
-		server.WithSuite(opentracing.NewDefaultServerSuite()),
 		server.WithRegistry(r),
-	)
+	}
+	if conf.GetConf().GetBool("tracer.enabled") {
+		opts = append(opts, server.WithSuite(opentracing.NewDefaultServerSuite()))
+	}
+
+	svr := feed.NewServer(new(FeedServiceImpl), opts...)
 
 	if err := svr.Run(); err != nil {
 		klog.Errorf("feed server stopped with error:", err)

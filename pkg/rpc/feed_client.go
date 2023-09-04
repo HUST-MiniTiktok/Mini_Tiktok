@@ -25,16 +25,21 @@ func NewFeedClient() (feedClient *FeedClient) {
 	if err != nil {
 		klog.Fatalf("new resolver failed: %v", err)
 	}
-	c, err := feedservice.NewClient("feed",
+	opts := []client.Option{
 		client.WithResolver(r),
-		client.WithSuite(opentracing.NewDefaultClientSuite()),
 		client.WithMiddleware(kitex.CommonMiddleware),
 		client.WithInstanceMW(kitex.ClientMiddleware),
 		client.WithMuxConnection(1),
-		client.WithRPCTimeout(5*time.Second),
-		client.WithConnectTimeout(50*time.Millisecond),
+		client.WithRPCTimeout(5 * time.Second),
+		client.WithConnectTimeout(100 * time.Millisecond),
 		client.WithFailureRetry(retry.NewFailurePolicy()),
-	)
+	}
+	if conf.GetConf().GetBool("tracer.enabled") {
+		opts = append(opts, client.WithSuite(opentracing.NewDefaultClientSuite()))
+	}
+
+	c, err := feedservice.NewClient("feed", opts...)
+
 	if err != nil {
 		klog.Fatalf("new feed client failed: %v", err)
 	}
