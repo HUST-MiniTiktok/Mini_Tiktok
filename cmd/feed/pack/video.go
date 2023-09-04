@@ -71,15 +71,28 @@ func ToKitexVideo(ctx context.Context, curr_user_id int64, curr_user_token strin
 	return kitex_video, nil
 }
 
-// ToKitexVideoList: convert []*db.Video to []*common.Video
-func ToKitexVideoList(ctx context.Context, curr_user_id int64, curr_user_token string, db_video []*db.Video) ([]*common.Video, error) {
-	kitex_videos := make([]*common.Video, 0, len(db_video))
-	for _, video := range db_video {
-		kitex_video, err := ToKitexVideo(ctx, curr_user_id, curr_user_token, video)
-		if err != nil {
+// ToKitexVideoList converts []*db.Video to []*common.Video
+func ToKitexVideoList(ctx context.Context, curr_user_id int64, curr_user_token string, db_videos []*db.Video) ([]*common.Video, error) {
+	kitex_videos := make([]*common.Video, 0, len(db_videos))
+	err_chan := make(chan error)
+	video_chan := make(chan *common.Video)
+	for _, db_video := range db_videos {
+		go func(db_video *db.Video) {
+			kitex_video, err := ToKitexVideo(ctx, curr_user_id, curr_user_token, db_video)
+			if err != nil {
+				err_chan <- err
+			} else {
+				video_chan <- kitex_video
+			}
+		}(db_video)
+	}
+	for i := 0; i < len(db_videos); i++ {
+		select {
+		case err := <-err_chan:
 			return nil, err
+		case kitex_video := <-video_chan:
+			kitex_videos = append(kitex_videos, kitex_video)
 		}
-		kitex_videos = append(kitex_videos, kitex_video)
 	}
 	return kitex_videos, nil
 }
