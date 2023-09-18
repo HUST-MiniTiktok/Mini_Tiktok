@@ -8,6 +8,8 @@
 * Docker 24.0.5
 * FFmpeg 5.1.2
 ## 项目部署
+### 配置
+根据项目运行环境填写[**Conf包**](https://github.com/HUST-MiniTiktok/mini_tiktok/tree/master/pkg/conf)下的YAML配置文件
 ### 启动
 ```bash
 chmod +x ./start-all.sh && ./start-all.sh
