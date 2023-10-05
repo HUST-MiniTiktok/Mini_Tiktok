@@ -39,7 +39,7 @@ func main() {
 		server.WithMiddleware(kitex.CommonMiddleware),
 		server.WithMiddleware(kitex.ServerMiddleware),
 		server.WithMuxTransport(),
-		server.WithLimit(&limit.Option{MaxConnections: 10000, MaxQPS: 100000}),
+		server.WithLimit(&limit.Option{MaxConnections: 10000000, MaxQPS: 100000000}),
 		server.WithRegistry(r),
 	}
 	if conf.GetConf().GetBool("tracer.enabled") {

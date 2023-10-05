@@ -6,6 +6,7 @@ replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
 
 require (
 	github.com/apache/thrift v0.13.0
+	github.com/bits-and-blooms/bloom/v3 v3.5.0
 	github.com/cloudwego/kitex v0.7.1
 	github.com/google/uuid v1.3.0
 	github.com/opentracing/opentracing-go v1.2.0
@@ -15,6 +16,7 @@ require (
 
 require (
 	github.com/aws/aws-sdk-go v1.38.20 // indirect
+	github.com/bits-and-blooms/bitset v1.8.0 // indirect
 	github.com/bytedance/go-tagexpr/v2 v2.9.2 // indirect
 	github.com/cloudwego/dynamicgo v0.1.3 // indirect
 	github.com/cloudwego/localsession v0.0.2 // indirect

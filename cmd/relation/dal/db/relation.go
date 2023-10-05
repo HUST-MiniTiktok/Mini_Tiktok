@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"strconv"
 	"time"
 
 	"gorm.io/gorm"
@@ -39,6 +40,9 @@ func CreateFollow(ctx context.Context, follow *Follow) (id int64, err error) {
 	go RDAddFollow(follow.UserId, follow.FollowerId)
 	go RDAddFollower(follow.UserId, follow.FollowerId)
 
+	go Filter.AddToBloomFilter(strconv.Itoa(int(follow.UserId)))
+	go Filter.AddToBloomFilter(strconv.Itoa(int(follow.FollowerId)))
+
 	return follow.ID, nil
 }
 
@@ -61,6 +65,16 @@ func CheckFollow(ctx context.Context, user_id int64, follower_id int64) (ok bool
 		return RDExistFollowValue(user_id, follower_id), nil
 	} else if RDExistFollowerKey(user_id) {
 		return RDExistFollowerValue(user_id, follower_id), nil
+	}
+
+	exist := Filter.TestBloom(strconv.Itoa(int(user_id)))
+	if !exist { // user not exist
+		return false, nil
+	}
+
+	exist = Filter.TestBloom(strconv.Itoa(int(follower_id)))
+	if !exist { // user not exist
+		return false, nil
 	}
 
 	var db_follow Follow
@@ -88,6 +102,11 @@ func GetFollowUserIdList(ctx context.Context, userId int64) (user_ids []int64, e
 		return RDGetFollowList(userId), nil
 	}
 
+	exist := Filter.TestBloom(strconv.Itoa(int(userId)))
+	if !exist { // user not exist
+		return nil, nil
+	}
+
 	var follows []Follow
 	err = DB.WithContext(ctx).Where("follower_id = ?", userId).Order("user_id asc").Find(&follows).Error
 	if err != nil {
@@ -103,6 +122,11 @@ func GetFollowUserIdList(ctx context.Context, userId int64) (user_ids []int64, e
 func GetFollowerUserIdList(ctx context.Context, userId int64) (user_ids []int64, err error) {
 	if RDExistFollowerKey(userId) {
 		return RDGetFollowerList(userId), nil
+	}
+
+	exist := Filter.TestBloom(strconv.Itoa(int(userId)))
+	if !exist { // user not exist
+		return nil, nil
 	}
 
 	var follows []Follow
@@ -124,6 +148,11 @@ func GetFriendUserIdList(ctx context.Context, userId int64) (user_ids []int64, e
 		return RDGetFriendList(userId), nil
 	}
 
+	exist := Filter.TestBloom(strconv.Itoa(int(userId)))
+	if !exist { // user not exist
+		return nil, nil
+	}
+
 	var follows []Follow
 	err = DB.WithContext(ctx).Where("user_id = ?", userId).Where("follower_id IN (SELECT user_id FROM follow WHERE follower_id = ?)", userId).Order("user_id asc").Find(&follows).Error
 	if err != nil {
@@ -140,6 +169,12 @@ func GetFollowUserCount(ctx context.Context, userId int64) (count int64, err err
 	if RDExistFollowKey(userId) {
 		return RDCountFollow(userId), nil
 	}
+
+	exist := Filter.TestBloom(strconv.Itoa(int(userId)))
+	if !exist { // user not exist
+		return 0, nil
+	}
+
 	err = DB.WithContext(ctx).Model(&Follow{}).Where("follower_id = ?", userId).Count(&count).Error
 	if err != nil {
 		return -1, err
@@ -152,6 +187,12 @@ func GetFollowerUserCount(ctx context.Context, userId int64) (count int64, err e
 	if RDExistFollowerKey(userId) {
 		return RDCountFollower(userId), nil
 	}
+
+	exist := Filter.TestBloom(strconv.Itoa(int(userId)))
+	if !exist { // user not exist
+		return 0, nil
+	}
+
 	err = DB.WithContext(ctx).Model(&Follow{}).Where("user_id = ?", userId).Count(&count).Error
 	if err != nil {
 		return -1, err
@@ -166,6 +207,12 @@ func GetFriendUserCount(ctx context.Context, userId int64) (count int64, err err
 	if RDExistFollowKey(userId) && RDExistFollowerKey(userId) {
 		return RDCountFriend(userId), nil
 	}
+
+	exist := Filter.TestBloom(strconv.Itoa(int(userId)))
+	if !exist { // user not exist
+		return 0, nil
+	}
+
 	err = DB.WithContext(ctx).Model(&Follow{}).Where("user_id = ?", userId).Where("follower_id IN (SELECT user_id FROM follow WHERE follower_id = ?)", userId).Count(&count).Error
 	if err != nil {
 		return -1, err

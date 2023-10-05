@@ -2,6 +2,7 @@ package db
 
 import (
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/bloomfilter"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/redis"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -11,6 +12,7 @@ import (
 var (
 	DB       *gorm.DB
 	RDClient *redis.RDClient
+	Filter   *bloomfilter.BloomFilter
 )
 
 // Init Mysql DB
@@ -33,4 +35,6 @@ func Init() {
 	DB.AutoMigrate(&Follow{})
 
 	RDClient = redis.NewRDClient(conf.GetConf().GetInt("db.redis.id.relation"))
+
+	Filter = bloomfilter.NewBloomFilter(10000, 0.01)
 }

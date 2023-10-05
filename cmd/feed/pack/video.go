@@ -14,6 +14,7 @@ import (
 
 // ToKitexVideo: convert db.Video to common.Video
 func ToKitexVideo(ctx context.Context, curr_user_id int64, curr_user_token string, db_video *db.Video) (*common.Video, error) {
+
 	kitex_video := &common.Video{
 		Id:       db_video.ID,
 		PlayUrl:  oss.ToRealURL(ctx, db_video.PlayURL),

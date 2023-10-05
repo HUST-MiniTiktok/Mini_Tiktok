@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"strconv"
 	"time"
 
 	"gorm.io/gorm"
@@ -52,6 +53,9 @@ func NewFavorite(ctx context.Context, user_id int64, video_id int64) (status int
 	go RDIncrVideoFavoriteCount(video_id, 1)
 	go RDIncrUserFavoriteCount(user_id, 1)
 
+	go Filter.AddToBloomFilter(strconv.Itoa(int(video_id)))
+	go Filter.AddToBloomFilter(strconv.Itoa(int(user_id)))
+
 	return 0, nil
 }
 
@@ -86,6 +90,11 @@ func VideoFavoriteCount(ctx context.Context, video_id int64) (count int64, err e
 		return RDGetVideoFavoriteCount(video_id), nil
 	}
 
+	exist := Filter.TestBloom(strconv.Itoa(int(video_id)))
+	if !exist { // video not exist
+		return 0, nil
+	}
+
 	err = DB.WithContext(ctx).Model(&Favorite{}).Where(&Favorite{VideoId: video_id}).Count(&count).Error
 	if err != nil {
 		return 0, err
@@ -101,6 +110,11 @@ func UserFavoriteCount(ctx context.Context, user_id int64) (count int64, err err
 
 	if RDExistUserFavoriteCount(user_id) {
 		return RDGetUserFavoriteCount(user_id), nil
+	}
+
+	exist := Filter.TestBloom(strconv.Itoa(int(user_id)))
+	if !exist { // user not exist
+		return 0, nil
 	}
 
 	err = DB.WithContext(ctx).Model(&Favorite{}).Where(&Favorite{UserId: user_id}).Count(&count).Error

@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"strconv"
 	"time"
 
 	"gorm.io/gorm"
@@ -38,6 +39,7 @@ func NewComment(ctx context.Context, user_id int64, video_id int64, comment_text
 	})
 
 	go RDIncrCommentCount(video_id, 1)
+	go Filter.AddToBloomFilter(strconv.Itoa(int(video_id)))
 
 	return comment, err
 }
@@ -68,6 +70,11 @@ func GetVideoCommentCounts(ctx context.Context, video_id int64) (count int64, er
 
 	if RDExistCommentCount(video_id) {
 		return RDGetCommentCount(video_id), nil
+	}
+
+	exist := Filter.TestBloom(strconv.Itoa(int(video_id)))
+	if !exist { // video not exist
+		return 0, nil
 	}
 
 	err = DB.WithContext(ctx).Model(&Comment{}).Where(&Comment{VideoId: video_id}).Count(&count).Error

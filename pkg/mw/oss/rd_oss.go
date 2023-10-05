@@ -1,6 +1,7 @@
 package oss
 
 import (
+	"math/rand"
 	"time"
 )
 
@@ -17,5 +18,5 @@ func RDGetURLMaping(db_url string) string {
 }
 
 func RDSetURLMaping(db_url string, real_url string) {
-	RDClient.Set(db_url, real_url, RDCacheExpire)
+	RDClient.Set(db_url, real_url, RDCacheExpire+time.Duration(rand.Intn(500))*time.Minute)
 }

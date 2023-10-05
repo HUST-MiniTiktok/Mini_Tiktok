@@ -1,6 +1,7 @@
 package db
 
 import (
+	"math/rand"
 	"strconv"
 	"time"
 )
@@ -14,7 +15,7 @@ const (
 func RDExistCommentCount(video_id int64) bool {
 	video_id_str := strconv.FormatInt(video_id, 10)
 	if RDClient.HExists(video_id_str, VCommentCount) {
-		RDClient.HExpire(video_id_str, RDCacheExpire)
+		RDClient.HExpire(video_id_str, RDCacheExpire+time.Duration(rand.Intn(200))*time.Minute)
 		return true
 	}
 	return false
@@ -29,7 +30,7 @@ func RDIncrCommentCount(video_id int64, val int64) {
 
 func RDSetCommentCount(video_id int64, val int64) {
 	video_id_str := strconv.FormatInt(video_id, 10)
-	RDClient.HSet(video_id_str, VCommentCount, val, RDCacheExpire)
+	RDClient.HSet(video_id_str, VCommentCount, val, RDCacheExpire+time.Duration(rand.Intn(200))*time.Minute)
 }
 
 func RDGetCommentCount(video_id int64) int64 {
