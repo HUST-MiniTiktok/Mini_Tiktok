@@ -27,23 +27,22 @@ func (Favorite) TableName() string {
 }
 
 // NewFavorite Create a new favorite record
-// status 返回0——成功，返回1——失败
-// err 返回nil——成功，返回其他——失败原因
+// status 0:success 1:failed
 func NewFavorite(ctx context.Context, user_id int64, video_id int64) (status int32, err error) {
 
 	favorite := Favorite{
 		UserId:  user_id,
 		VideoId: video_id}
 
-	err = DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		status, err := CheckFavorite(ctx, user_id, video_id)
-		if err != nil {
-			return err
-		}
-		if status { // 重复点赞
-			return nil
-		}
+	isFavorited, err := CheckFavorite(ctx, user_id, video_id)
+	if err != nil {
+		return 1, err
+	}
+	if isFavorited { // Repeat favorite
+		return 1, nil
+	}
 
+	err = DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		if err := tx.WithContext(ctx).Model(&Favorite{}).Create(&favorite).Error; err != nil {
 			return err
 		}
