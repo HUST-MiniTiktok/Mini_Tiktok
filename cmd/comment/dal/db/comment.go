@@ -5,10 +5,15 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/redis"
+	"github.com/cloudwego/kitex/pkg/klog"
+
 	"gorm.io/gorm"
 )
 
-const CommentTableName = "comment"
+const (
+	CommentTableName = "comment"
+)
 
 type Comment struct {
 	ID          int64          `json:"id" gorm:"primaryKey;autoincrement"`
@@ -72,17 +77,38 @@ func GetVideoCommentCounts(ctx context.Context, video_id int64) (count int64, er
 		return RDGetCommentCount(video_id), nil
 	}
 
-	exist := Filter.TestBloom(strconv.Itoa(int(video_id)))
-	if !exist { // video not exist
-		return 0, nil
+	// cache do not exist，try to query from mysql
+	if RDClient.AcquireLock(video_id, CommentCountField) {
+		defer RDClient.ReleaseLock(video_id, CommentCountField)
+
+		exist := Filter.TestBloom(strconv.Itoa(int(video_id)))
+		if !exist { // video not exist
+			return 0, nil
+		}
+
+		err = DB.WithContext(ctx).Model(&Comment{}).Where(&Comment{VideoId: video_id}).Count(&count).Error
+		if err != nil {
+			return 0, err
+		}
+		go RDSetCommentCount(video_id, count)
+		return count, nil
 	}
 
-	err = DB.WithContext(ctx).Model(&Comment{}).Where(&Comment{VideoId: video_id}).Count(&count).Error
+	time.Sleep(redis.RetryTime) // delay and retry
+	return GetVideoCommentCounts(ctx, video_id)
+}
+
+func LoadCommentVideoIDToBloomFilter(ctx context.Context) error {
+	var videoIdList []string
+
+	err := DB.WithContext(ctx).Model(&Comment{}).Pluck("VideoId", &videoIdList).Error
 	if err != nil {
-		return 0, err
+		klog.Errorf("Load Comment VideoID To BloomFilter Failed: %v", err)
+		return err
 	}
 
-	go RDSetCommentCount(video_id, count)
-
-	return count, nil
+	for _, video_id := range videoIdList {
+		Filter.AddToBloomFilter(video_id)
+	}
+	return nil
 }

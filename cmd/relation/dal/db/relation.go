@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/redis"
+	"github.com/cloudwego/kitex/pkg/klog"
 	"gorm.io/gorm"
 )
 
@@ -67,33 +69,40 @@ func CheckFollow(ctx context.Context, user_id int64, follower_id int64) (ok bool
 		return RDExistFollowerValue(user_id, follower_id), nil
 	}
 
-	exist := Filter.TestBloom(strconv.Itoa(int(user_id)))
-	if !exist { // user not exist
-		return false, nil
-	}
+	// cache do not exist，try to query from mysql
+	if RDClient.AcquireLock(user_id, FollowSuffix) {
+		defer RDClient.ReleaseLock(user_id, FollowSuffix)
 
-	exist = Filter.TestBloom(strconv.Itoa(int(follower_id)))
-	if !exist { // user not exist
-		return false, nil
-	}
+		exist := Filter.TestBloom(strconv.Itoa(int(user_id)))
+		if !exist { // user not exist
+			return false, nil
+		}
 
-	var db_follow Follow
-	err = DB.WithContext(ctx).Where("user_id = ? and follower_id = ?", user_id, follower_id).Limit(1).Find(&db_follow).Error
-	if err != nil {
-		return false, err
+		exist = Filter.TestBloom(strconv.Itoa(int(follower_id)))
+		if !exist { // user not exist
+			return false, nil
+		}
+
+		var db_follow Follow
+		err = DB.WithContext(ctx).Where("user_id = ? and follower_id = ?", user_id, follower_id).Limit(1).Find(&db_follow).Error
+		if err != nil {
+			return false, err
+		}
+		result := db_follow != (Follow{})
+		if result {
+			go func() {
+				if !RDExistFollowKey(follower_id) || !RDExistFollowValue(user_id, follower_id) {
+					RDAddFollow(user_id, follower_id)
+				}
+				if !RDExistFollowerKey(user_id) || !RDExistFollowerValue(user_id, follower_id) {
+					RDAddFollower(user_id, follower_id)
+				}
+			}()
+		}
+		return result, nil
 	}
-	result := db_follow != (Follow{})
-	if result {
-		go func() {
-			if !RDExistFollowKey(follower_id) || !RDExistFollowValue(user_id, follower_id) {
-				RDAddFollow(user_id, follower_id)
-			}
-			if !RDExistFollowerKey(user_id) || !RDExistFollowerValue(user_id, follower_id) {
-				RDAddFollower(user_id, follower_id)
-			}
-		}()
-	}
-	return result, nil
+	time.Sleep(redis.RetryTime) // delay and retry
+	return CheckFollow(ctx, user_id, follower_id)
 }
 
 // GetFollowById: get a follow user id list by current user id
@@ -102,20 +111,27 @@ func GetFollowUserIdList(ctx context.Context, userId int64) (user_ids []int64, e
 		return RDGetFollowList(userId), nil
 	}
 
-	exist := Filter.TestBloom(strconv.Itoa(int(userId)))
-	if !exist { // user not exist
-		return nil, nil
-	}
+	// cache do not exist，try to query from mysql
+	if RDClient.AcquireLock(userId, FollowSuffix) {
+		defer RDClient.ReleaseLock(userId, FollowSuffix)
 
-	var follows []Follow
-	err = DB.WithContext(ctx).Where("follower_id = ?", userId).Order("user_id asc").Find(&follows).Error
-	if err != nil {
-		return nil, err
+		exist := Filter.TestBloom(strconv.Itoa(int(userId)))
+		if !exist { // user not exist
+			return nil, nil
+		}
+
+		var follows []Follow
+		err = DB.WithContext(ctx).Where("follower_id = ?", userId).Order("user_id asc").Find(&follows).Error
+		if err != nil {
+			return nil, err
+		}
+		for _, follow := range follows {
+			user_ids = append(user_ids, follow.UserId)
+		}
+		return user_ids, nil
 	}
-	for _, follow := range follows {
-		user_ids = append(user_ids, follow.UserId)
-	}
-	return user_ids, nil
+	time.Sleep(redis.RetryTime) // delay and retry
+	return GetFollowUserIdList(ctx, userId)
 }
 
 // GetFollowerUserIdList: get a follower user id list by current user id
@@ -124,20 +140,27 @@ func GetFollowerUserIdList(ctx context.Context, userId int64) (user_ids []int64,
 		return RDGetFollowerList(userId), nil
 	}
 
-	exist := Filter.TestBloom(strconv.Itoa(int(userId)))
-	if !exist { // user not exist
-		return nil, nil
-	}
+	// cache do not exist，try to query from mysql
+	if RDClient.AcquireLock(userId, FollowerSuffix) {
+		defer RDClient.ReleaseLock(userId, FollowerSuffix)
 
-	var follows []Follow
-	err = DB.WithContext(ctx).Where("user_id = ?", userId).Order("user_id asc").Find(&follows).Error
-	if err != nil {
-		return nil, err
+		exist := Filter.TestBloom(strconv.Itoa(int(userId)))
+		if !exist { // user not exist
+			return nil, nil
+		}
+
+		var follows []Follow
+		err = DB.WithContext(ctx).Where("user_id = ?", userId).Order("user_id asc").Find(&follows).Error
+		if err != nil {
+			return nil, err
+		}
+		for _, follow := range follows {
+			user_ids = append(user_ids, follow.FollowerId)
+		}
+		return user_ids, nil
 	}
-	for _, follow := range follows {
-		user_ids = append(user_ids, follow.FollowerId)
-	}
-	return user_ids, nil
+	time.Sleep(redis.RetryTime) // delay and retry
+	return GetFollowerUserIdList(ctx, userId)
 }
 
 // GetFriendUserIdList: get a friend user id list by current user id
@@ -148,74 +171,131 @@ func GetFriendUserIdList(ctx context.Context, userId int64) (user_ids []int64, e
 		return RDGetFriendList(userId), nil
 	}
 
-	exist := Filter.TestBloom(strconv.Itoa(int(userId)))
-	if !exist { // user not exist
-		return nil, nil
-	}
+	// cache do not exist，try to query from mysql
+	if RDClient.AcquireLock(userId, FollowSuffix+FollowerSuffix) {
+		defer RDClient.ReleaseLock(userId, FollowSuffix+FollowerSuffix)
 
-	var follows []Follow
-	err = DB.WithContext(ctx).Where("user_id = ?", userId).Where("follower_id IN (SELECT user_id FROM follow WHERE follower_id = ?)", userId).Order("user_id asc").Find(&follows).Error
-	if err != nil {
-		return nil, err
+		exist := Filter.TestBloom(strconv.Itoa(int(userId)))
+		if !exist { // user not exist
+			return nil, nil
+		}
+
+		var follows []Follow
+		err = DB.WithContext(ctx).Where("user_id = ?", userId).Where("follower_id IN (SELECT user_id FROM follow WHERE follower_id = ?)", userId).Order("user_id asc").Find(&follows).Error
+		if err != nil {
+			return nil, err
+		}
+		for _, follow := range follows {
+			user_ids = append(user_ids, follow.FollowerId)
+		}
+		return user_ids, nil
 	}
-	for _, follow := range follows {
-		user_ids = append(user_ids, follow.FollowerId)
-	}
-	return user_ids, nil
+	time.Sleep(redis.RetryTime) // delay and retry
+	return GetFriendUserIdList(ctx, userId)
 }
 
-// GetFollowUserList: get a follow user list by current user id
+// GetFollowUserCount: get a follow user count number of current user id
 func GetFollowUserCount(ctx context.Context, userId int64) (count int64, err error) {
 	if RDExistFollowKey(userId) {
 		return RDCountFollow(userId), nil
 	}
 
-	exist := Filter.TestBloom(strconv.Itoa(int(userId)))
-	if !exist { // user not exist
-		return 0, nil
-	}
+	// cache do not exist，try to query from mysql
+	if RDClient.AcquireLock(userId, FollowSuffix) {
+		defer RDClient.ReleaseLock(userId, FollowSuffix)
 
-	err = DB.WithContext(ctx).Model(&Follow{}).Where("follower_id = ?", userId).Count(&count).Error
-	if err != nil {
-		return -1, err
+		exist := Filter.TestBloom(strconv.Itoa(int(userId)))
+		if !exist { // user not exist
+			return 0, nil
+		}
+
+		err = DB.WithContext(ctx).Model(&Follow{}).Where("follower_id = ?", userId).Count(&count).Error
+		if err != nil {
+			return -1, err
+		}
+		return count, nil
 	}
-	return count, nil
+	time.Sleep(redis.RetryTime) // delay and retry
+	return GetFollowUserCount(ctx, userId)
 }
 
-// GetFollowerUserList: get a follower user list by current user id
+// GetFollowerUserCount: get a follower user count number of current user id
 func GetFollowerUserCount(ctx context.Context, userId int64) (count int64, err error) {
 	if RDExistFollowerKey(userId) {
 		return RDCountFollower(userId), nil
 	}
 
-	exist := Filter.TestBloom(strconv.Itoa(int(userId)))
-	if !exist { // user not exist
-		return 0, nil
-	}
+	// cache do not exist，try to query from mysql
+	if RDClient.AcquireLock(userId, FollowSuffix+FollowerSuffix) {
+		defer RDClient.ReleaseLock(userId, FollowSuffix+FollowerSuffix)
 
-	err = DB.WithContext(ctx).Model(&Follow{}).Where("user_id = ?", userId).Count(&count).Error
-	if err != nil {
-		return -1, err
+		exist := Filter.TestBloom(strconv.Itoa(int(userId)))
+		if !exist { // user not exist
+			return 0, nil
+		}
+
+		err = DB.WithContext(ctx).Model(&Follow{}).Where("user_id = ?", userId).Count(&count).Error
+		if err != nil {
+			return -1, err
+		}
+		return count, nil
 	}
-	return count, nil
+	time.Sleep(redis.RetryTime) // delay and retry
+	return GetFollowerUserCount(ctx, userId)
 }
 
-// GetFriendUserList: get a friend user list by current user id
+// GetFriendUserCount: get a friend user count number of current user id
 func GetFriendUserCount(ctx context.Context, userId int64) (count int64, err error) {
 	// Friend 要求 A关注B 且 B关注A
 	// user_id 表示被关注者A, follower_id 表示关注者B
 	if RDExistFollowKey(userId) && RDExistFollowerKey(userId) {
 		return RDCountFriend(userId), nil
 	}
+	// cache do not exist，try to query from mysql
+	if RDClient.AcquireLock(userId, FollowSuffix+FollowerSuffix) {
+		defer RDClient.ReleaseLock(userId, FollowSuffix+FollowerSuffix)
 
-	exist := Filter.TestBloom(strconv.Itoa(int(userId)))
-	if !exist { // user not exist
-		return 0, nil
+		exist := Filter.TestBloom(strconv.Itoa(int(userId)))
+		if !exist { // user not exist
+			return 0, nil
+		}
+
+		err = DB.WithContext(ctx).Model(&Follow{}).Where("user_id = ?", userId).Where("follower_id IN (SELECT user_id FROM follow WHERE follower_id = ?)", userId).Count(&count).Error
+		if err != nil {
+			return -1, err
+		}
+		return count, nil
 	}
+	time.Sleep(redis.RetryTime) // delay and retry
+	return GetFriendUserCount(ctx, userId)
+}
 
-	err = DB.WithContext(ctx).Model(&Follow{}).Where("user_id = ?", userId).Where("follower_id IN (SELECT user_id FROM follow WHERE follower_id = ?)", userId).Count(&count).Error
+func LoadRelationUserIDToBloomFilter(ctx context.Context) error {
+	var userIdList []string
+
+	err := DB.WithContext(ctx).Model(&Follow{}).Pluck("UserId", &userIdList).Error
 	if err != nil {
-		return -1, err
+		klog.Errorf("Load Relation UserID To BloomFilter Failed: %v", err)
+		return err
 	}
-	return count, nil
+
+	for _, user_id := range userIdList {
+		Filter.AddToBloomFilter(user_id)
+	}
+	return nil
+}
+
+func LoadRelationFollowerIDToBloomFilter(ctx context.Context) error {
+	var userIdList []string
+
+	err := DB.WithContext(ctx).Model(&Follow{}).Pluck("FollowerId", &userIdList).Error
+	if err != nil {
+		klog.Errorf("Load Relation FollowerID To BloomFilter Failed: %v", err)
+		return err
+	}
+
+	for _, user_id := range userIdList {
+		Filter.AddToBloomFilter(user_id)
+	}
+	return nil
 }

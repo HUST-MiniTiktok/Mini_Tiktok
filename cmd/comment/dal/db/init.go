@@ -1,6 +1,8 @@
 package db
 
 import (
+	"context"
+
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/bloomfilter"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/redis"
@@ -37,4 +39,6 @@ func Init() {
 	RDClient = redis.NewRDClient(conf.GetConf().GetInt("db.redis.id.comment"))
 
 	Filter = bloomfilter.NewBloomFilter(10000, 0.01)
+	ctx := context.Background()
+	LoadCommentVideoIDToBloomFilter(ctx)
 }

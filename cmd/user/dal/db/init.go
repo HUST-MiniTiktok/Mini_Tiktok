@@ -7,7 +7,9 @@ import (
 	gormopentracing "gorm.io/plugin/opentracing"
 )
 
-var DB *gorm.DB
+var (
+	DB *gorm.DB
+)
 
 // Init Mysql DB
 func Init() {
