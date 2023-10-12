@@ -30,3 +30,10 @@ func (s *CommentServiceImpl) GetVideoCommentCount(ctx context.Context, request *
 	resp, err = comment_service.GetVideoCommentCount(request)
 	return
 }
+
+// GetVideoCommentListCount implements the CommentServiceImpl interface.
+func (s *CommentServiceImpl) GetVideoCommentListCount(ctx context.Context, request *comment.GetVideoCommentCountListRequest) (resp *comment.GetVideoCommentCountListResponse, err error) {
+	comment_service := service.NewCommentService(ctx)
+	resp, err = comment_service.GetVideoCommentCountList(request)
+	return
+}

@@ -71,7 +71,7 @@ func GetVideoComments(ctx context.Context, video_id int64) ([]*Comment, error) {
 }
 
 // GetVideoComments returns the number of comments of the inputed video.
-func GetVideoCommentCounts(ctx context.Context, video_id int64) (count int64, err error) {
+func GetVideoCommentCount(ctx context.Context, video_id int64) (count int64, err error) {
 
 	if RDExistCommentCount(video_id) {
 		return RDGetCommentCount(video_id), nil
@@ -95,7 +95,20 @@ func GetVideoCommentCounts(ctx context.Context, video_id int64) (count int64, er
 	}
 
 	time.Sleep(redis.RetryTime) // delay and retry
-	return GetVideoCommentCounts(ctx, video_id)
+	return GetVideoCommentCount(ctx, video_id)
+}
+
+// GetVideoComments returns the number of comments of the inputed video.
+func GetVideoCommentCountList(ctx context.Context, video_id_list []int64) (count_list []int64, err error) {
+	size := len(video_id_list)
+	for i := 0; i < size; i++ {
+		count, err := GetVideoCommentCount(ctx, video_id_list[i])
+		if err != nil {
+			return nil, err
+		}
+		count_list[i] = count
+	}
+	return count_list, nil
 }
 
 func LoadCommentVideoIDToBloomFilter(ctx context.Context) error {

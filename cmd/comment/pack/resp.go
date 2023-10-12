@@ -16,3 +16,7 @@ func NewCommentListResponse(err error) *comment.CommentListResponse {
 func NewGetVideoCommentCountResponse(err error) *comment.GetVideoCommentCountResponse {
 	return conv.ToKitexBaseResponse(err, &comment.GetVideoCommentCountResponse{}).(*comment.GetVideoCommentCountResponse)
 }
+
+func NewGetVideoCommentCountListResponse(err error) *comment.GetVideoCommentCountListResponse {
+	return conv.ToKitexBaseResponse(err, &comment.GetVideoCommentCountListResponse{}).(*comment.GetVideoCommentCountListResponse)
+}

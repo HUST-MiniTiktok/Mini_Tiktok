@@ -35,13 +35,23 @@ struct CommentListResponse {
 }
 
 struct GetVideoCommentCountRequest {
-    1: i64 video_id // 视频id
+    1: i64 video_id                                     // 视频id
 }
 
 struct GetVideoCommentCountResponse {
     1: i32 status_code (go.tag="json:\"status_code\"")  // 状态码，0-成功，其他值-失败
     2: optional string status_msg                       // 返回状态描述
     3: i64 comment_count                                // 评论总数
+}
+
+struct GetVideoCommentCountListRequest {
+    1: list<i64> video_id_list                          // 视频id列表
+}
+
+struct GetVideoCommentCountListResponse {
+    1: i32 status_code (go.tag="json:\"status_code\"")  // 状态码，0-成功，其他值-失败
+    2: optional string status_msg                       // 返回状态描述
+    3: list<i64> comment_count_list                     // 评论总数列表
 }
 
 service CommentService {
@@ -51,4 +61,6 @@ service CommentService {
     CommentListResponse CommentList(1: CommentListRequest request) (api.get = "/douyin/comment/list/")
     // 获取视频评论总数
     GetVideoCommentCountResponse GetVideoCommentCount(1: GetVideoCommentCountRequest request)
+    // 根据视频ID列表获取评论数列表
+    GetVideoCommentCountListResponse GetVideoCommentListCount(1: GetVideoCommentCountListRequest request)
 }

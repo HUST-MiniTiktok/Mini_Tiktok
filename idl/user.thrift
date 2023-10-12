@@ -47,6 +47,17 @@ struct CheckUserIsExistResponse {
     3: bool is_exist                                        // 用户是否存在
 }
 
+struct GetUserListRequest {
+    1: list<i64> user_id_list                               // 用户id列表
+    2: string token                                         // 用户鉴权token
+}
+
+struct GetUserListResponse {
+    1: i32 status_code (go.tag="json:\"status_code\"")      // 状态码，0-成功，其他值-失败
+    2: optional string status_msg                           // 返回状态描述
+    3: list<common.User> user_list                          // 用户信息列表
+}
+
 service UserService {
     // 用户信息
     UserResponse User(1: UserRequest request) (api.get = "/douyin/user/")
@@ -56,4 +67,6 @@ service UserService {
     UserLoginResponse Login(1: UserLoginRequest request) (api.post = "/douyin/user/login/")
     // 检查用户是否存在
     CheckUserIsExistResponse CheckUserIsExist(1: CheckUserIsExistRequest request)
+    // 批量获取用户信息
+    GetUserListResponse GetUserList(1: GetUserListRequest request)
 }

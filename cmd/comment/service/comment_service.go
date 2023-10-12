@@ -86,11 +86,22 @@ func (s *CommentService) CommentList(request *comment.CommentListRequest) (resp 
 
 // GetVideoCommentCount implements the CommentServiceImpl interface.
 func (s *CommentService) GetVideoCommentCount(request *comment.GetVideoCommentCountRequest) (resp *comment.GetVideoCommentCountResponse, er error) {
-	count, err := db.GetVideoCommentCounts(s.ctx, request.VideoId)
+	count, err := db.GetVideoCommentCount(s.ctx, request.VideoId)
 	if err != nil {
 		return pack.NewGetVideoCommentCountResponse(err), err
 	}
 	resp = pack.NewGetVideoCommentCountResponse(errno.Success)
 	resp.CommentCount = count
+	return resp, nil
+}
+
+// GetVideoCommentCountList: Obtain a list of comment count based on the video ID list.
+func (s *CommentService) GetVideoCommentCountList(request *comment.GetVideoCommentCountListRequest) (resp *comment.GetVideoCommentCountListResponse, er error) {
+	count_list, err := db.GetVideoCommentCountList(s.ctx, request.VideoIdList)
+	if err != nil {
+		return pack.NewGetVideoCommentCountListResponse(err), err
+	}
+	resp = pack.NewGetVideoCommentCountListResponse(errno.Success)
+	resp.CommentCountList = count_list
 	return resp, nil
 }

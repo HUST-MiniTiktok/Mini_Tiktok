@@ -48,26 +48,26 @@ func TestGetVideoCommentCounts(t *testing.T) {
 	ctx := context.Background()
 	Init()
 
-	counts, err := GetVideoCommentCounts(ctx, 1)
+	counts, err := GetVideoCommentCount(ctx, 1)
 	log.Println(counts)
 	log.Println(err)
 
 	newcomment1, _ := NewComment(ctx, 1, 1, "亿烟丁真")
 	newcomment2, _ := NewComment(ctx, 2, 1, "鉴定为 王源剩太多导致的")
 	time.Sleep(time.Second)
-	counts, err = GetVideoCommentCounts(ctx, 1)
+	counts, err = GetVideoCommentCount(ctx, 1)
 	log.Println(counts)
 	log.Println(err)
 
 	DelComment(ctx, newcomment1.ID, 1)
 	time.Sleep(time.Second)
-	counts, err = GetVideoCommentCounts(ctx, 1)
+	counts, err = GetVideoCommentCount(ctx, 1)
 	log.Println(counts)
 	log.Println(err)
 
 	DelComment(ctx, newcomment2.ID, 1)
 	time.Sleep(time.Second)
-	counts, err = GetVideoCommentCounts(ctx, 1)
+	counts, err = GetVideoCommentCount(ctx, 1)
 	log.Println(counts)
 	log.Println(err)
 }

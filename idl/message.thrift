@@ -44,6 +44,18 @@ struct GetFriendLatestMsgResponse {
     4: i64 msgType                                      // message消息的类型，0 => 当前请求用户接收的消息， 1 => 当前请求用户发送的消息
 }
 
+struct GetFriendLatestMsgListRequest {
+    1: string token                                     // 用户鉴权token
+    2: list<i64> friend_user_id_list                    // 好友用户id 列表
+}
+
+struct GetFriendLatestMsgListResponse {
+    1: i32 status_code (go.tag="json:\"status_code\"")  // 状态码，0-成功，其他值-失败
+    2: optional string status_msg                       // 返回状态描述
+    3: optional list<string> message_list                          // 和该好友的最新聊天消息
+    4: list<i64> msgType_list                           // message消息的类型，0 => 当前请求用户接收的消息， 1 => 当前请求用户发送的消息
+}
+
 service MessageService {
     // 聊天记录
     MessageChatResponse MessageChat(MessageChatRequest request) (api.get = "/douyin/message/chat/")
@@ -51,4 +63,6 @@ service MessageService {
     MessageActionResponse MessageAction(MessageActionRequest request) (api.post = "/douyin/message/action/")
     // 获取好友最新消息
     GetFriendLatestMsgResponse GetFriendLatestMsg(GetFriendLatestMsgRequest request)
+    // 获取好友最新消息
+    GetFriendLatestMsgListResponse GetFriendLatestMsgList(GetFriendLatestMsgListRequest request)
 }

@@ -59,6 +59,19 @@ struct GetFollowInfoResponse {
     5: bool is_follow                                   // 是否关注
 }
 
+struct GetFollowInfoListRequest {
+    1: list<string> token_list     // 用户token
+    2: list<i64> to_user_id_list   // 对方用户id
+}
+
+struct GetFollowInfoListResponse {
+    1: i32 status_code (go.tag="json:\"status_code\"")  // 状态码，0-成功，其他值-失败
+    2: optional string status_msg                       // 返回状态描述
+    3: list<i64> follow_count_list                                 // 关注总数
+    4: list<i64> follower_count_list                               // 粉丝总数
+    5: list<bool> is_follow_list                                   // 是否关注
+}
+
 service RelationService {
     // 关注操作
     RelationActionResponse RelationAction(RelationActionRequest request) (api.post = "/douyin/relation/action/")
@@ -70,4 +83,6 @@ service RelationService {
     RelationFriendListResponse RelationFriendList(RelationFriendListRequest request) (api.get = "/douyin/relation/friend/list/")
     // 获取关注信息
     GetFollowInfoResponse GetFollowInfo(GetFollowInfoRequest request)
+    // 批量根据用户token和目标用户ID列表获取关注信息
+    GetFollowInfoListResponse GetFollowInfoList(GetFollowInfolistRequest request)
 }
