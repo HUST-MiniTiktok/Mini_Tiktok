@@ -99,15 +99,41 @@ func GetVideoCommentCount(ctx context.Context, video_id int64) (count int64, err
 }
 
 // GetVideoComments returns the number of comments of the inputed video.
+//
+//	func GetVideoCommentCountList(ctx context.Context, video_id_list []int64) (count_list []int64, err error) {
+//		size := len(video_id_list)
+//		for i := 0; i < size; i++ {
+//			count, err := GetVideoCommentCount(ctx, video_id_list[i])
+//			if err != nil {
+//				return nil, err
+//			}
+//			count_list[i] = count
+//		}
+//		return count_list, nil
+//	}
 func GetVideoCommentCountList(ctx context.Context, video_id_list []int64) (count_list []int64, err error) {
 	size := len(video_id_list)
-	for i := 0; i < size; i++ {
-		count, err := GetVideoCommentCount(ctx, video_id_list[i])
-		if err != nil {
-			return nil, err
+	var sql_video_id_list []int64
+	var sql_video_id_order []int
+	for i, j := 0, 0; i < size; i++ {
+		if RDExistCommentCount(video_id_list[i]) {
+			count_list[i] = RDGetCommentCount(video_id_list[i])
+		} else {
+			sql_video_id_order[j] = i
+			sql_video_id_list[j] = video_id_list[i]
+			j++
 		}
-		count_list[i] = count
 	}
+	if len(sql_video_id_list) == 0 {
+		return count_list, nil
+	}
+	// to do
+	// 批量查询
+	// err = DB.WithContext(ctx).Model(&Comment{}).Group("VideoId").Count(&count_list).Error
+	// if err != nil {
+	// 	return nil, err
+	// }
+
 	return count_list, nil
 }
 

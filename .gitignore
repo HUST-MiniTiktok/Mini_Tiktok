@@ -42,3 +42,7 @@ _testmain.go
 /.vscode
 *.local.yml
 dumped_hertz_remote_config.json
+**/log/*
+**/log/
+**/lib/*
+**/etc/*

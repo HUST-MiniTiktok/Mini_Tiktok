@@ -2,9 +2,11 @@ package db
 
 import (
 	"context"
+	"encoding/json"
 	"strconv"
 	"time"
 
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/mq"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/redis"
 	"github.com/cloudwego/kitex/pkg/klog"
 	"gorm.io/gorm"
@@ -30,10 +32,6 @@ func (Favorite) TableName() string {
 // status 0:success 1:failed
 func NewFavorite(ctx context.Context, user_id int64, video_id int64) (status int32, err error) {
 
-	favorite := Favorite{
-		UserId:  user_id,
-		VideoId: video_id}
-
 	isFavorited, err := CheckFavorite(ctx, user_id, video_id)
 	if err != nil {
 		return 1, err
@@ -42,22 +40,23 @@ func NewFavorite(ctx context.Context, user_id int64, video_id int64) (status int
 		return 1, nil
 	}
 
-	err = DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		if err := tx.WithContext(ctx).Model(&Favorite{}).Create(&favorite).Error; err != nil {
-			return err
-		}
-		return nil
-	})
-
-	if err != nil {
-		return 1, err
-	}
-
 	go RDIncrVideoFavoriteCount(video_id, 1)
 	go RDIncrUserFavoriteCount(user_id, 1)
 
 	go Filter.AddToBloomFilter(strconv.Itoa(int(video_id)))
 	go Filter.AddToBloomFilter(strconv.Itoa(int(user_id)))
+
+	// message queue
+	req := FavoriteMessage{
+		ActionType: 1,
+		UserId:     user_id,
+		VideoId:    video_id,
+	}
+	body, _ := json.Marshal(&req)
+	err = mq.SendMessage2MQ(body, FavoriteMQName)
+	if err != nil {
+		return 1, err
+	}
 
 	return 0, nil
 }
@@ -65,13 +64,20 @@ func NewFavorite(ctx context.Context, user_id int64, video_id int64) (status int
 // Cancel a favorite record
 func CancelFavorite(ctx context.Context, user_id int64, video_id int64) (status int32, err error) {
 
-	err = DB.WithContext(ctx).Model(&Favorite{}).Where("user_id = ? and video_id = ?", user_id, video_id).Delete(&Favorite{}).Error
+	go RDIncrVideoFavoriteCount(video_id, -1)
+	go RDIncrUserFavoriteCount(user_id, -1)
+
+	// message queue
+	req := FavoriteMessage{
+		ActionType: 2,
+		UserId:     user_id,
+		VideoId:    video_id,
+	}
+	body, _ := json.Marshal(&req)
+	err = mq.SendMessage2MQ(body, FavoriteMQName)
 	if err != nil {
 		return 1, err
 	}
-
-	go RDIncrVideoFavoriteCount(video_id, -1)
-	go RDIncrUserFavoriteCount(user_id, -1)
 
 	return 0, nil
 }

@@ -6,6 +6,7 @@ import (
 )
 
 const VideoTableName = "video"
+const feedNum = 5
 
 type Video struct {
 	ID          int64     `json:"id" gorm:"primaryKey;autoincrement"`
@@ -60,7 +61,7 @@ func GetVideoByAuthorId(ctx context.Context, authorId int64) (videos []*Video, e
 
 // GetVideosByLastPublishTime: get videos by last publish time
 func GetVideosByLastPublishTime(ctx context.Context, lastPublishTime time.Time) (videos []*Video, err error) {
-	err = DB.WithContext(ctx).Where("publish_time < ?", lastPublishTime).Order("publish_time desc").Limit(30).Find(&videos).Error
+	err = DB.WithContext(ctx).Where("publish_time < ?", lastPublishTime).Order("publish_time desc").Limit(feedNum).Find(&videos).Error
 	if err != nil {
 		return nil, err
 	}

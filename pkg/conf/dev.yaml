@@ -15,7 +15,7 @@ db:
       comment: 3
 
 oss:
-    endpoint: "222.20.61.122:12001"
+    endpoint: "222.20.60.12:12001"
     accesskey: "mini_tiktok_user"
     secretkey: "mini_tiktok_pass"
     videobucket: "video"
@@ -35,3 +35,10 @@ tracer:
   jaeger:
     host: "127.0.0.1"
     port: "12006"
+
+mq:
+  RabbitMQ: amqp
+  RabbitMQHost: "127.0.0.1"
+  RabbitMQPort: "5672"
+  RabbitMQUser: "admin"
+  RabbitMQPassWord: "admin"

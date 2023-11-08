@@ -59,6 +59,23 @@ services:
       - ETCD_LISTEN_PEER_URLS=http://0.0.0.0:2380
       - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
       - ETCD_ADVERTISE_CLIENT_URLS=http://etcd1:2379
+  rabbitmq:
+    restart: always
+    image: rabbitmq:management
+    container_name: mini_tiktok_rabbitmq
+    hostname: rabbit
+    privileged: true #给数据卷赋权限 避免启动出现Permission denied
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+      TZ: Asia/Shanghai
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - ./docker/rabbitmq/lib:/var/lib/rabbitmq
+      - ./docker/rabbitmq/etc:/etc/rabbitmq
+      - ./docker/rabbitmq/log:/var/log/rabbitmq
 
   jaeger:
     image: jaegertracing/all-in-one:latest

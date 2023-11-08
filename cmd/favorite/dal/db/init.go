@@ -5,6 +5,7 @@ import (
 
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/conf"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/bloomfilter"
+	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/mq"
 	"github.com/HUST-MiniTiktok/mini_tiktok/pkg/mw/redis"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -16,6 +17,8 @@ var (
 	RDClient *redis.RDClient
 	Filter   *bloomfilter.BloomFilter
 )
+
+const FavoriteMQName = "favorite-queue"
 
 // Init Mysql DB
 func Init() {
@@ -42,4 +45,7 @@ func Init() {
 	ctx := context.Background()
 	LoadFavoriteVideoIDToBloomFilter(ctx)
 	LoadFavoriteUserIDToBloomFilter(ctx)
+
+	mq.InitRabbitMQ()
+	LoadSyncMQ()
 }
